@@ -1,8 +1,7 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
 
-// Edge runtime disabled for better dev performance
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 // Mission data (static for now, can be fetched from API later)
 interface MissionData {
