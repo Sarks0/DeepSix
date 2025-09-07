@@ -20,27 +20,59 @@ interface RoverPhoto {
     landing_date: string;
     launch_date: string;
     status: string;
+    max_sol?: number;
+    max_date?: string;
+    total_photos?: number;
   };
 }
 
-// Known good sols for fallback
-const FALLBACK_SOLS: Record<RoverName, number[]> = {
-  perseverance: [900, 800, 700, 600, 500, 400, 300, 200, 100],
-  curiosity: [3000, 2500, 2000, 1500, 1000, 500, 100],
-  opportunity: [5000, 4000, 3000, 2000, 1000],
-  spirit: [2000, 1500, 1000, 500, 100],
-};
+interface RoverManifest {
+  photo_manifest: {
+    name: string;
+    landing_date: string;
+    launch_date: string;
+    status: string;
+    max_sol: number;
+    max_date: string;
+    total_photos: number;
+    photos: Array<{
+      sol: number;
+      earth_date: string;
+      total_photos: number;
+      cameras: string[];
+    }>;
+  };
+}
 
 function isValidRover(rover: string): rover is RoverName {
   return ['perseverance', 'curiosity', 'opportunity', 'spirit'].includes(rover);
 }
 
+async function fetchRoverManifest(rover: RoverName, apiKey: string): Promise<RoverManifest | null> {
+  try {
+    const url = `https://api.nasa.gov/mars-photos/api/v1/manifests/${rover}?api_key=${apiKey}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      console.error(`Failed to fetch manifest: ${response.status}`);
+      return null;
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error(`Error fetching manifest for ${rover}:`, error);
+    return null;
+  }
+}
+
 async function fetchRoverPhotos(
   rover: RoverName,
   sol: number,
-  apiKey: string
+  apiKey: string,
+  camera?: string
 ): Promise<RoverPhoto[]> {
-  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${sol}&api_key=${apiKey}`;
+  const cameraParam = camera ? `&camera=${camera}` : '';
+  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${sol}&api_key=${apiKey}${cameraParam}`;
   
   try {
     const response = await fetch(url);
@@ -57,24 +89,99 @@ async function fetchRoverPhotos(
   }
 }
 
-async function getLatestPhotos(
+async function fetchLatestPhotos(
   rover: RoverName,
-  limit: number,
-  apiKey: string
+  apiKey: string,
+  limit: number = 50
 ): Promise<RoverPhoto[]> {
-  // Try to get recent photos by checking last few sols
-  const fallbackSols = FALLBACK_SOLS[rover] || [1000, 500, 100];
+  try {
+    // First, try the latest_photos endpoint for the most recent photos
+    const latestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
+    const latestResponse = await fetch(latestUrl);
+    
+    if (latestResponse.ok) {
+      const latestData = await latestResponse.json();
+      if (latestData.latest_photos && latestData.latest_photos.length > 0) {
+        // Return the requested number of latest photos
+        return latestData.latest_photos.slice(0, limit);
+      }
+    }
+  } catch (error) {
+    console.error(`Error fetching latest photos for ${rover}:`, error);
+  }
   
-  for (const sol of fallbackSols) {
+  // Fallback: Get manifest and fetch from recent sols
+  const manifest = await fetchRoverManifest(rover, apiKey);
+  if (!manifest) {
+    return [];
+  }
+  
+  const maxSol = manifest.photo_manifest.max_sol;
+  const recentPhotos: RoverPhoto[] = [];
+  
+  // Try to get photos from the last 30 sols with photos
+  const recentSols = manifest.photo_manifest.photos
+    .slice(-30)
+    .reverse()
+    .map(p => p.sol);
+  
+  for (const sol of recentSols) {
+    if (recentPhotos.length >= limit) break;
+    
     const photos = await fetchRoverPhotos(rover, sol, apiKey);
     if (photos.length > 0) {
-      return photos.slice(0, limit);
+      // Add variety by selecting from different cameras
+      const byCamera = new Map<string, RoverPhoto[]>();
+      photos.forEach(photo => {
+        const cam = photo.camera.name;
+        if (!byCamera.has(cam)) {
+          byCamera.set(cam, []);
+        }
+        byCamera.get(cam)!.push(photo);
+      });
+      
+      // Take one from each camera in rotation
+      let added = 0;
+      const maxPerSol = Math.min(10, limit - recentPhotos.length);
+      while (added < maxPerSol && byCamera.size > 0) {
+        for (const [cam, camPhotos] of byCamera) {
+          if (camPhotos.length > 0 && added < maxPerSol) {
+            recentPhotos.push(camPhotos.shift()!);
+            added++;
+          }
+          if (camPhotos.length === 0) {
+            byCamera.delete(cam);
+          }
+        }
+      }
     }
   }
   
-  // If no photos found, try sol 1
-  const photos = await fetchRoverPhotos(rover, 1, apiKey);
-  return photos.slice(0, limit);
+  return recentPhotos.slice(0, limit);
+}
+
+async function getPhotosByDateRange(
+  rover: RoverName,
+  startDate: string,
+  endDate: string,
+  apiKey: string,
+  limit: number = 50
+): Promise<RoverPhoto[]> {
+  // Fetch photos between two Earth dates
+  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?earth_date=${startDate}&api_key=${apiKey}`;
+  
+  try {
+    const response = await fetch(url);
+    if (!response.ok) {
+      return [];
+    }
+    
+    const data = await response.json();
+    return (data.photos || []).slice(0, limit);
+  } catch (error) {
+    console.error(`Error fetching photos by date for ${rover}:`, error);
+    return [];
+  }
 }
 
 export async function GET(
@@ -84,8 +191,13 @@ export async function GET(
   try {
     const { rover } = await context.params;
     const { searchParams } = new URL(request.url);
+    
+    // Parse query parameters
     const sol = searchParams.get('sol') ? parseInt(searchParams.get('sol')!) : undefined;
+    const earthDate = searchParams.get('earth_date');
+    const camera = searchParams.get('camera');
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
+    const latest = searchParams.get('latest') === 'true';
 
     // Validate rover name
     if (!isValidRover(rover)) {
@@ -100,24 +212,50 @@ export async function GET(
     // Get API key from environment
     const apiKey = getApiKey();
 
-    let photos: RoverPhoto[];
+    let photos: RoverPhoto[] = [];
+    let metadata: any = {};
 
-    if (sol !== undefined) {
+    if (latest || (!sol && !earthDate)) {
+      // Fetch latest photos (default behavior)
+      photos = await fetchLatestPhotos(rover, apiKey, limit);
+      metadata.type = 'latest';
+    } else if (earthDate) {
+      // Fetch by Earth date
+      photos = await getPhotosByDateRange(rover, earthDate, earthDate, apiKey, limit);
+      metadata.type = 'earth_date';
+      metadata.earth_date = earthDate;
+    } else if (sol !== undefined) {
       // Fetch specific sol
-      photos = await fetchRoverPhotos(rover, sol, apiKey);
+      photos = await fetchRoverPhotos(rover, sol, apiKey, camera);
       photos = photos.slice(0, limit);
-    } else {
-      // Fetch latest available photos
-      photos = await getLatestPhotos(rover, limit, apiKey);
+      metadata.type = 'sol';
+      metadata.sol = sol;
     }
+
+    // Get manifest data for additional info
+    const manifest = await fetchRoverManifest(rover, apiKey);
+    if (manifest) {
+      metadata.rover_info = {
+        max_sol: manifest.photo_manifest.max_sol,
+        max_date: manifest.photo_manifest.max_date,
+        total_photos: manifest.photo_manifest.total_photos,
+        status: manifest.photo_manifest.status
+      };
+    }
+
+    // Add cache headers for better performance
+    const headers = new Headers();
+    headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
 
     return NextResponse.json({
       photos,
       success: true,
       total: photos.length,
       rover,
-      sol: sol || 'latest',
-    });
+      metadata,
+      cached_until: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+    }, { headers });
+    
   } catch (error: any) {
     console.error('Mars photos API error:', error);
     return NextResponse.json(
