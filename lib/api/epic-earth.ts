@@ -3,8 +3,6 @@
 
 import { NASAApiBase, CircuitBreaker } from './base';
 import { getApiKey } from './config';
-
-const NASA_API_KEY = getApiKey();
 import {
   EPICResponse,
   EPICImageData,
@@ -398,10 +396,10 @@ export class EPICEarthAPI extends NASAApiBase {
     const basePath = `${baseUrl}/${collection}/${date.replace(/-/g, '/')}/png`;
 
     return {
-      thumbnail: `${basePath}/${imageName}.png?api_key=${NASA_API_KEY}`,
-      medium: `${basePath}/${imageName}.png?api_key=${NASA_API_KEY}`,
-      large: `${basePath}/${imageName}.png?api_key=${NASA_API_KEY}`,
-      archive: `${basePath}/${imageName}.png?api_key=${NASA_API_KEY}`,
+      thumbnail: `${basePath}/${imageName}.png?api_key=${getApiKey()}`,
+      medium: `${basePath}/${imageName}.png?api_key=${getApiKey()}`,
+      large: `${basePath}/${imageName}.png?api_key=${getApiKey()}`,
+      archive: `${basePath}/${imageName}.png?api_key=${getApiKey()}`,
     };
   }
 
