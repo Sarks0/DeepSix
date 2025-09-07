@@ -5,13 +5,14 @@ import Link from 'next/link';
 
 export default function AboutPage() {
   const techStack = [
-    { name: 'Next.js 14', description: 'React framework with App Router' },
+    { name: 'Next.js 15', description: 'React framework with App Router' },
     { name: 'TypeScript', description: 'Type-safe development' },
-    { name: 'Three.js / React Three Fiber', description: '3D visualization' },
     { name: 'Tailwind CSS', description: 'Utility-first styling' },
     { name: 'Framer Motion', description: 'Smooth animations' },
     { name: 'NASA APIs', description: 'Real-time space data' },
-    { name: 'Docker', description: 'Containerized deployment' },
+    { name: 'Vercel', description: 'Cloud deployment platform' },
+    { name: 'Zustand', description: 'State management' },
+    { name: 'IndexedDB', description: 'Client-side data caching' },
   ];
 
   const dataSources = [
@@ -29,16 +30,16 @@ export default function AboutPage() {
         'Monitor active NASA missions with live telemetry data from the Deep Space Network',
     },
     {
-      title: '3D Solar System',
-      description: 'Interactive visualization of spacecraft positions and planetary orbits',
-    },
-    {
       title: 'Mars Exploration',
-      description: 'Browse thousands of photos from Perseverance and Curiosity rovers',
+      description: 'Browse thousands of photos from Perseverance and Curiosity rovers with offline caching',
     },
     {
       title: 'Mission Archives',
       description: "Explore both active and completed missions, including InSight's achievements",
+    },
+    {
+      title: 'Smart Image Caching',
+      description: 'Automatic offline storage of Mars rover photos for seamless browsing',
     },
     {
       title: 'Communication Delays',
