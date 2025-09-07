@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useRef } from 'react';
+import { Suspense, useRef, useEffect, useState } from 'react';
 import { Canvas, useFrame } from '@react-three/fiber';
 import { OrbitControls, Stars, Text } from '@react-three/drei';
 import * as THREE from 'three';
@@ -106,6 +106,39 @@ function SolarSystemContent() {
 }
 
 export function SimpleSolarSystem({ className = 'w-full h-full' }) {
+  const [isClient, setIsClient] = useState(false);
+  const [canvasError, setCanvasError] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    return (
+      <div className={className}>
+        <div className="w-full h-full flex items-center justify-center bg-black">
+          <div className="text-white text-center">
+            <div className="animate-spin w-8 h-8 border-2 border-blue-500 border-t-transparent rounded-full mx-auto mb-4"></div>
+            <p>Initializing...</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (canvasError) {
+    return (
+      <div className={className}>
+        <div className="w-full h-full flex items-center justify-center bg-black">
+          <div className="text-white text-center">
+            <p>Unable to load 3D visualization</p>
+            <p className="text-sm text-gray-400 mt-2">Please try refreshing the page</p>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={className}>
       <Canvas 
@@ -116,6 +149,11 @@ export function SimpleSolarSystem({ className = 'w-full h-full' }) {
           alpha: true 
         }}
         dpr={[1, 1]}
+        onCreated={() => console.log('Canvas created successfully')}
+        onError={(error) => {
+          console.error('Canvas error:', error);
+          setCanvasError(true);
+        }}
       >
         <Suspense fallback={null}>
           <SolarSystemContent />
