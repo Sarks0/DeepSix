@@ -2,8 +2,6 @@
 
 import { NASAAPIError, APIRateLimit, RetryConfig } from '@/lib/types/nasa-api';
 import { getApiKey } from './config';
-
-const NASA_API_KEY = getApiKey();
 import type { NextRequest } from 'next/server';
 
 // ================================
@@ -150,8 +148,8 @@ export class NASAApiBase {
   private readonly apiKey: string;
 
   constructor(request?: NextRequest) {
-    // Get API key from Cloudflare context if available, otherwise use build-time key
-    this.apiKey = NASA_API_KEY;
+    // Get API key dynamically to support Edge Runtime
+    this.apiKey = getApiKey();
   }
 
   protected async makeRequest<T>(
