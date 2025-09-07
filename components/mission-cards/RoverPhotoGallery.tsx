@@ -241,6 +241,20 @@ export function RoverPhotoGallery({
     fetchLatestPhotos(true); // Force refresh
   };
 
+  const handlePrevious = () => {
+    setCurrentPage((prev) => {
+      const totalPages = Math.ceil(photos.length / limit);
+      return prev === 0 ? totalPages - 1 : prev - 1;
+    });
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => {
+      const totalPages = Math.ceil(photos.length / limit);
+      return (prev + 1) % totalPages;
+    });
+  };
+
   if (loading && photos.length === 0) {
     return <GallerySkeleton />;
   }
@@ -283,7 +297,7 @@ export function RoverPhotoGallery({
             <span className="ml-4 text-yellow-400">📡 Offline - Using cached photos</span>
           )}
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
           <button
             onClick={handleRefresh}
             className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-sm"
@@ -292,18 +306,38 @@ export function RoverPhotoGallery({
             {loading ? 'Loading...' : 'Refresh'}
           </button>
           {totalPages > 1 && (
-            <div className="flex gap-1">
-              {Array.from({ length: totalPages }, (_, i) => (
-                <button
-                  key={i}
-                  onClick={() => setCurrentPage(i)}
-                  className={`w-2 h-2 rounded-full transition-colors ${
-                    i === currentPage ? 'bg-blue-500' : 'bg-gray-600 hover:bg-gray-500'
-                  }`}
-                  aria-label={`Go to page ${i + 1}`}
-                />
-              ))}
-            </div>
+            <>
+              <button
+                onClick={handlePrevious}
+                className="p-1 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
+                aria-label="Previous page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div className="flex gap-1">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      i === currentPage ? 'bg-blue-500' : 'bg-gray-600 hover:bg-gray-500'
+                    }`}
+                    aria-label={`Go to page ${i + 1}`}
+                  />
+                ))}
+              </div>
+              <button
+                onClick={handleNext}
+                className="p-1 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
+                aria-label="Next page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
           )}
         </div>
       </div>
