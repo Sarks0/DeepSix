@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server';
 import { retryWithBackoff, FALLBACK_DATA } from '@/lib/api/error-handler';
 
-export const runtime = 'edge';
-
 interface DishData {
   name?: string;
   dishNumber?: number;

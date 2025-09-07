@@ -3,8 +3,6 @@ import { nasaMediaAPI } from '@/lib/api/nasa-media';
 import { NASAAPIError } from '@/lib/types/nasa-api';
 import { handleApiError, retryWithBackoff } from '@/lib/api/error-handler';
 
-export const runtime = 'edge';
-
 export async function GET(request: NextRequest) {
   try {
     const { searchParams } = new URL(request.url);
