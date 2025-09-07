@@ -226,7 +226,7 @@ export async function GET(
       metadata.earth_date = earthDate;
     } else if (sol !== undefined) {
       // Fetch specific sol
-      photos = await fetchRoverPhotos(rover, sol, apiKey, camera);
+      photos = await fetchRoverPhotos(rover, sol, apiKey, camera || undefined);
       photos = photos.slice(0, limit);
       metadata.type = 'sol';
       metadata.sol = sol;

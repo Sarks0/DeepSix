@@ -73,7 +73,7 @@ export function RoverPhotoGallery({
           return {
             id: parseInt(img.id.split('-')[1] || '0'),
             sol: img.sol || metadata.sol || 0,
-            camera: metadata.camera || { 
+            camera: metadata?.camera || { 
               id: 0, 
               name: 'Unknown', 
               rover_id: 0, 

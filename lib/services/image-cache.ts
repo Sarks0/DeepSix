@@ -10,7 +10,7 @@ interface CachedImage {
   earthDate: string;
   sol?: number;
   rover?: string;
-  camera?: string;
+  camera?: any; // Can be string or camera object
   cachedAt: number;
   expiresAt: number;
   metadata?: any;
@@ -107,7 +107,7 @@ class ImageCacheService {
       earthDate?: string;
       sol?: number;
       rover?: string;
-      camera?: string;
+      camera?: any;
       thumbnailUrl?: string;
       [key: string]: any;
     }
