@@ -4,16 +4,6 @@
   "devCommand": "npm run dev",
   "installCommand": "npm install",
   "outputDirectory": ".next",
-  "env": {
-    "NEXT_PUBLIC_NASA_API_KEY": "@nasa_api_key",
-    "NEXT_PUBLIC_APP_URL": "@app_url"
-  },
-  "build": {
-    "env": {
-      "NEXT_PUBLIC_NASA_API_KEY": "@nasa_api_key",
-      "NEXT_PUBLIC_APP_URL": "@app_url"
-    }
-  },
   "functions": {
     "app/api/*/route.ts": {
       "maxDuration": 10
