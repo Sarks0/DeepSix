@@ -8,17 +8,20 @@ const rateLimitMap = new Map<string, { count: number; resetTime: number }>();
 const WINDOW_MS = 60000; // 1 minute
 const MAX_REQUESTS = 100; // 100 requests per minute
 
-// Clean up old entries periodically
-setInterval(() => {
+// Clean up old entries on each request (Edge Runtime compatible)
+function cleanupOldEntries() {
   const now = Date.now();
   for (const [key, value] of rateLimitMap.entries()) {
     if (value.resetTime < now) {
       rateLimitMap.delete(key);
     }
   }
-}, 60000);
+}
 
 export function middleware(request: NextRequest) {
+  // Clean up old entries periodically
+  cleanupOldEntries();
+  
   // Only apply rate limiting to API routes
   if (!request.nextUrl.pathname.startsWith('/api/')) {
     return NextResponse.next();

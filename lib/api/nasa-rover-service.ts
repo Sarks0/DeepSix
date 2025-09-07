@@ -3,7 +3,7 @@
  * Handles authentication, rate limiting, caching, and data transformation
  */
 
-import { getApiKey } from './config';
+import { getNasaApiKey } from './cloudflare-env';
 import type { NextRequest } from 'next/server';
 
 export interface RoverPhoto {
@@ -68,12 +68,12 @@ export class NASARoverService {
   private readonly RATE_LIMIT = 950; // Leave buffer under NASA's 1000/hour limit
 
   private constructor(apiKey?: string) {
-    this.apiKey = apiKey || getApiKey();
+    this.apiKey = apiKey || getNasaApiKey();
   }
 
   static getInstance(request?: NextRequest): NASARoverService {
-    // Use API key from config
-    const apiKey = getApiKey();
+    // Use API key from Cloudflare environment
+    const apiKey = getNasaApiKey();
     
     // Create new instance with the runtime API key
     // Note: We're not using singleton pattern here to ensure we always use the correct API key

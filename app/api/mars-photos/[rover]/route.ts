@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiKey } from '@/lib/api/config';
+import { getNasaApiKey } from '@/lib/api/cloudflare-env';
 
 export const runtime = 'edge';
 
@@ -100,7 +100,7 @@ export async function GET(
     }
 
     // Get API key from environment (works with both local and Cloudflare)
-    const apiKey = getApiKey();
+    const apiKey = getNasaApiKey();
 
     let photos: RoverPhoto[];
 
