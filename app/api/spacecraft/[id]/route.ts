@@ -8,8 +8,7 @@ import {
   withTimeout,
 } from '@/lib/api/error-handler';
 
-// Edge runtime disabled for better dev performance
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

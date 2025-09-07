@@ -1,8 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiKey } from '@/lib/api/config';
 
-// Edge runtime disabled for better dev performance
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
 

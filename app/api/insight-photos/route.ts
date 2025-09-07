@@ -3,8 +3,7 @@ import { nasaMediaAPI } from '@/lib/api/nasa-media';
 import { NASAAPIError } from '@/lib/types/nasa-api';
 import { handleApiError, retryWithBackoff } from '@/lib/api/error-handler';
 
-// Edge runtime disabled for better dev performance
-// export const runtime = 'edge';
+export const runtime = 'edge';
 
 export async function GET(request: NextRequest) {
   try {
