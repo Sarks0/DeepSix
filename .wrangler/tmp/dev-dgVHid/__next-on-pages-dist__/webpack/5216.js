@@ -1,1 +1,0 @@
-var o={},d=((_,c,p)=>(o.__chunk_5216=(u,s,r)=>{"use strict";function e(){if(typeof process<"u"&&process.env){let n=process.env.NASA_API_KEY||"your_api_key_here";if(n)return n}return console.warn("No NASA API key found, using DEMO_KEY"),"DEMO_KEY"}r.d(s,{B3:()=>t,CG:()=>e});let t=e();typeof process<"u"&&process.env},o));export{d as __getNamedExports};

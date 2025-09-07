@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
+import { Analytics } from '@vercel/analytics/react';
 import { Navigation } from '@/components/ui/navigation';
 import { AnimatedStarfield } from '@/components/effects/AnimatedStarfield';
 import { GridOverlay } from '@/components/effects/GridOverlay';
@@ -49,6 +50,7 @@ export default function RootLayout({
           <main className="min-h-screen">{children}</main>
         </div>
         <PerformanceMonitor enabled={true} position="bottom-right" minimal={false} />
+        <Analytics />
       </body>
     </html>
   );
