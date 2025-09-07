@@ -2,7 +2,8 @@ import { NextResponse } from 'next/server';
 import { getSpacecraftPosition } from '@/lib/api/spacecraft-positions';
 import { handleApiError, FALLBACK_DATA, withTimeout } from '@/lib/api/error-handler';
 
-// Removed edge runtime for Cloudflare compatibility
+// Edge runtime disabled for better dev performance
+// export const runtime = 'edge';
 
 const SPACECRAFT_LIST = ['voyager-1', 'voyager-2', 'new-horizons', 'parker-solar-probe'];
 

@@ -8,7 +8,8 @@ import {
   withTimeout,
 } from '@/lib/api/error-handler';
 
-// Removed edge runtime for Cloudflare compatibility
+// Edge runtime disabled for better dev performance
+// export const runtime = 'edge';
 
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {

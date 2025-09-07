@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { getApiKey } from '@/lib/api/config';
 
-// Removed edge runtime - let Cloudflare handle it automatically
+// Edge runtime disabled for better dev performance
+// export const runtime = 'edge';
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
 
@@ -98,8 +100,8 @@ export async function GET(
       );
     }
 
-    // Use DEMO_KEY directly - no imports, no complexity
-    const apiKey = 'DEMO_KEY';
+    // Get API key from environment (works with both local and Cloudflare)
+    const apiKey = getApiKey();
 
     let photos: RoverPhoto[];
 

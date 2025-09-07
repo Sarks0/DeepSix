@@ -1,0 +1,1 @@
+var s={},u=((c,d,_)=>(s.__chunk_5216=(p,o,r)=>{"use strict";function e(){if(typeof process<"u"&&process.env){let n=process.env.NASA_API_KEY||"bgWba6j4hyTXEkyUm5hPNzqwNTLSADrSddLejJGj";if(n)return n}return console.warn("No NASA API key found, using DEMO_KEY"),"DEMO_KEY"}r.d(o,{B3:()=>t,CG:()=>e});let t=e();typeof process<"u"&&process.env},s));export{u as __getNamedExports};
