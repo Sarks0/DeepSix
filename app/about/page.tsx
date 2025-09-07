@@ -16,38 +16,37 @@ export default function AboutPage() {
   ];
 
   const dataSources = [
+    { name: 'Mars Rover Photos API', description: 'Latest images from Mars rovers' },
     { name: 'Deep Space Network', description: 'Real-time spacecraft communications' },
-    { name: 'Mars Rover Photos API', description: 'Latest images from Mars' },
-    { name: 'InSight Weather API', description: 'Historical Mars weather data' },
-    { name: 'JPL Horizons', description: 'Spacecraft ephemeris data' },
-    { name: 'ISS Location API', description: 'International Space Station tracking' },
+    { name: 'NASA Image Library', description: 'Historical mission photos and media' },
+    { name: 'Mars Weather Service', description: 'Current conditions on Mars' },
+    { name: 'Spacecraft Tracking', description: 'Position and status data' },
   ];
 
   const features = [
     {
-      title: 'Real-Time Tracking',
-      description:
-        'Monitor active NASA missions with live telemetry data from the Deep Space Network',
+      title: 'Mars Rover Gallery',
+      description: 'Browse thousands of photos from Perseverance, Curiosity, and Opportunity rovers',
     },
     {
-      title: 'Mars Exploration',
-      description: 'Browse thousands of photos from Perseverance and Curiosity rovers with offline caching',
+      title: 'Offline Image Caching',
+      description: 'Automatic storage of rover photos for seamless offline browsing',
+    },
+    {
+      title: 'Mission Dashboard',
+      description: 'Track active and completed NASA missions with real-time status updates',
+    },
+    {
+      title: 'Live Data Feeds',
+      description: 'Real-time telemetry and communication data from Deep Space Network',
     },
     {
       title: 'Mission Archives',
-      description: "Explore both active and completed missions, including InSight's achievements",
+      description: 'Explore historical missions including Spirit, Opportunity, and InSight',
     },
     {
-      title: 'Smart Image Caching',
-      description: 'Automatic offline storage of Mars rover photos for seamless browsing',
-    },
-    {
-      title: 'Communication Delays',
-      description: 'Calculate signal travel times to spacecraft billions of kilometers away',
-    },
-    {
-      title: 'Educational Resource',
-      description: 'Learn about space exploration through real data and visualizations',
+      title: 'Responsive Design',
+      description: 'Optimized experience across desktop, tablet, and mobile devices',
     },
   ];
 
@@ -69,15 +68,15 @@ export default function AboutPage() {
       >
         <h2 className="text-2xl font-bold mb-4">Our Mission</h2>
         <p className="text-gray-300 leading-relaxed mb-4">
-          DeepSix is a real-time mission control dashboard that brings NASA&apos;s deep space
-          exploration directly to your screen. We aggregate data from multiple NASA APIs and space
-          agencies to provide an comprehensive view of humanity&apos;s journey into the cosmos.
+          DeepSix is a real-time NASA mission tracking dashboard that brings space exploration 
+          directly to your screen. We aggregate data from multiple NASA APIs to provide a 
+          comprehensive view of Mars exploration and deep space missions.
         </p>
         <p className="text-gray-300 leading-relaxed">
-          From the dusty plains of Mars to the edge of interstellar space, DeepSix tracks active
-          missions, visualizes spacecraft positions, and presents scientific data in an accessible,
-          engaging format. Whether you&apos;re a space enthusiast, educator, or researcher, DeepSix
-          offers a window into ongoing space exploration.
+          From the dusty plains of Mars captured by rovers to tracking distant spacecraft, 
+          DeepSix presents scientific data in an accessible, engaging format. Whether you&apos;re 
+          a space enthusiast, educator, or researcher, DeepSix offers a window into ongoing 
+          space exploration with a focus on Mars missions and their incredible discoveries.
         </p>
       </motion.section>
 
@@ -114,7 +113,7 @@ export default function AboutPage() {
       >
         <h2 className="text-2xl font-bold mb-6">Data Sources</h2>
         <p className="text-gray-300 mb-4">
-          All data displayed on DeepSix comes directly from official NASA and space agency sources:
+          All data displayed on DeepSix comes directly from official NASA sources:
         </p>
         <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-6">
           <ul className="space-y-3">
@@ -152,11 +151,38 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
-      {/* Why DeepSix */}
+      {/* Current Missions */}
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ delay: 0.5 }}
+        className="mb-12"
+      >
+        <h2 className="text-2xl font-bold mb-4">Featured Missions</h2>
+        <div className="grid gap-4">
+          <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-4">
+            <h3 className="font-semibold text-green-400 mb-2">Active Rovers</h3>
+            <p className="text-sm text-gray-300">
+              <span className="font-bold">Perseverance</span> - Exploring Jezero Crater since 2021<br/>
+              <span className="font-bold">Curiosity</span> - Investigating Gale Crater since 2012
+            </p>
+          </div>
+          <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-4">
+            <h3 className="font-semibold text-yellow-400 mb-2">Historical Missions</h3>
+            <p className="text-sm text-gray-300">
+              <span className="font-bold">Opportunity</span> - 15 years of exploration (2004-2018)<br/>
+              <span className="font-bold">Spirit</span> - Twin rover mission (2004-2010)<br/>
+              <span className="font-bold">InSight</span> - Mars seismology studies (2018-2022)
+            </p>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* Why DeepSix */}
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.6 }}
         className="mb-12"
       >
         <h2 className="text-2xl font-bold mb-4">Why &quot;DeepSix&quot;?</h2>
@@ -177,7 +203,7 @@ export default function AboutPage() {
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.6 }}
+        transition={{ delay: 0.7 }}
         className="mb-12"
       >
         <h2 className="text-2xl font-bold mb-4">Credits & Acknowledgments</h2>
@@ -188,9 +214,9 @@ export default function AboutPage() {
           <ul className="space-y-2 text-gray-400">
             <li>• NASA (National Aeronautics and Space Administration)</li>
             <li>• JPL (Jet Propulsion Laboratory)</li>
-            <li>• DSN (Deep Space Network)</li>
-            <li>• The Mars Exploration Program</li>
-            <li>• The Planetary Data System</li>
+            <li>• Mars Exploration Program</li>
+            <li>• Deep Space Network</li>
+            <li>• NASA Open Data Portal</li>
           </ul>
           <p className="text-sm text-gray-500 mt-4">
             This project is not affiliated with NASA or any government agency. All data is publicly
@@ -203,10 +229,10 @@ export default function AboutPage() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.7 }}
+        transition={{ delay: 0.8 }}
         className="text-center py-8"
       >
-        <p className="text-gray-400 mb-6">Ready to explore the cosmos?</p>
+        <p className="text-gray-400 mb-6">Ready to explore Mars?</p>
         <Link
           href="/missions"
           className="inline-flex items-center px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg font-semibold hover:from-blue-600 hover:to-purple-700 transition-colors"
