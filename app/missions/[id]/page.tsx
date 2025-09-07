@@ -1,8 +1,8 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
 
-// Disable Edge Runtime for this page due to async_hooks compatibility issue
-// export const runtime = 'edge';
+export const runtime = 'edge';
+export const dynamic = 'force-static';
 
 // Mission data (static for now, can be fetched from API later)
 interface MissionData {
