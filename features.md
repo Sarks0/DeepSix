@@ -457,5 +457,305 @@ DeepSix currently provides:
 
 ---
 
+## Dashboard Improvements Plan
+
+### Overview
+The current dashboard provides basic mission cards and communication delay information. This plan outlines comprehensive improvements to create a more informative, dynamic, and engaging dashboard experience.
+
+### Priority 1: Mars Mission Sol Tracking
+
+#### 🔴 **Live Sol Cycle Display**
+**Description:** Show current Martian day (sol) for active rovers
+
+**Implementation:**
+```typescript
+- Display current sol for Perseverance and Curiosity
+- Calculate Earth date to Sol conversion
+- Show sol sunrise/sunset times
+- Mission duration in sols and Earth days
+- Sol progress bar (% of sol completed)
+```
+
+**UI Components:**
+- Sol counter widget with live updates
+- Mini calendar showing sol/Earth date mapping
+- Sol timeline visualization
+- Mission milestone markers (every 100 sols)
+
+**Technical Requirements:**
+- Sol calculation algorithm
+- Timezone handling for Mars Local Solar Time
+- Real-time updates every Mars minute (~61.65 seconds)
+- Historical sol data caching
+
+---
+
+### Priority 2: Enhanced Mission Cards
+
+#### 📊 **Dynamic Mission Status Cards**
+**Features:**
+- Live rover location coordinates
+- Distance traveled today/total
+- Current activity status (driving, sampling, imaging)
+- Power levels and battery status
+- Scientific instruments status
+- Last communication timestamp
+- Weather conditions at rover location
+
+**Visual Enhancements:**
+- Animated status indicators
+- Mini trajectory map
+- Photo thumbnail from latest sol
+- Activity timeline for past 7 sols
+
+---
+
+### Priority 3: Dashboard Widgets
+
+#### 🎯 **Widget System Architecture**
+
+**Core Widgets:**
+
+1. **Mars Weather Widget**
+   - Current temperature at rover locations
+   - Atmospheric pressure
+   - Wind speed and direction
+   - Dust storm alerts
+   - UV radiation levels
+
+2. **Photo of the Sol**
+   - Featured image from current sol
+   - Auto-rotating gallery
+   - Quick stats (camera, sol, location)
+   - One-click to full gallery
+
+3. **Mission Achievements**
+   - Milestone tracker
+   - Recent discoveries
+   - Science objectives progress
+   - Distance records
+
+4. **Communication Status**
+   - Deep Space Network connection
+   - Data transmission rate
+   - Queue status
+   - Next communication window
+
+5. **Quick Stats Grid**
+   - Total photos taken
+   - Sols on Mars
+   - Distance traveled
+   - Rock samples collected
+   - Helicopter flights (for Perseverance)
+
+---
+
+### Priority 4: Real-time Data Integration
+
+#### 🔄 **Live Data Feeds**
+
+**Implementation Plan:**
+1. WebSocket connection for real-time updates
+2. Server-sent events for mission status
+3. Polling fallback with smart intervals
+4. Differential updates to minimize bandwidth
+
+**Data Sources:**
+- NASA Mars API endpoints
+- DSN Now real-time tracking
+- Mars weather service
+- Rover telemetry feeds
+
+---
+
+### Priority 5: Dashboard Customization
+
+#### ⚙️ **User Preferences**
+
+**Customizable Elements:**
+- Widget layout (drag & drop)
+- Favorite missions pinning
+- Data refresh intervals
+- Metric/Imperial units toggle
+- Time format (Earth/Mars/UTC)
+- Notification preferences
+
+**Saved Dashboards:**
+- Multiple dashboard layouts
+- Mission-specific views
+- Quick switch between presets
+- Export/import configurations
+
+---
+
+### Priority 6: Interactive Elements
+
+#### 🎮 **Engagement Features**
+
+1. **Sol Prediction Game**
+   - Guess tomorrow's photo count
+   - Predict distance traveled
+   - Weather forecasting challenge
+
+2. **Mission Timeline**
+   - Interactive scrollable timeline
+   - Key events and discoveries
+   - Zoom to explore details
+   - Compare multiple missions
+
+3. **3D Rover Model**
+   - Simplified 3D viewer (WebGL)
+   - Instrument highlights
+   - Current configuration display
+
+---
+
+### Implementation Roadmap
+
+#### Phase 1: Sol Tracking (Week 1)
+```
+Day 1-2: Sol calculation engine
+Day 3-4: UI components for sol display
+Day 5: Integration with existing mission cards
+Day 6-7: Testing and refinement
+```
+
+#### Phase 2: Enhanced Mission Cards (Week 2)
+```
+Day 1-2: Data aggregation layer
+Day 3-4: Card UI redesign
+Day 5-6: Real-time update system
+Day 7: Performance optimization
+```
+
+#### Phase 3: Widget System (Week 3-4)
+```
+Week 3: Core widget framework
+Week 4: Individual widget implementation
+```
+
+#### Phase 4: Customization (Week 5)
+```
+Day 1-2: Preference storage system
+Day 3-4: Drag-drop layout engine
+Day 5: Import/export functionality
+```
+
+---
+
+### Technical Architecture
+
+#### Data Flow
+```
+NASA APIs → Cache Layer → State Management → UI Components
+     ↓           ↓              ↓                ↓
+  Raw Data → IndexedDB →    Zustand →    React Components
+```
+
+#### Caching Strategy
+- **Hot Cache**: Current sol data (memory)
+- **Warm Cache**: Last 7 sols (IndexedDB)
+- **Cold Cache**: Historical data (on-demand)
+
+#### Performance Targets
+- Initial dashboard load: < 1 second
+- Widget updates: < 100ms
+- Sol calculations: < 10ms
+- API response (cached): < 50ms
+
+---
+
+### Sol Cycle Implementation Details
+
+#### Mars Sol Calculation
+```typescript
+interface SolData {
+  rover: string;
+  currentSol: number;
+  earthDate: Date;
+  marsLocalSolarTime: string;
+  sunriseTime: string;
+  sunsetTime: string;
+  solarLongitude: number;
+  season: 'spring' | 'summer' | 'fall' | 'winter';
+}
+
+// Sol calculation for each rover
+function calculateSol(landingDate: Date, currentDate: Date): number {
+  const MARS_SOL_DURATION = 24.6597; // hours
+  const EARTH_DAY_DURATION = 24; // hours
+  // ... calculation logic
+}
+```
+
+#### UI Component Example
+```tsx
+<SolTracker
+  rover="perseverance"
+  showTimeline={true}
+  updateInterval={60000} // Update every minute
+  onSolChange={(newSol) => handleSolUpdate(newSol)}
+/>
+```
+
+---
+
+### Success Metrics
+
+**User Engagement:**
+- Average session duration increase by 40%
+- Dashboard interaction rate > 80%
+- Widget customization adoption > 60%
+
+**Performance:**
+- Time to Interactive (TTI) < 2 seconds
+- First Contentful Paint (FCP) < 1 second
+- Cumulative Layout Shift (CLS) < 0.1
+
+**Data Freshness:**
+- Sol data accuracy: 100%
+- Update latency < 5 minutes
+- Cache hit rate > 90%
+
+---
+
+### MVP Dashboard Improvements (Quick Wins)
+
+#### Week 1 Deliverables
+1. **Sol Counter Component**
+   - Basic sol display for each rover
+   - Earth date equivalent
+   - Mission duration counter
+
+2. **Enhanced Mission Cards**
+   - Add sol information
+   - Latest photo thumbnail
+   - Quick stats section
+
+3. **Dashboard Header**
+   - Current Mars time
+   - Earth-Mars delay indicator
+   - Active missions count
+
+---
+
+### Future Enhancements
+
+**Advanced Features (Phase 2):**
+- Mars globe with rover positions
+- Augmented reality rover viewer
+- Mission comparison tools
+- Educational tooltips and guides
+- Social sharing capabilities
+- Daily digest email option
+
+**Integration Opportunities:**
+- Connect with Mars Sample Return mission
+- Helicopter (Ingenuity) flight tracker
+- Future mission countdown timers
+- Artemis program cross-references
+
+---
+
 *Last Updated: September 2025*
-*Status: Proposal - NASA API Integration Added*
+*Status: Proposal - Dashboard Improvements & NASA API Integration Added*
