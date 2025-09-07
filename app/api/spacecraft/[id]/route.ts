@@ -8,8 +8,6 @@ import {
   withTimeout,
 } from '@/lib/api/error-handler';
 
-export const runtime = 'edge';
-
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     // Await params for Next.js compatibility

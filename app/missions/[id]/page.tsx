@@ -1,8 +1,7 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
 
-export const runtime = 'edge';
-export const dynamic = 'force-static';
+// Dynamic page for mission details
 
 // Mission data (static for now, can be fetched from API later)
 interface MissionData {

@@ -1,13 +1,9 @@
-// Import setupDevPlatform for Cloudflare development
-import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
-
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Cloudflare Pages supports Next.js with @cloudflare/next-on-pages
   // Performance optimizations
   compiler: {
-    // Don't remove console in production - causes issues with Cloudflare Pages
-    removeConsole: false,
+    // Remove console in production for smaller bundle
+    removeConsole: process.env.NODE_ENV === 'production',
   },
   // Webpack optimizations
   webpack: (config, { dev, isServer }) => {
@@ -46,15 +42,15 @@ const nextConfig = {
     }
     return config;
   },
-  // Enable ESLint during production builds for security
+  // Enable ESLint during production builds for code quality
   eslint: {
-    ignoreDuringBuilds: true, // Temporarily disabled for performance testing
+    ignoreDuringBuilds: false,
   },
-  // Enable TypeScript checking during production builds for security
+  // Enable TypeScript checking during production builds
   typescript: {
-    ignoreBuildErrors: true, // Temporarily disabled for performance testing
+    ignoreBuildErrors: false,
   },
-  // Headers for performance
+  // Headers for security and performance
   headers: async () => [
     {
       source: '/(.*)',
@@ -66,11 +62,28 @@ const nextConfig = {
         {
           key: 'X-Frame-Options',
           value: 'DENY'
+        },
+        {
+          key: 'X-Content-Type-Options',
+          value: 'nosniff'
+        },
+        {
+          key: 'X-XSS-Protection',
+          value: '1; mode=block'
+        }
+      ],
+    },
+    {
+      source: '/api/(.*)',
+      headers: [
+        {
+          key: 'Cache-Control',
+          value: 'public, s-maxage=60, stale-while-revalidate=300'
         }
       ],
     },
   ],
-  // Allow external image sources
+  // Allow external image sources from NASA
   images: {
     remotePatterns: [
       {
@@ -92,11 +105,5 @@ const nextConfig = {
     formats: ['image/webp'],
   },
 };
-
-// Setup Cloudflare development platform for local testing
-// Disabled for now - causing performance issues in development
-// if (process.env.NODE_ENV === 'development') {
-//   await setupDevPlatform();
-// }
 
 export default nextConfig;
