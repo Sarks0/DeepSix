@@ -1,3 +1,6 @@
+// Import setupDevPlatform for Cloudflare development
+import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Cloudflare Pages supports Next.js with @cloudflare/next-on-pages
@@ -89,5 +92,11 @@ const nextConfig = {
     formats: ['image/webp'],
   },
 };
+
+// Setup Cloudflare development platform for local testing
+// Disabled for now - causing performance issues in development
+// if (process.env.NODE_ENV === 'development') {
+//   await setupDevPlatform();
+// }
 
 export default nextConfig;

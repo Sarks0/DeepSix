@@ -4,7 +4,6 @@
  */
 
 import { NASA_API_KEY } from './config';
-import { getApiKeyFromContext } from './cloudflare-env';
 import type { NextRequest } from 'next/server';
 
 export interface RoverPhoto {
@@ -73,8 +72,8 @@ export class NASARoverService {
   }
 
   static getInstance(request?: NextRequest): NASARoverService {
-    // Get API key from Cloudflare context if available
-    const apiKey = request ? getApiKeyFromContext(request) : NASA_API_KEY;
+    // Use API key from config
+    const apiKey = NASA_API_KEY;
     
     // Create new instance with the runtime API key
     // Note: We're not using singleton pattern here to ensure we always use the correct API key

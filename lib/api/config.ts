@@ -1,31 +1,20 @@
 /**
- * API Configuration for Cloudflare Pages Edge Runtime
- * Handles environment variable access in both local and Cloudflare environments
+ * API Configuration
+ * Handles environment variable access for NASA API
  */
 
 export function getApiKey(): string {
-  // Try multiple sources for the API key
-  // 1. NASA_API_KEY - Cloudflare Pages secret
-  // 2. NEXT_PUBLIC_NASA_API_KEY - Local development
-  // 3. DEMO_KEY - Fallback for testing
+  // Get API key from environment variables
+  const apiKey = process.env.NEXT_PUBLIC_NASA_API_KEY;
   
-  if (typeof process !== 'undefined' && process.env) {
-    const apiKey = process.env.NASA_API_KEY || process.env.NEXT_PUBLIC_NASA_API_KEY;
-    if (apiKey) return apiKey;
+  if (!apiKey) {
+    console.warn('No NASA API key found, using DEMO_KEY');
+    return 'DEMO_KEY';
   }
   
-  // Fallback to DEMO_KEY if no API key is found
-  console.warn('No NASA API key found, using DEMO_KEY');
-  return 'DEMO_KEY';
+  return apiKey;
 }
 
 export function getAppUrl(): string {
-  if (typeof process !== 'undefined' && process.env) {
-    return process.env.NEXT_PUBLIC_APP_URL || 'https://deepsix.io';
-  }
-  return 'https://deepsix.io';
+  return process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
 }
-
-// Export as constants that are resolved at build time
-export const NASA_API_KEY = getApiKey();
-export const APP_URL = getAppUrl();

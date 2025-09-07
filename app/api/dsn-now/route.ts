@@ -1,7 +1,8 @@
 import { NextResponse } from 'next/server';
 import { retryWithBackoff, FALLBACK_DATA } from '@/lib/api/error-handler';
 
-// Removed edge runtime for Cloudflare compatibility
+// Edge runtime disabled for better dev performance
+// export const runtime = 'edge';
 
 interface DishData {
   name?: string;

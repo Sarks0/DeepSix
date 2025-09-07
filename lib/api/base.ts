@@ -2,7 +2,6 @@
 
 import { NASAAPIError, APIRateLimit, RetryConfig } from '@/lib/types/nasa-api';
 import { NASA_API_KEY } from './config';
-import { getApiKeyFromContext } from './cloudflare-env';
 import type { NextRequest } from 'next/server';
 
 // ================================
@@ -150,7 +149,7 @@ export class NASAApiBase {
 
   constructor(request?: NextRequest) {
     // Get API key from Cloudflare context if available, otherwise use build-time key
-    this.apiKey = request ? getApiKeyFromContext(request) : NASA_API_KEY;
+    this.apiKey = NASA_API_KEY;
   }
 
   protected async makeRequest<T>(
