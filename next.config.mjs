@@ -3,6 +3,7 @@ import { setupDevPlatform } from '@cloudflare/next-on-pages/next-dev';
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',
   // Cloudflare Pages supports Next.js with @cloudflare/next-on-pages
   // Performance optimizations
   compiler: {
