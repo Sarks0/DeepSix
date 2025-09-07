@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useSpacecraftDelays } from '@/hooks/use-spacecraft';
 import { RoverIcon, ProbeIcon, SolarIcon } from '@/components/icons/MissionIcons';
+import { SolTracker } from '@/components/dashboard/SolTracker';
 
 export default function Home() {
   const { delays, isLoading } = useSpacecraftDelays();
@@ -26,11 +27,25 @@ export default function Home() {
         </p>
       </motion.div>
 
+      {/* Sol Tracking Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Mars Mission Sol Tracking</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 max-w-4xl mx-auto">
+          <SolTracker rover="perseverance" variant="detailed" />
+          <SolTracker rover="curiosity" variant="detailed" />
+        </div>
+      </motion.div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.1 }}
+          transition={{ delay: 0.2 }}
           className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-red-500 transition-all hover:shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:bg-gray-900/70"
         >
           <div className="h-12 w-12 bg-gradient-to-br from-red-600/30 to-orange-600/30 rounded-lg flex items-center justify-center mb-4 border border-red-500/30">
@@ -39,10 +54,14 @@ export default function Home() {
           <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
             Mars Missions
           </h2>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-400 mb-3">
             Follow Perseverance and Curiosity rovers exploring the Red Planet
           </p>
-          <div className="flex items-center text-sm text-green-400">
+          <div className="space-y-2">
+            <SolTracker rover="perseverance" variant="minimal" />
+            <SolTracker rover="curiosity" variant="minimal" />
+          </div>
+          <div className="flex items-center text-sm text-green-400 mt-3">
             <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
             <span className="uppercase tracking-wider text-xs">Active</span>
           </div>
@@ -51,7 +70,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
+          transition={{ delay: 0.3 }}
           className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-purple-500 transition-all hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:bg-gray-900/70"
         >
           <div className="h-12 w-12 bg-gradient-to-br from-purple-600/30 to-indigo-600/30 rounded-lg flex items-center justify-center mb-4 border border-purple-500/30">
@@ -72,7 +91,7 @@ export default function Home() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
+          transition={{ delay: 0.4 }}
           className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-yellow-500 transition-all hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] hover:bg-gray-900/70"
         >
           <div className="h-12 w-12 bg-gradient-to-br from-yellow-600/30 to-orange-600/30 rounded-lg flex items-center justify-center mb-4 border border-yellow-500/30">
@@ -94,7 +113,7 @@ export default function Home() {
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        transition={{ delay: 0.4 }}
+        transition={{ delay: 0.5 }}
         className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg border border-gray-700 p-8"
       >
         <h2 className="text-2xl font-bold mb-4">Communication Delay Calculator</h2>
