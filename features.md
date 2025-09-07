@@ -292,5 +292,170 @@ DeepSix currently provides:
 
 ---
 
+## NASA API Integration Opportunities
+
+### Priority 1: Quick Wins (1-2 days each)
+
+#### 🌟 **Astronomy Picture of the Day (APOD)**
+**Why Perfect for DeepSix:**
+- Simple single endpoint, easy integration
+- Daily fresh content keeps users coming back
+- High-quality imagery with educational explanations
+- Can be cached for offline viewing (fits our pattern)
+
+**Implementation:**
+- Add APOD widget to dashboard
+- Create dedicated APOD page with archive browser
+- Cache last 30 days of APOD for offline access
+- Add "APOD of the Day" notification option
+
+#### 🌍 **Earth Polychromatic Imaging Camera (EPIC)**
+**Why Great Addition:**
+- Real Earth images from deep space perspective
+- Updates multiple times daily
+- Beautiful blue marble views
+- Complements Mars focus with Earth perspective
+
+**Implementation:**
+- Live Earth widget showing latest image
+- Time-lapse viewer for Earth rotation
+- Side-by-side Earth/Mars comparison feature
+
+### Priority 2: Major Features (3-5 days each)
+
+#### ☄️ **Near Earth Object Web Service (NeoWs)**
+**Why Valuable:**
+- Adds "threat monitoring" excitement
+- Real-time data about asteroids
+- Educational about solar system dynamics
+- Engagement through "potentially hazardous" tracking
+
+**Implementation:**
+- NEO tracker dashboard
+- Asteroid approach timeline
+- Size comparison visualizations
+- Alert system for close approaches
+
+#### 🔥 **Earth Observatory Natural Event Tracker (EONET)**
+**Why Complementary:**
+- Real-time natural disasters/events
+- Satellite imagery of events
+- Educational about Earth observation
+- Adds urgency/relevance to space tech
+
+**Implementation:**
+- Live event map
+- Event type filters (wildfires, storms, volcanoes)
+- Historical event archive
+- Event tracking and notifications
+
+### Priority 3: Content Enhancement (2-3 days each)
+
+#### 📸 **NASA Images and Video Library**
+**Why Essential:**
+- Massive historical content
+- Searchable mission archives
+- High-resolution imagery
+- Video content adds variety
+
+**Implementation:**
+- Enhanced search across all NASA missions
+- Mission-specific galleries
+- Video player with related content
+- Collections by theme/era
+
+#### 🛰️ **Earth Imagery (Landsat)**
+**Why Interesting:**
+- Location-based Earth imagery
+- Time-series showing changes
+- User can search their location
+- Environmental monitoring angle
+
+**Implementation:**
+- "View from Space" location search
+- Before/after comparisons
+- Saved locations feature
+- Environmental change tracking
+
+### Not Recommended for Initial Implementation:
+
+#### ⚡ **POWER API**
+- Too technical/specialized for general audience
+- Energy/climate data less engaging
+- Better for research applications
+
+#### 🧬 **OSDR API**
+- Very specialized (space biology)
+- Limited general interest
+- Complex data structures
+
+---
+
+## Recommended Implementation Order
+
+### Phase 1: Dashboard Enhancement (Week 1)
+1. **APOD Integration** ✨
+   - Dashboard widget
+   - Full archive page
+   - Caching system
+
+2. **EPIC Earth View** 🌍
+   - Live Earth widget
+   - Comparison with Mars
+
+### Phase 2: Engagement Features (Week 2)
+3. **NeoWs Asteroid Tracker** ☄️
+   - NEO dashboard
+   - Threat assessment view
+   - Approach calendar
+
+4. **NASA Image Library** 📸
+   - Enhanced search
+   - Mission galleries
+   - Video support
+
+### Phase 3: Advanced Features (Week 3+)
+5. **EONET Event Tracker** 🔥
+   - Event map
+   - Alert system
+
+6. **Earth Imagery** 🛰️
+   - Location search
+   - Time-series analysis
+
+---
+
+## Integration Architecture
+
+### Shared Components Needed:
+1. **API Service Layer**
+   ```typescript
+   - /lib/api/apod.ts
+   - /lib/api/epic.ts
+   - /lib/api/neows.ts
+   - /lib/api/eonet.ts
+   ```
+
+2. **Caching Strategy**
+   - Extend existing IndexedDB service
+   - Add API-specific cache policies
+   - Implement stale-while-revalidate
+
+3. **UI Components**
+   - MediaViewer (images/video)
+   - Timeline component
+   - Map visualizations
+   - Data cards/widgets
+
+---
+
+## Success Metrics
+- **User Engagement:** Daily active users increase
+- **Content Variety:** Multiple data sources accessed per session
+- **Performance:** All APIs cached, <500ms load time
+- **Offline Support:** Core features work offline
+
+---
+
 *Last Updated: September 2025*
-*Status: Proposal*
+*Status: Proposal - NASA API Integration Added*
