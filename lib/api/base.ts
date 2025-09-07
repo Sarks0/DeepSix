@@ -1,7 +1,9 @@
 // NASA API Base Configuration with Rate Limiting and Error Handling
 
 import { NASAAPIError, APIRateLimit, RetryConfig } from '@/lib/types/nasa-api';
-import { NASA_API_KEY } from './config';
+import { getApiKey } from './config';
+
+const NASA_API_KEY = getApiKey();
 import type { NextRequest } from 'next/server';
 
 // ================================

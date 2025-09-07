@@ -1,7 +1,7 @@
 name = "deepsix-dashboard"
 compatibility_date = "2024-09-06"
 compatibility_flags = ["nodejs_compat", "nodejs_als"]
-pages_build_output_dir = ".vercel/output/static"
+pages_build_output_dir = ".next"
 
 # Environment variables for development
 [vars]

@@ -2,7 +2,9 @@
 // Provides daily imagery of Earth from the DSCOVR satellite
 
 import { NASAApiBase, CircuitBreaker } from './base';
-import { NASA_API_KEY } from './config';
+import { getApiKey } from './config';
+
+const NASA_API_KEY = getApiKey();
 import {
   EPICResponse,
   EPICImageData,
