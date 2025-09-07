@@ -1,0 +1,58 @@
+name: Security Scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    # Run security scan every Monday at 3 AM
+    - cron: '0 3 * * 1'
+
+jobs:
+  security-scan:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+      
+      - name: Run npm audit fix (dry run)
+        run: npm audit fix --dry-run --audit-level=moderate
+        continue-on-error: true
+      
+      - name: Check for outdated packages
+        run: npm outdated || true
+      
+      - name: License check
+        run: npx license-checker --production --summary
+        continue-on-error: true
+
+  # Dependency review requires GitHub Advanced Security (free for public repos only)
+  # Uncomment this job if/when the repository becomes public
+  # dependency-review:
+  #   runs-on: ubuntu-latest
+  #   if: github.event_name == 'pull_request'
+  #   
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v5
+  #     
+  #     - name: Dependency Review
+  #       uses: actions/dependency-review-action@v4
+  #       with:
+  #         fail-on-severity: moderate
+  #         deny-licenses: GPL-3.0, AGPL-3.0

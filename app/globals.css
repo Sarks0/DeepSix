@@ -1,0 +1,213 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #030712;
+  --foreground: #f3f4f6;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #030712;
+    --foreground: #f3f4f6;
+  }
+}
+
+body {
+  color: var(--foreground);
+  background: var(--background);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* Glassmorphism effects */
+  .glass {
+    @apply bg-gray-900/30 backdrop-blur-md border border-gray-800/50;
+  }
+
+  .glass-hover {
+    @apply transition-all hover:bg-gray-900/50 hover:border-gray-700/50;
+  }
+
+  /* Neon glow effects */
+  .neon-blue {
+    @apply shadow-[0_0_20px_rgba(59,130,246,0.5)];
+  }
+
+  .neon-purple {
+    @apply shadow-[0_0_20px_rgba(168,85,247,0.5)];
+  }
+
+  .neon-green {
+    @apply shadow-[0_0_20px_rgba(34,197,94,0.5)];
+  }
+
+  /* Text glow */
+  .text-glow {
+    text-shadow: 0 0 20px currentColor;
+  }
+
+  /* Holographic gradient */
+  .holographic {
+    background: linear-gradient(
+      135deg,
+      rgba(59, 130, 246, 0.1),
+      rgba(168, 85, 247, 0.1),
+      rgba(59, 130, 246, 0.1)
+    );
+    background-size: 200% 200%;
+    animation: holographic 4s ease infinite;
+  }
+
+  @keyframes holographic {
+    0% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+    100% {
+      background-position: 0% 50%;
+    }
+  }
+
+  /* Data stream effect */
+  .data-stream {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .data-stream::before {
+    content: '';
+    position: absolute;
+    top: -100%;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(180deg, transparent, rgba(59, 130, 246, 0.1), transparent);
+    animation: dataFlow 3s linear infinite;
+  }
+
+  @keyframes dataFlow {
+    to {
+      top: 100%;
+    }
+  }
+
+  /* Pulse animation */
+  @keyframes pulse-glow {
+    0%,
+    100% {
+      opacity: 1;
+      box-shadow: 0 0 10px currentColor;
+    }
+    50% {
+      opacity: 0.7;
+      box-shadow: 0 0 20px currentColor;
+    }
+  }
+
+  .pulse-glow {
+    animation: pulse-glow 2s ease-in-out infinite;
+  }
+
+  /* Circuit board pattern */
+  .circuit-pattern {
+    background-image:
+      linear-gradient(90deg, transparent 98%, rgba(59, 130, 246, 0.1) 98%),
+      linear-gradient(transparent 98%, rgba(59, 130, 246, 0.1) 98%);
+    background-size: 20px 20px;
+  }
+
+  /* Custom scrollbar */
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-thumb-gray-700::-webkit-scrollbar-thumb {
+    background-color: #374151;
+    border-radius: 3px;
+  }
+
+  .scrollbar-track-gray-900::-webkit-scrollbar-track {
+    background-color: #111827;
+  }
+
+  /* Glitch effect */
+  @keyframes glitch {
+    0%,
+    100% {
+      transform: translate(0);
+      filter: hue-rotate(0deg);
+    }
+    20% {
+      transform: translate(-1px, 1px);
+      filter: hue-rotate(90deg);
+    }
+    40% {
+      transform: translate(1px, -1px);
+      filter: hue-rotate(180deg);
+    }
+    60% {
+      transform: translate(-1px, -1px);
+      filter: hue-rotate(270deg);
+    }
+    80% {
+      transform: translate(1px, 1px);
+      filter: hue-rotate(360deg);
+    }
+  }
+
+  .glitch {
+    animation: glitch 0.3s infinite;
+  }
+
+  .glitch-hover:hover {
+    animation: glitch 0.3s;
+  }
+
+  /* Shimmer animation for loading skeletons */
+  @keyframes shimmer {
+    0% {
+      transform: translateX(-100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+}
+
+/* Animations */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+/* Font smoothing */
+* {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
