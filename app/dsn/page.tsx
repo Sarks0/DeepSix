@@ -6,7 +6,7 @@ import { dsnService, type DSNData } from '@/lib/api/dsn';
 import { SignalVisualizer } from '@/components/dsn/SignalVisualizer';
 import { SpacecraftTimeline } from '@/components/dsn/SpacecraftTimeline';
 import { MissionControlDashboard } from '@/components/dsn/MissionControlDashboard';
-import { EarthGlobe } from '@/components/dsn/EarthGlobe';
+import { EarthMap2D } from '@/components/dsn/EarthMap2D';
 
 export default function DeepSpaceNetworkPage() {
   const [dsnData, setDsnData] = useState<DSNData | null>(null);
@@ -122,15 +122,14 @@ export default function DeepSpaceNetworkPage() {
         </div>
       </motion.div>
 
-      {/* 3D Earth Globe */}
+      {/* 2D Earth Map */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="mb-8"
       >
-        <h2 className="text-2xl font-bold mb-4">Global Station Network</h2>
-        <EarthGlobe stations={dsnData.stations} />
+        <EarthMap2D stations={dsnData.stations} />
       </motion.div>
 
       {/* Active Communications Summary */}
