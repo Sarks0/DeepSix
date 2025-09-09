@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { calculateSol, formatSolDisplay, getSolMilestone, type SolData } from '@/lib/utils/mars-sol';
 
@@ -110,12 +111,16 @@ export function SolTracker({
   }
 
   // Detailed variant
+  const missionPath = `/missions/${rover}`;
+  
   return (
-    <motion.div 
-      className={`bg-gray-800/50 rounded-lg p-4 space-y-3 border border-gray-700 ${className}`}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-    >
+    <Link href={missionPath} className="block">
+      <motion.div 
+        className={`bg-gray-800/50 rounded-lg p-4 space-y-3 border border-gray-700 hover:border-orange-500/50 transition-all cursor-pointer hover:bg-gray-800/70 ${className}`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.02 }}
+      >
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-sm font-medium text-gray-400 mb-1">
@@ -188,6 +193,7 @@ export function SolTracker({
         <div>Landing: {solData.landingDate.toLocaleDateString()}</div>
         <div>Last updated: {currentTime.toLocaleTimeString()}</div>
       </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 }

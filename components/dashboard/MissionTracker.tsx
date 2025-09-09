@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { 
   calculateMissionData, 
@@ -142,12 +143,23 @@ export function MissionTracker({
   }
 
   // Detailed variant
+  // Map mission names to the correct URL paths
+  const missionUrlMap: Record<string, string> = {
+    voyager1: 'voyager-1',
+    voyager2: 'voyager-2',
+    parker: 'parker-solar-probe',
+    newhorizons: 'new-horizons'
+  };
+  const missionPath = `/missions/${missionUrlMap[mission] || mission}`;
+  
   return (
-    <motion.div 
-      className={`bg-gray-800/50 rounded-lg p-4 space-y-3 border border-gray-700 ${className}`}
-      initial={{ opacity: 0, scale: 0.95 }}
-      animate={{ opacity: 1, scale: 1 }}
-    >
+    <Link href={missionPath} className="block">
+      <motion.div 
+        className={`bg-gray-800/50 rounded-lg p-4 space-y-3 border border-gray-700 hover:border-purple-500/50 transition-all cursor-pointer hover:bg-gray-800/70 ${className}`}
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        whileHover={{ scale: 1.02 }}
+      >
       <div className="flex justify-between items-start">
         <div>
           <h3 className="text-2xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
@@ -237,6 +249,7 @@ export function MissionTracker({
       <div className="text-xs text-gray-500 pt-2 border-t border-gray-700">
         <div>Last updated: {currentTime.toLocaleTimeString()}</div>
       </div>
-    </motion.div>
+      </motion.div>
+    </Link>
   );
 }
