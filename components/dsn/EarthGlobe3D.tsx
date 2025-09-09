@@ -125,7 +125,7 @@ interface EarthGlobeProps {
 
 export default function EarthGlobe3D({ stations }: EarthGlobeProps) {
   return (
-    <div className="w-full h-96 bg-gray-900 rounded-lg overflow-hidden">
+    <div className="w-full h-96 bg-gray-900 rounded-lg overflow-hidden relative">
       <Canvas
         camera={{ position: [0, 0, 3], fov: 45 }}
         gl={{ antialias: true, alpha: true }}
