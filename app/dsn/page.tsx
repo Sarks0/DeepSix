@@ -6,7 +6,7 @@ import { dsnService, type DSNData } from '@/lib/api/dsn';
 import { SignalVisualizer } from '@/components/dsn/SignalVisualizer';
 import { SpacecraftTimeline } from '@/components/dsn/SpacecraftTimeline';
 import { MissionControlDashboard } from '@/components/dsn/MissionControlDashboard';
-import { EarthMap2D } from '@/components/dsn/EarthMap2D';
+import { StationList } from '@/components/dsn/StationList';
 
 export default function DeepSpaceNetworkPage() {
   const [dsnData, setDsnData] = useState<DSNData | null>(null);
@@ -122,14 +122,15 @@ export default function DeepSpaceNetworkPage() {
         </div>
       </motion.div>
 
-      {/* 2D Earth Map */}
+      {/* Station List */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.1 }}
         className="mb-8"
       >
-        <EarthMap2D stations={dsnData.stations} />
+        <h2 className="text-2xl font-bold mb-4">Global Station Network</h2>
+        <StationList stations={dsnData.stations} />
       </motion.div>
 
       {/* Active Communications Summary */}
@@ -190,23 +191,27 @@ export default function DeepSpaceNetworkPage() {
         </motion.div>
       )}
 
-      {/* Spacecraft Timeline - Show for selected spacecraft */}
+      {/* Spacecraft Timeline - Show available spacecraft from active communications */}
       <div className="mb-8">
         <h2 className="text-2xl font-bold mb-4">Spacecraft Missions</h2>
-        <div className="flex gap-2 mb-4">
-          {['VGR1', 'VGR2'].map(code => (
-            <button
-              key={code}
-              onClick={() => setSelectedSpacecraft(code)}
-              className={`px-3 py-1 rounded transition-colors ${
-                selectedSpacecraft === code
-                  ? 'bg-blue-500 text-white'
-                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-              }`}
-            >
-              {code === 'VGR1' ? 'Voyager 1' : 'Voyager 2'}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {activeSpacecraft.length > 0 ? (
+            activeSpacecraft.map(sc => (
+              <button
+                key={sc.spacecraft}
+                onClick={() => setSelectedSpacecraft(selectedSpacecraft === sc.spacecraft ? null : sc.spacecraft)}
+                className={`px-3 py-1 rounded transition-colors ${
+                  selectedSpacecraft === sc.spacecraft
+                    ? 'bg-blue-500 text-white'
+                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+                }`}
+              >
+                {dsnService.formatSpacecraftName(sc.spacecraft)}
+              </button>
+            ))
+          ) : (
+            <p className="text-gray-500">No active spacecraft communications</p>
+          )}
         </div>
         
         {selectedSpacecraft && (
@@ -217,88 +222,6 @@ export default function DeepSpaceNetworkPage() {
         )}
       </div>
 
-      {/* Station Status Grid */}
-      <div className="space-y-6">
-        {dsnData.stations.map((station, idx) => (
-          <motion.div
-            key={station.name}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 + idx * 0.1 }}
-            className="bg-gray-800/30 rounded-lg p-6 border border-gray-700"
-          >
-            <div className="flex items-center justify-between mb-4">
-              <div>
-                <h2 className="text-2xl font-bold text-white">{station.friendlyName}</h2>
-                <p className="text-sm text-gray-400">Station: {station.name.toUpperCase()}</p>
-              </div>
-              <div className="text-right">
-                <p className="text-sm text-gray-400">Local Time</p>
-                <p className="text-lg font-mono text-white">
-                  {new Date(station.timeUTC).toLocaleTimeString('en-US', {
-                    timeZone: getTimeZone(station.name),
-                    hour12: false
-                  })}
-                </p>
-              </div>
-            </div>
-
-            {/* Dishes Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {station.dishes.map(dish => {
-                const hasTarget = dish.targets.length > 0 && dish.targets[0]?.spacecraft?.length && dish.targets[0].spacecraft.length > 0;
-                const isActive = hasTarget;
-
-                return (
-                  <div
-                    key={dish.name}
-                    className={`p-4 rounded-lg border ${
-                      isActive 
-                        ? 'bg-green-900/20 border-green-500/50' 
-                        : 'bg-gray-900/50 border-gray-700'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <h3 className="font-bold text-white">{dish.name}</h3>
-                      {isActive && (
-                        <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-                      )}
-                    </div>
-
-                    {hasTarget && dish.targets[0] ? (
-                      <div className="space-y-2">
-                        <p className="text-sm text-green-400">
-                          Tracking: {dish.targets[0].spacecraft?.map(sc => 
-                            dsnService.formatSpacecraftName(sc)
-                          ).join(', ')}
-                        </p>
-                        <div className="text-xs text-gray-400">
-                          <p>Az: {dish.azimuthAngle.toFixed(1)}° El: {dish.elevationAngle.toFixed(1)}°</p>
-                          {dish.targets[0].downSignal && (
-                            <p className="text-blue-400">
-                              ↓ {formatDataRate(dish.targets[0].downSignal.dataRate)}
-                            </p>
-                          )}
-                          {dish.targets[0].upSignal && (
-                            <p className="text-orange-400">
-                              ↑ {formatDataRate(dish.targets[0].upSignal.dataRate)}
-                            </p>
-                          )}
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="text-sm text-gray-500">
-                        <p>Idle</p>
-                        <p className="text-xs mt-1">Wind: {dish.windSpeed} km/h</p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          </motion.div>
-        ))}
-      </div>
     </div>
   );
 }

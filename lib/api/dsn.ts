@@ -15,27 +15,31 @@ export interface DSNDish {
   name: string;
   azimuthAngle: number;
   elevationAngle: number;
-  windSpeed: number;
-  isMSPA: boolean;
-  isArray: boolean;
-  isDDOR: boolean;
-  created: string;
-  updated: string;
+  windSpeed: number | string;
+  activity?: string;
+  isMSPA?: boolean;
+  isArray?: boolean;
+  isDDOR?: boolean;
+  created?: string;
+  updated?: string;
   targets: DSNTarget[];
 }
 
 export interface DSNTarget {
-  id: number;
+  id?: number | string;
   name: string;
   downSignal?: DSNSignal;
   upSignal?: DSNSignal;
   spacecraft?: string[];
+  rtlt?: string;
 }
 
 export interface DSNSignal {
-  signalType: string;
+  active?: boolean;
+  band?: string;
+  signalType?: string;
   dataRate: number;
-  frequency: number;
+  frequency?: number;
   power: number;
   signalTypeDebug?: string;
   spacecraftId?: number;
