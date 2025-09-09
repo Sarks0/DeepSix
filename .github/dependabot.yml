@@ -98,9 +98,9 @@ updates:
       time: "05:00"
     open-pull-requests-limit: 2
     reviewers:
-      - "sarks0"
+      - "Sarks0"
     assignees:
-      - "sarks0"
+      - "Sarks0"
     commit-message:
       prefix: "ci"
       include: "scope"
