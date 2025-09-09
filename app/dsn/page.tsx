@@ -83,6 +83,7 @@ export default function DeepSpaceNetworkPage() {
         dsnData={dsnData}
         isFullscreen={isFullscreen}
         onToggleFullscreen={toggleFullscreen}
+        onExitMissionControl={() => setViewMode('standard')}
       />
     );
   }

@@ -8,12 +8,14 @@ interface MissionControlDashboardProps {
   dsnData: DSNData;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  onExitMissionControl: () => void;
 }
 
 export function MissionControlDashboard({ 
   dsnData, 
   isFullscreen, 
-  onToggleFullscreen 
+  onToggleFullscreen,
+  onExitMissionControl 
 }: MissionControlDashboardProps) {
   const [alerts, setAlerts] = useState<Array<{
     id: string;
@@ -22,7 +24,6 @@ export function MissionControlDashboard({
     timestamp: Date;
   }>>([]);
   
-  const [soundEnabled, setSoundEnabled] = useState(false);
 
   // Calculate statistics
   const stats = {
@@ -46,33 +47,32 @@ export function MissionControlDashboard({
     ).size
   };
 
-  // Simulate alerts for new connections
+  // Track new spacecraft connections
   useEffect(() => {
-    const checkForChanges = () => {
-      // This would compare with previous state in real implementation
-      const newAlert = {
-        id: Date.now().toString(),
-        message: `New signal acquired: Voyager 1 on DSS-14`,
-        type: 'success' as const,
-        timestamp: new Date()
-      };
+    const checkForNewConnections = () => {
+      // Check for new spacecraft connections
+      const currentSpacecraft = new Set(
+        dsnData.stations.flatMap(s => 
+          s.dishes.flatMap(d => 
+            d.targets.flatMap(t => t.spacecraft || [])
+          )
+        )
+      );
       
-      // Random alerts for demo (remove in production)
-      if (Math.random() > 0.95) {
-        setAlerts(prev => [...prev.slice(-4), newAlert]);
-        
-        if (soundEnabled) {
-          // Play notification sound
-          const audio = new Audio('data:audio/wav;base64,UklGRnoGAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQoGAACBhYqFbF1fdJivrJBhNjVgodDbq2EcBj+a2/LDciUFLIHO8tiJNwgZaLvt559NEAxQp+PwtmMcBjiR1/LMeSwFJHfH8N2QQAoUXrTp66hVFApGn+DyvmwhBzGJ0fPTgjMGHm7A7+OZURE');
-          audio.volume = 0.3;
-          audio.play().catch(() => {});
-        }
+      // This would track changes in real implementation
+      if (currentSpacecraft.size > 0 && alerts.length === 0) {
+        const newAlert = {
+          id: Date.now().toString(),
+          message: `Tracking ${currentSpacecraft.size} spacecraft across ${dsnData.stations.length} stations`,
+          type: 'info' as const,
+          timestamp: new Date()
+        };
+        setAlerts([newAlert]);
       }
     };
 
-    const interval = setInterval(checkForChanges, 5000);
-    return () => clearInterval(interval);
-  }, [soundEnabled]);
+    checkForNewConnections();
+  }, [dsnData, alerts.length]);
 
   return (
     <div className={`${isFullscreen ? 'fixed inset-0 z-50 bg-gray-950' : ''} p-4`}>
@@ -84,15 +84,11 @@ export function MissionControlDashboard({
         
         <div className="flex items-center gap-3">
           <button
-            onClick={() => setSoundEnabled(!soundEnabled)}
-            className={`p-2 rounded transition-colors ${
-              soundEnabled 
-                ? 'bg-green-500/20 text-green-400' 
-                : 'bg-gray-800 text-gray-400'
-            }`}
-            title="Toggle sound alerts"
+            onClick={onExitMissionControl}
+            className="px-4 py-2 rounded bg-gray-800 text-gray-400 hover:bg-gray-700 transition-colors"
+            title="Exit Mission Control"
           >
-            {soundEnabled ? '🔔' : '🔕'}
+            ← Back to Standard View
           </button>
           <button
             onClick={onToggleFullscreen}
