@@ -1,5 +1,6 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
+import { MissionMilestones } from '@/components/mission-cards/MissionMilestones';
 
 // Dynamic page for mission details
 
@@ -124,17 +125,34 @@ const missions: Record<string, MissionData> = {
     location: 'Interstellar Space',
     distance: '25.1 billion km from Earth',
     description:
-      'Humanity&apos;s most distant spacecraft, exploring interstellar space and carrying the Golden Record.',
+      'Humanity\'s most distant spacecraft and first human-made object to enter interstellar space. After revolutionary flybys of Jupiter and Saturn, Voyager 1 continues its eternal journey carrying the Golden Record - a message from Earth to the cosmos.',
+    achievements: [
+      'First spacecraft to enter interstellar space (August 25, 2012)',
+      'Most distant human-made object from Earth',
+      'Discovered active volcanoes on Io (Jupiter\'s moon) - first beyond Earth',
+      'Discovered Jupiter\'s complex ring system',
+      'Detailed images of Saturn\'s rings revealing intricate structure',
+      'First close-up images of Titan showing thick atmosphere',
+      'Operating for over 47 years - longest operating spacecraft',
+      'Traveled over 25 billion kilometers from Earth',
+      'Confirmed the heliopause boundary at 121 AU from the Sun',
+    ],
     objectives: [
-      'Study the outer Solar System',
-      'Explore interstellar space',
-      'Carry humanity&apos;s message to the stars',
+      'Complete the Grand Tour of the outer planets',
+      'Study Jupiter and Saturn systems in detail',
+      'Investigate the boundary of the solar system',
+      'Explore the interstellar medium',
+      'Carry humanity\'s message via the Golden Record',
+      'Study cosmic rays and magnetic fields in interstellar space',
+      'Continue transmitting data as long as power permits (until ~2025)',
     ],
     instruments: [
-      'Cosmic Ray Subsystem',
-      'Low-Energy Charged Particles',
-      'Magnetometer',
-      'Plasma Wave System',
+      'Cosmic Ray Subsystem (CRS): Measures high-energy particles',
+      'Low-Energy Charged Particle (LECP): Detects ions and electrons',
+      'Magnetometer (MAG): Measures magnetic field strength and direction',
+      'Plasma Wave System (PWS): Detects plasma wave emissions',
+      'Cameras (disabled): Took over 67,000 images including the famous "Pale Blue Dot"',
+      'Golden Record: 12-inch gold-plated copper disk with sounds and images from Earth',
     ],
   },
   'voyager-2': {
@@ -145,17 +163,39 @@ const missions: Record<string, MissionData> = {
     location: 'Interstellar Space',
     distance: '20.9 billion km from Earth',
     description:
-      'The only spacecraft to visit all four giant planets, now exploring interstellar space.',
+      'The only spacecraft to visit all four giant planets - Jupiter, Saturn, Uranus, and Neptune. Voyager 2 provided humanity\'s first and only close-up look at the ice giants and entered interstellar space in 2018, continuing its epic journey of discovery.',
+    achievements: [
+      'Only spacecraft to visit Uranus (1986) and Neptune (1989)',
+      'Entered interstellar space (November 5, 2018)',
+      'Discovered 11 new moons: 3 at Jupiter, 4 at Saturn, 2 at Uranus, 2 at Neptune',
+      'First detailed images of Neptune\'s Great Dark Spot',
+      'Discovered active geysers on Neptune\'s moon Triton',
+      'Revealed Uranus\' unusual tilted magnetic field',
+      'Discovered Neptune\'s rings and unusual magnetic field',
+      'First to detect lightning on Jupiter and Saturn',
+      'Confirmed Europa has a subsurface ocean',
+      'Operating continuously for over 47 years',
+    ],
     objectives: [
-      'Grand Tour of the Solar System',
-      'Study Jupiter, Saturn, Uranus, and Neptune',
-      'Explore interstellar medium',
+      'Complete the Grand Tour visiting all four giant planets',
+      'First reconnaissance of Uranus and Neptune systems',
+      'Study the ice giants\' atmospheres, rings, and moons',
+      'Investigate the outer boundary of the solar system',
+      'Explore interstellar space from a different region than Voyager 1',
+      'Compare interstellar medium data with Voyager 1 findings',
+      'Continue operations until power depletion (~2025)',
     ],
     instruments: [
-      'Imaging Science System',
-      'Plasma Science Experiment',
-      'Infrared Interferometer Spectrometer',
-      'Photopolarimeter System',
+      'Imaging Science System (ISS): Twin cameras for detailed planetary photography',
+      'Cosmic Ray Subsystem (CRS): Studies high-energy particles',
+      'Plasma Science (PLS): Measures solar wind and planetary magnetospheres',
+      'Low-Energy Charged Particle (LECP): Analyzes ions and electrons',
+      'Magnetometer (MAG): Maps magnetic fields',
+      'Infrared Interferometer Spectrometer (IRIS): Analyzed atmospheric composition',
+      'Photopolarimeter System (PPS): Studied atmospheric particles',
+      'Planetary Radio Astronomy (PRA): Detected radio emissions from planets',
+      'Ultraviolet Spectrometer (UVS): Studied atmospheric composition',
+      'Golden Record: Identical to Voyager 1, carrying Earth\'s message to the cosmos',
     ],
   },
   'parker-solar-probe': {
@@ -164,18 +204,31 @@ const missions: Record<string, MissionData> = {
     type: 'Solar Probe',
     launchDate: 'August 12, 2018',
     location: 'Solar Orbit',
-    description: 'Touching the Sun to study the solar corona and solar wind.',
+    distance: '6.9 million km from Sun (closest approach)',
+    description: 'Humanity\'s first mission to "touch" the Sun, flying through the solar corona to unlock the mysteries of our closest star. Named after Eugene Parker who theorized the solar wind.',
+    achievements: [
+      'First spacecraft to fly through the solar corona (April 2021)',
+      'Fastest human-made object: 635,266 km/h (394,736 mph)',
+      'Closest approach to the Sun: 6.9 million km (4.3 million miles)',
+      'Discovered magnetic switchbacks in solar wind',
+      'First direct measurements of the solar wind acceleration zone',
+      'Captured first images of Venus\' surface in visible light',
+      'Discovered a dust-free zone around the Sun',
+      'Measured the solar wind slowing down as it leaves the Sun',
+    ],
     objectives: [
-      'Trace energy flow in the corona',
-      'Understand solar wind acceleration',
-      'Explore magnetic fields near the Sun',
-      'Study solar energetic particles',
+      'Trace the flow of energy that heats the corona and accelerates solar wind',
+      'Determine the structure and dynamics of magnetic fields at sources of solar wind',
+      'Explore mechanisms that accelerate and transport energetic particles',
+      'Study the dust environment near the Sun',
+      'Revolutionize our understanding of the Sun and its effects on space weather',
     ],
     instruments: [
-      'FIELDS: Electromagnetic fields investigation',
-      'WISPR: Wide-field Imager',
-      'ISʘIS: Integrated Science Investigation of the Sun',
-      'SWEAP: Solar Wind Electrons Alphas and Protons',
+      'FIELDS: Measures electric and magnetic fields, radio waves, and plasma density',
+      'WISPR: Wide-field Imager for Solar Probe - captures images of solar wind structures',
+      'ISʘIS: Integrated Science Investigation of the Sun - measures energetic particles',
+      'SWEAP: Solar Wind Electrons Alphas and Protons - counts particles and measures properties',
+      'Heat Shield: 11.43 cm thick carbon-composite shield protecting instruments from 1,377°C heat',
     ],
   },
 };
@@ -324,6 +377,11 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                 ))}
               </ul>
             </div>
+          )}
+
+          {/* Mission Timeline for Voyager and Parker */}
+          {(id.includes('voyager') || id === 'parker-solar-probe') && (
+            <MissionMilestones missionId={id} />
           )}
 
           {/* Mission Objectives */}
