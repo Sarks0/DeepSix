@@ -52,6 +52,26 @@ export default function AboutPage() {
 
   return (
     <div className="container mx-auto px-4 py-8 max-w-4xl">
+      {/* Work in Progress Notice */}
+      <motion.div 
+        initial={{ opacity: 0, y: -20 }} 
+        animate={{ opacity: 1, y: 0 }} 
+        className="mb-8 p-4 bg-yellow-900/20 border border-yellow-600/50 rounded-lg"
+      >
+        <div className="flex items-start gap-3">
+          <span className="text-2xl">⚠️</span>
+          <div>
+            <p className="text-lg font-bold text-yellow-400 mb-1">
+              🚧 Work in Progress
+            </p>
+            <p className="text-sm text-yellow-200/80">
+              <strong>This project is actively under development and may contain bugs or incomplete features.</strong> 
+              Data may not always be available or accurate. We appreciate your patience as we continue to improve DeepSix.
+            </p>
+          </div>
+        </div>
+      </motion.div>
+
       <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-12">
         <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           About DeepSix
