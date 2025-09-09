@@ -15,10 +15,10 @@ export default function Home() {
         transition={{ duration: 0.5 }}
         className="text-center mb-8"
       >
-        <h1 className="text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <h1 className="text-4xl md:text-5xl font-bold mb-3 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
           DeepSix
         </h1>
-        <p className="text-sm text-gray-400 max-w-2xl mx-auto">
+        <p className="text-lg text-gray-400 max-w-2xl mx-auto">
           Real-time mission control for humanity&apos;s journey into the deepest reaches of space
         </p>
       </motion.div>
