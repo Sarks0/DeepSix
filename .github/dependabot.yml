@@ -1,70 +1,110 @@
-# Dependabot configuration for DeepSix
-# Automatically creates pull requests to keep dependencies up-to-date
-
 version: 2
 updates:
-  # Enable version and security updates for npm packages
+  # npm - Main project dependencies
   - package-ecosystem: "npm"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "monday"
       time: "04:00"
-    open-pull-requests-limit: 10
-    pull-request-branch-name:
-      separator: "/"
+    open-pull-requests-limit: 5
+    reviewers:
+      - "sarks0"
+    assignees:
+      - "sarks0"
     commit-message:
       prefix: "deps"
       prefix-development: "deps-dev"
       include: "scope"
-    labels:
-      - "dependencies"
-      - "automated"
-    reviewers:
-      - "Sarks0"
     groups:
-      # Group all minor and patch updates together
-      minor-and-patch:
+      # Group Next.js and React updates together
+      next-react:
+        patterns:
+          - "next"
+          - "react"
+          - "react-dom"
+          - "@next/*"
+      # Group TypeScript and type definitions
+      typescript:
+        patterns:
+          - "typescript"
+          - "@types/*"
+      # Group Tailwind CSS and related
+      tailwind:
+        patterns:
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "autoprefixer"
+          - "postcss"
+      # Group testing dependencies
+      testing:
+        patterns:
+          - "@testing-library/*"
+          - "jest"
+          - "@jest/*"
+          - "vitest"
+      # Group ESLint and Prettier
+      linting:
+        patterns:
+          - "eslint"
+          - "eslint-*"
+          - "@eslint/*"
+          - "prettier"
+      # Group animation libraries
+      animation:
+        patterns:
+          - "framer-motion"
+          - "@react-spring/*"
+      # Group state management
+      state-management:
+        patterns:
+          - "zustand"
+          - "@tanstack/*"
+      # Group build tools
+      build-tools:
+        patterns:
+          - "@vercel/*"
+          - "sharp"
+          - "@swc/*"
+      # Group all other dependencies
+      misc-dependencies:
         patterns:
           - "*"
-        update-types:
-          - "minor"
-          - "patch"
-    ignore:
-      # Ignore major version updates for critical packages
-      - dependency-name: "next"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "react"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
-      - dependency-name: "react-dom"
-        update-types: ["version-update:semver-major", "version-update:semver-minor"]
-      - dependency-name: "three"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@types/node"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@react-three/fiber"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@react-three/drei"
-        update-types: ["version-update:semver-major"]
-      - dependency-name: "@cloudflare/next-on-pages"
-        update-types: ["version-update:semver-major"]
-    allow:
-      - dependency-type: "all"
+        exclude-patterns:
+          - "next"
+          - "react*"
+          - "@next/*"
+          - "typescript"
+          - "@types/*"
+          - "tailwindcss"
+          - "@tailwindcss/*"
+          - "eslint*"
+          - "@eslint/*"
+          - "prettier"
+          - "framer-motion"
+          - "zustand"
+          - "@vercel/*"
+          - "@testing-library/*"
+          - "jest"
+          - "@jest/*"
+          - "vitest"
 
-  # Enable updates for GitHub Actions
+  # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
-      interval: "weekly"
+      interval: "monthly"
       day: "monday"
-      time: "04:00"
-    pull-request-branch-name:
-      separator: "/"
+      time: "05:00"
+    open-pull-requests-limit: 2
+    reviewers:
+      - "sarks0"
+    assignees:
+      - "sarks0"
     commit-message:
       prefix: "ci"
       include: "scope"
-    labels:
-      - "github-actions"
-      - "automated"
-    reviewers:
-      - "Sarks0"
+    groups:
+      actions:
+        patterns:
+          - "*"

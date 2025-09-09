@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getApiKey } from '@/lib/api/config';
+import { calculateSol, formatSolDisplay, getSolMilestone } from '@/lib/utils/mars-sol';
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
 
@@ -241,6 +242,27 @@ export async function GET(
         total_photos: manifest.photo_manifest.total_photos,
         status: manifest.photo_manifest.status
       };
+    }
+
+    // Add sol tracking data
+    try {
+      const solData = calculateSol(rover, new Date());
+      const solDisplay = formatSolDisplay(solData);
+      const milestone = getSolMilestone(solData.currentSol);
+      
+      metadata.sol_tracking = {
+        current_sol: solData.currentSol,
+        mission_duration_earth_days: solData.missionDurationEarthDays,
+        mission_duration_sols: solData.missionDurationSols,
+        sol_progress: solData.solProgress,
+        mars_local_solar_time: solData.marsLocalSolarTime,
+        season: solData.season,
+        landing_date: solData.landingDate,
+        display: solDisplay,
+        milestone: milestone
+      };
+    } catch (error) {
+      console.error(`Error calculating sol data for ${rover}:`, error);
     }
 
     // Add cache headers for better performance

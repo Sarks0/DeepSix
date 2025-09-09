@@ -70,6 +70,7 @@ CLAUDE.md
 .claude/
 .wrangler/
 CLOUDFLARE_DEPLOYMENT.md
+features.md
 
 # Temporary files
 *.tmp
