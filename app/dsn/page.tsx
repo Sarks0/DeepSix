@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { dsnService, type DSNData, type DSNStation } from '@/lib/api/dsn';
+import { dsnService, type DSNData } from '@/lib/api/dsn';
 
 export default function DeepSpaceNetworkPage() {
   const [dsnData, setDsnData] = useState<DSNData | null>(null);
@@ -132,7 +132,7 @@ export default function DeepSpaceNetworkPage() {
             {/* Dishes Grid */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {station.dishes.map(dish => {
-                const hasTarget = dish.targets.length > 0 && dish.targets[0].spacecraft?.length > 0;
+                const hasTarget = dish.targets.length > 0 && dish.targets[0]?.spacecraft?.length && dish.targets[0].spacecraft.length > 0;
                 const isActive = hasTarget;
 
                 return (
@@ -151,7 +151,7 @@ export default function DeepSpaceNetworkPage() {
                       )}
                     </div>
 
-                    {hasTarget ? (
+                    {hasTarget && dish.targets[0] ? (
                       <div className="space-y-2">
                         <p className="text-sm text-green-400">
                           Tracking: {dish.targets[0].spacecraft?.map(sc => 
