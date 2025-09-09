@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { useSpacecraftDelays } from '@/hooks/use-spacecraft';
 import { RoverIcon, ProbeIcon, SolarIcon } from '@/components/icons/MissionIcons';
 import { SolTracker } from '@/components/dashboard/SolTracker';
+import { MissionTracker } from '@/components/dashboard/MissionTracker';
 
 export default function Home() {
   const { delays, isLoading } = useSpacecraftDelays();
@@ -41,6 +42,21 @@ export default function Home() {
         </div>
       </motion.div>
 
+      {/* Deep Space Missions Tracking Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.15 }}
+        className="mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Deep Space Mission Tracking</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+          <MissionTracker mission="voyager1" variant="detailed" />
+          <MissionTracker mission="voyager2" variant="detailed" />
+          <MissionTracker mission="parker" variant="detailed" />
+        </div>
+      </motion.div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -61,10 +77,6 @@ export default function Home() {
             <SolTracker rover="perseverance" variant="minimal" />
             <SolTracker rover="curiosity" variant="minimal" />
           </div>
-          <div className="flex items-center text-sm text-green-400 mt-3">
-            <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-            <span className="uppercase tracking-wider text-xs">Active</span>
-          </div>
         </motion.div>
 
         <motion.div
@@ -79,12 +91,12 @@ export default function Home() {
           <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
             Voyager Probes
           </h2>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-400 mb-3">
             The most distant human-made objects in interstellar space
           </p>
-          <div className="flex items-center text-sm text-green-400">
-            <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-            <span className="uppercase tracking-wider text-xs">Active</span>
+          <div className="space-y-2">
+            <MissionTracker mission="voyager1" variant="minimal" />
+            <MissionTracker mission="voyager2" variant="minimal" />
           </div>
         </motion.div>
 
@@ -100,13 +112,10 @@ export default function Home() {
           <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
             Parker Solar Probe
           </h2>
-          <p className="text-gray-400 mb-4">
+          <p className="text-gray-400 mb-3">
             Touching the Sun and studying our star&apos;s corona up close
           </p>
-          <div className="flex items-center text-sm text-green-400">
-            <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse shadow-[0_0_10px_rgba(74,222,128,0.8)]" />
-            <span className="uppercase tracking-wider text-xs">Active</span>
-          </div>
+          <MissionTracker mission="parker" variant="minimal" />
         </motion.div>
       </div>
 
