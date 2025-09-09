@@ -4,9 +4,9 @@ import { motion } from 'framer-motion';
 import type { DSNStation } from '@/lib/api/dsn';
 
 const STATION_LOCATIONS: Record<string, { lat: number; lon: number; name: string }> = {
-  gdscc: { lat: 35.4, lon: -116.9, name: 'Goldstone, CA' },
-  mdscc: { lat: 40.4, lon: -4.2, name: 'Madrid, Spain' },
-  cdscc: { lat: -35.4, lon: 148.9, name: 'Canberra, Australia' }
+  gdscc: { lat: 35.4, lon: -116.9, name: 'Goldstone, CA' },  // California, USA
+  mdscc: { lat: 40.4, lon: -4.2, name: 'Madrid, Spain' },     // Spain
+  cdscc: { lat: -35.4, lon: 149.0, name: 'Canberra, Australia' }  // Australia
 };
 
 interface EarthMap2DProps {
@@ -23,26 +23,20 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
 
   return (
     <div className="w-full h-96 bg-gray-900 rounded-lg overflow-hidden relative">
-      {/* Satellite map background */}
+      {/* NASA Blue Marble Earth map background */}
       <div 
-        className="absolute inset-0 bg-cover bg-center opacity-40"
+        className="absolute inset-0"
         style={{
-          backgroundImage: `url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/2/1/2')`,
+          backgroundImage: `url('https://eoimages.gsfc.nasa.gov/images/imagerecords/74000/74393/world.topo.200407.3x5400x2700.jpg')`,
           backgroundSize: 'cover',
-          filter: 'brightness(0.7) contrast(1.2)'
+          backgroundPosition: 'center',
+          filter: 'brightness(0.4) contrast(1.2) saturate(0.7)',
+          opacity: 0.8
         }}
-      />
-      
-      {/* Earth map image overlay */}
-      <img 
-        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Whole_world_-_land_and_oceans_12000.jpg/1920px-Whole_world_-_land_and_oceans_12000.jpg"
-        alt="World Map"
-        className="absolute inset-0 w-full h-full object-cover opacity-50"
-        style={{ filter: 'brightness(0.6) contrast(1.1) saturate(0.8)' }}
       />
 
       {/* Gradient overlay for better contrast */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 via-transparent to-gray-900/40" />
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/60 via-gray-900/20 to-gray-900/60" />
       
       {/* World map grid overlay */}
       <div className="absolute inset-0 opacity-20">
@@ -89,11 +83,18 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
           dish.targets.some(t => t.spacecraft && t.spacecraft.length > 0)
         );
 
+        // Adjust label position for edge cases
+        const labelPosition = x > 80 ? 'right' : 'left';
+        
         return (
           <motion.div
             key={station.name}
             className="absolute"
-            style={{ left: `${x}%`, top: `${y}%`, transform: 'translate(-50%, -50%)' }}
+            style={{ 
+              left: `${Math.max(5, Math.min(95, x))}%`, 
+              top: `${Math.max(10, Math.min(90, y))}%`, 
+              transform: 'translate(-50%, -50%)' 
+            }}
             initial={{ scale: 0 }}
             animate={{ scale: 1 }}
             transition={{ delay: stations.indexOf(station) * 0.1 }}
@@ -112,8 +113,10 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
                 )}
               </div>
 
-              {/* Station label */}
-              <div className="absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap">
+              {/* Station label - position based on location */}
+              <div className={`absolute top-1/2 -translate-y-1/2 whitespace-nowrap ${
+                labelPosition === 'right' ? 'right-6' : 'left-6'
+              }`}>
                 <div className="bg-gray-900/95 backdrop-blur-sm px-2 py-1 rounded text-xs border border-gray-700/50">
                   <div className="font-semibold text-white">{station.friendlyName}</div>
                   <div className="text-gray-400">{location.name}</div>
