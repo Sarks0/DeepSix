@@ -1,9 +1,7 @@
 'use client';
 
-import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useSpacecraftDelays } from '@/hooks/use-spacecraft';
-import { RoverIcon, ProbeIcon, SolarIcon } from '@/components/icons/MissionIcons';
 import { SolTracker } from '@/components/dashboard/SolTracker';
 import { MissionTracker } from '@/components/dashboard/MissionTracker';
 
@@ -56,68 +54,6 @@ export default function Home() {
           <MissionTracker mission="parker" variant="detailed" />
         </div>
       </motion.div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.2 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-red-500 transition-all hover:shadow-[0_0_30px_rgba(239,68,68,0.3)] hover:bg-gray-900/70"
-        >
-          <div className="h-12 w-12 bg-gradient-to-br from-red-600/30 to-orange-600/30 rounded-lg flex items-center justify-center mb-4 border border-red-500/30">
-            <RoverIcon className="text-red-400" size={28} />
-          </div>
-          <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-red-400 to-orange-400 bg-clip-text text-transparent">
-            Mars Missions
-          </h2>
-          <p className="text-gray-400 mb-3">
-            Follow Perseverance and Curiosity rovers exploring the Red Planet
-          </p>
-          <div className="space-y-2">
-            <SolTracker rover="perseverance" variant="minimal" />
-            <SolTracker rover="curiosity" variant="minimal" />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.3 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-purple-500 transition-all hover:shadow-[0_0_30px_rgba(168,85,247,0.3)] hover:bg-gray-900/70"
-        >
-          <div className="h-12 w-12 bg-gradient-to-br from-purple-600/30 to-indigo-600/30 rounded-lg flex items-center justify-center mb-4 border border-purple-500/30">
-            <ProbeIcon className="text-purple-400" size={28} />
-          </div>
-          <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-purple-400 to-indigo-400 bg-clip-text text-transparent">
-            Voyager Probes
-          </h2>
-          <p className="text-gray-400 mb-3">
-            The most distant human-made objects in interstellar space
-          </p>
-          <div className="space-y-2">
-            <MissionTracker mission="voyager1" variant="minimal" />
-            <MissionTracker mission="voyager2" variant="minimal" />
-          </div>
-        </motion.div>
-
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ delay: 0.4 }}
-          className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6 hover:border-yellow-500 transition-all hover:shadow-[0_0_30px_rgba(250,204,21,0.3)] hover:bg-gray-900/70"
-        >
-          <div className="h-12 w-12 bg-gradient-to-br from-yellow-600/30 to-orange-600/30 rounded-lg flex items-center justify-center mb-4 border border-yellow-500/30">
-            <SolarIcon className="text-yellow-400" size={28} />
-          </div>
-          <h2 className="text-xl font-semibold mb-2 bg-gradient-to-r from-yellow-400 to-orange-400 bg-clip-text text-transparent">
-            Parker Solar Probe
-          </h2>
-          <p className="text-gray-400 mb-3">
-            Touching the Sun and studying our star&apos;s corona up close
-          </p>
-          <MissionTracker mission="parker" variant="minimal" />
-        </motion.div>
-      </div>
 
       <motion.div
         initial={{ opacity: 0 }}
