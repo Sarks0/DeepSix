@@ -13,15 +13,12 @@ export default function Home() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="text-center mb-12"
+        className="text-center mb-8"
       >
-        <h1 className="text-5xl md:text-7xl font-bold mb-4 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
+        <h1 className="text-2xl md:text-3xl font-bold mb-2 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
           DeepSix
         </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-2">
-          Navigate the Deepest Frontiers
-        </p>
-        <p className="text-lg text-gray-500 max-w-2xl mx-auto">
+        <p className="text-sm text-gray-400 max-w-2xl mx-auto">
           Real-time mission control for humanity&apos;s journey into the deepest reaches of space
         </p>
       </motion.div>
