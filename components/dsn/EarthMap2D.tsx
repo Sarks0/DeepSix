@@ -22,9 +22,30 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
   };
 
   return (
-    <div className="w-full h-96 bg-gradient-to-b from-gray-900 via-blue-900/20 to-gray-900 rounded-lg overflow-hidden relative">
-      {/* World map background pattern */}
-      <div className="absolute inset-0 opacity-10">
+    <div className="w-full h-96 bg-gray-900 rounded-lg overflow-hidden relative">
+      {/* Satellite map background */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center opacity-40"
+        style={{
+          backgroundImage: `url('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/2/1/2')`,
+          backgroundSize: 'cover',
+          filter: 'brightness(0.7) contrast(1.2)'
+        }}
+      />
+      
+      {/* Earth map image overlay */}
+      <img 
+        src="https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/Whole_world_-_land_and_oceans_12000.jpg/1920px-Whole_world_-_land_and_oceans_12000.jpg"
+        alt="World Map"
+        className="absolute inset-0 w-full h-full object-cover opacity-50"
+        style={{ filter: 'brightness(0.6) contrast(1.1) saturate(0.8)' }}
+      />
+
+      {/* Gradient overlay for better contrast */}
+      <div className="absolute inset-0 bg-gradient-to-b from-gray-900/40 via-transparent to-gray-900/40" />
+      
+      {/* World map grid overlay */}
+      <div className="absolute inset-0 opacity-20">
         <svg className="w-full h-full" viewBox="0 0 360 180">
           {/* Grid lines */}
           {[...Array(7)].map((_, i) => (
@@ -79,9 +100,13 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
           >
             {/* Station dot */}
             <div className="relative">
-              <div className={`w-4 h-4 rounded-full ${
+              <div className={`w-5 h-5 rounded-full border-2 border-white/80 ${
                 hasActiveComms ? 'bg-green-500' : 'bg-red-500'
-              } shadow-lg`}>
+              } shadow-2xl`} style={{
+                boxShadow: hasActiveComms 
+                  ? '0 0 20px rgba(34, 197, 94, 0.8), 0 0 40px rgba(34, 197, 94, 0.4)' 
+                  : '0 0 20px rgba(239, 68, 68, 0.8), 0 0 40px rgba(239, 68, 68, 0.4)'
+              }}>
                 {hasActiveComms && (
                   <div className="absolute inset-0 rounded-full bg-green-400 animate-ping" />
                 )}
@@ -89,7 +114,7 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
 
               {/* Station label */}
               <div className="absolute left-6 top-1/2 -translate-y-1/2 whitespace-nowrap">
-                <div className="bg-gray-900/90 px-2 py-1 rounded text-xs">
+                <div className="bg-gray-900/95 backdrop-blur-sm px-2 py-1 rounded text-xs border border-gray-700/50">
                   <div className="font-semibold text-white">{station.friendlyName}</div>
                   <div className="text-gray-400">{location.name}</div>
                   {hasActiveComms && (
@@ -179,21 +204,21 @@ export function EarthMap2D({ stations }: EarthMap2DProps) {
       </svg>
 
       {/* Legend */}
-      <div className="absolute bottom-4 left-4 bg-gray-900/80 backdrop-blur-sm rounded-lg p-3">
+      <div className="absolute bottom-4 left-4 bg-gray-900/95 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
         <div className="flex items-center gap-4 text-xs">
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse shadow-lg shadow-green-500/50"></div>
             <span className="text-gray-300">Active Station</span>
           </div>
           <div className="flex items-center gap-2">
-            <div className="w-3 h-3 bg-red-500 rounded-full"></div>
+            <div className="w-3 h-3 bg-red-500 rounded-full shadow-lg shadow-red-500/50"></div>
             <span className="text-gray-300">Idle Station</span>
           </div>
         </div>
       </div>
 
       {/* Title */}
-      <div className="absolute top-4 left-4">
+      <div className="absolute top-4 left-4 bg-gray-900/95 backdrop-blur-sm rounded-lg p-3 border border-gray-700/50">
         <h3 className="text-lg font-bold text-white">Global Station Network</h3>
         <p className="text-xs text-gray-400">Real-time communication status</p>
       </div>
