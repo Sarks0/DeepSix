@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { dsnService, type DSNData } from '@/lib/api/dsn';
 import { SignalVisualizer } from '@/components/dsn/SignalVisualizer';
-import { SpacecraftTimeline } from '@/components/dsn/SpacecraftTimeline';
 import { MissionControlDashboard } from '@/components/dsn/MissionControlDashboard';
 import { StationList } from '@/components/dsn/StationList';
 
@@ -15,7 +14,6 @@ export default function DeepSpaceNetworkPage() {
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
   const [viewMode, setViewMode] = useState<'standard' | 'mission-control'>('standard');
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [selectedSpacecraft, setSelectedSpacecraft] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -191,36 +189,6 @@ export default function DeepSpaceNetworkPage() {
         </motion.div>
       )}
 
-      {/* Spacecraft Timeline - Show available spacecraft from active communications */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">Spacecraft Missions</h2>
-        <div className="flex flex-wrap gap-2 mb-4">
-          {activeSpacecraft.length > 0 ? (
-            activeSpacecraft.map(sc => (
-              <button
-                key={sc.spacecraft}
-                onClick={() => setSelectedSpacecraft(selectedSpacecraft === sc.spacecraft ? null : sc.spacecraft)}
-                className={`px-3 py-1 rounded transition-colors ${
-                  selectedSpacecraft === sc.spacecraft
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                }`}
-              >
-                {dsnService.formatSpacecraftName(sc.spacecraft)}
-              </button>
-            ))
-          ) : (
-            <p className="text-gray-500">No active spacecraft communications</p>
-          )}
-        </div>
-        
-        {selectedSpacecraft && (
-          <SpacecraftTimeline
-            spacecraftCode={selectedSpacecraft}
-            isActive={activeSpacecraft.some(sc => sc.spacecraft === selectedSpacecraft)}
-          />
-        )}
-      </div>
 
     </div>
   );

@@ -23,7 +23,6 @@ export function MissionControlDashboard({
   }>>([]);
   
   const [soundEnabled, setSoundEnabled] = useState(false);
-  const [selectedPanel, setSelectedPanel] = useState<'overview' | 'stations' | 'signals' | 'timeline'>('overview');
 
   // Calculate statistics
   const stats = {
@@ -81,21 +80,6 @@ export function MissionControlDashboard({
       <div className="flex justify-between items-center mb-4">
         <div className="flex items-center gap-4">
           <h2 className="text-2xl font-bold text-white">Mission Control</h2>
-          <div className="flex gap-2">
-            {(['overview', 'stations', 'signals', 'timeline'] as const).map(panel => (
-              <button
-                key={panel}
-                onClick={() => setSelectedPanel(panel)}
-                className={`px-3 py-1 rounded text-sm transition-colors ${
-                  selectedPanel === panel
-                    ? 'bg-blue-500 text-white'
-                    : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
-                }`}
-              >
-                {panel.charAt(0).toUpperCase() + panel.slice(1)}
-              </button>
-            ))}
-          </div>
         </div>
         
         <div className="flex items-center gap-3">
