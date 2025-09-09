@@ -25,6 +25,7 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "three": "^0.180.0",
+    "xml2js": "^0.6.2",
     "zustand": "^5.0.8"
   },
   "devDependencies": {

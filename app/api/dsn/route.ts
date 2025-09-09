@@ -1,102 +1,129 @@
 import { NextResponse } from 'next/server';
+import { parseStringPromise } from 'xml2js';
 
-export const runtime = 'edge';
+// Use Node.js runtime for XML parsing
+export const runtime = 'nodejs';
 
 // Parse XML to JSON
-function parseXMLToJSON(xml: string): any {
-  const parser = new DOMParser();
-  const doc = parser.parseFromString(xml, 'text/xml');
-  
-  const stations: any[] = [];
-  
-  // Get all station nodes
-  const stationNodes = doc.querySelectorAll('station');
-  
-  stationNodes.forEach(stationNode => {
-    const station: any = {
-      name: stationNode.getAttribute('name') || '',
-      friendlyName: stationNode.getAttribute('friendlyname') || '',
-      timeUTC: parseInt(stationNode.getAttribute('timeUTC') || '0'),
-      timeZoneOffset: parseInt(stationNode.getAttribute('timeZoneOffset') || '0'),
-      dishes: []
-    };
-    
-    // Get all dish nodes for this station
-    const dishNodes = stationNode.querySelectorAll('dish');
-    
-    dishNodes.forEach(dishNode => {
-      const dish: any = {
-        name: dishNode.getAttribute('name') || '',
-        azimuthAngle: parseFloat(dishNode.getAttribute('azimuthAngle') || '0'),
-        elevationAngle: parseFloat(dishNode.getAttribute('elevationAngle') || '0'),
-        windSpeed: parseFloat(dishNode.getAttribute('windSpeed') || '0'),
-        isMSPA: dishNode.getAttribute('isMSPA') === 'true',
-        isArray: dishNode.getAttribute('isArray') === 'true',
-        isDDOR: dishNode.getAttribute('isDDOR') === 'true',
-        created: dishNode.getAttribute('created') || '',
-        updated: dishNode.getAttribute('updated') || '',
-        targets: []
-      };
-      
-      // Get target nodes
-      const downSignalNode = dishNode.querySelector('downSignal');
-      const upSignalNode = dishNode.querySelector('upSignal');
-      const targetNode = dishNode.querySelector('target');
-      
-      if (targetNode || downSignalNode || upSignalNode) {
-        const target: any = {
-          id: targetNode ? parseInt(targetNode.getAttribute('id') || '0') : 0,
-          name: targetNode ? targetNode.getAttribute('name') || '' : '',
-          spacecraft: []
-        };
-        
-        // Parse spacecraft
-        if (targetNode) {
-          const spacecraftNodes = targetNode.querySelectorAll('spacecraft');
-          spacecraftNodes.forEach(scNode => {
-            const scName = scNode.getAttribute('name');
-            if (scName) {
-              target.spacecraft.push(scName);
-            }
-          });
-        }
-        
-        // Parse down signal
-        if (downSignalNode) {
-          target.downSignal = {
-            signalType: downSignalNode.getAttribute('signalType') || '',
-            dataRate: parseFloat(downSignalNode.getAttribute('dataRate') || '0'),
-            frequency: parseFloat(downSignalNode.getAttribute('frequency') || '0'),
-            power: parseFloat(downSignalNode.getAttribute('power') || '0'),
-            spacecraftId: parseInt(downSignalNode.getAttribute('spacecraftId') || '0')
-          };
-        }
-        
-        // Parse up signal
-        if (upSignalNode) {
-          target.upSignal = {
-            signalType: upSignalNode.getAttribute('signalType') || '',
-            dataRate: parseFloat(upSignalNode.getAttribute('dataRate') || '0'),
-            frequency: parseFloat(upSignalNode.getAttribute('frequency') || '0'),
-            power: parseFloat(upSignalNode.getAttribute('power') || '0')
-          };
-        }
-        
-        if (target.spacecraft.length > 0 || target.downSignal || target.upSignal) {
-          dish.targets.push(target);
-        }
-      }
-      
-      station.dishes.push(dish);
+async function parseXMLToJSON(xml: string): Promise<any> {
+  try {
+    const result = await parseStringPromise(xml, {
+      explicitArray: false,
+      ignoreAttrs: false,
+      mergeAttrs: false
     });
-    
-    stations.push(station);
-  });
-  
-  return {
-    stations,
-    timestamp: Date.now()
-  };
+
+    if (!result.dsn || !result.dsn.station) {
+      return { stations: [], timestamp: Date.now() };
+    }
+
+    // Ensure stations is always an array
+    const stationData = Array.isArray(result.dsn.station) 
+      ? result.dsn.station 
+      : [result.dsn.station];
+
+    const stations = stationData.map((station: any) => {
+      const stationInfo = {
+        name: station.$.name || '',
+        friendlyName: station.$.friendlyname || '',
+        timeUTC: parseInt(station.$.timeUTC || '0'),
+        timeZoneOffset: parseInt(station.$.timeZoneOffset || '0'),
+        dishes: [] as any[]
+      };
+
+      // Process dishes
+      if (station.dish) {
+        const dishes = Array.isArray(station.dish) ? station.dish : [station.dish];
+        
+        stationInfo.dishes = dishes.map((dish: any) => {
+          const dishInfo: any = {
+            name: dish.$.name || '',
+            azimuthAngle: parseFloat(dish.$.azimuthAngle || '0'),
+            elevationAngle: parseFloat(dish.$.elevationAngle || '0'),
+            windSpeed: parseFloat(dish.$.windSpeed || '0'),
+            isMSPA: dish.$.isMSPA === 'true',
+            isArray: dish.$.isArray === 'true',
+            isDDOR: dish.$.isDDOR === 'true',
+            created: dish.$.created || '',
+            updated: dish.$.updated || '',
+            targets: []
+          };
+
+          // Process targets
+          if (dish.target || dish.downSignal || dish.upSignal) {
+            const target: any = {
+              id: 0,
+              name: '',
+              spacecraft: []
+            };
+
+            // Handle target info
+            if (dish.target) {
+              const targetData = Array.isArray(dish.target) ? dish.target[0] : dish.target;
+              target.id = parseInt(targetData.$.id || '0');
+              target.name = targetData.$.name || '';
+              
+              // Handle spacecraft
+              if (targetData.spacecraft) {
+                const spacecraftData = Array.isArray(targetData.spacecraft) 
+                  ? targetData.spacecraft 
+                  : [targetData.spacecraft];
+                
+                target.spacecraft = spacecraftData
+                  .map((sc: any) => sc.$.name || sc._ || '')
+                  .filter((name: string) => name);
+              }
+            }
+
+            // Handle downSignal
+            if (dish.downSignal) {
+              const downSignalData = Array.isArray(dish.downSignal) 
+                ? dish.downSignal[0] 
+                : dish.downSignal;
+              
+              target.downSignal = {
+                signalType: downSignalData.$.signalType || '',
+                dataRate: parseFloat(downSignalData.$.dataRate || '0'),
+                frequency: parseFloat(downSignalData.$.frequency || '0'),
+                power: parseFloat(downSignalData.$.power || '0'),
+                spacecraftId: parseInt(downSignalData.$.spacecraftId || '0')
+              };
+            }
+
+            // Handle upSignal
+            if (dish.upSignal) {
+              const upSignalData = Array.isArray(dish.upSignal) 
+                ? dish.upSignal[0] 
+                : dish.upSignal;
+              
+              target.upSignal = {
+                signalType: upSignalData.$.signalType || '',
+                dataRate: parseFloat(upSignalData.$.dataRate || '0'),
+                frequency: parseFloat(upSignalData.$.frequency || '0'),
+                power: parseFloat(upSignalData.$.power || '0')
+              };
+            }
+
+            if (target.spacecraft.length > 0 || target.downSignal || target.upSignal) {
+              dishInfo.targets.push(target);
+            }
+          }
+
+          return dishInfo;
+        });
+      }
+
+      return stationInfo;
+    });
+
+    return {
+      stations,
+      timestamp: Date.now()
+    };
+  } catch (error) {
+    console.error('Error parsing XML:', error);
+    return { stations: [], timestamp: Date.now() };
+  }
 }
 
 export async function GET() {
@@ -111,7 +138,7 @@ export async function GET() {
     }
 
     const xmlText = await response.text();
-    const jsonData = parseXMLToJSON(xmlText);
+    const jsonData = await parseXMLToJSON(xmlText);
 
     return NextResponse.json(jsonData, {
       headers: {

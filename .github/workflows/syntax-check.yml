@@ -26,11 +26,10 @@ jobs:
         run: npm ci
       
       - name: TypeScript compiler check
-        run: npm run type-check || true
+        run: npm run type-check
       
       - name: ESLint check
         run: npm run lint
-        continue-on-error: true
 
   syntax-json-yaml:
     name: JSON & YAML Syntax Check
