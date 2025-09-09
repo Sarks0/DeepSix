@@ -1,5 +1,9 @@
 # DeepSix - Navigate the Deepest Frontiers
 
+<div align="center">
+  <img src="deepSix.png" alt="DeepSix Logo" width="600" />
+</div>
+
 A real-time dashboard for tracking humanity's furthest reach into the cosmos. DeepSix provides live mission data, comprehensive tracking of NASA's deep space missions, and real-time Mars sol cycle monitoring.
 
 **Note:** This is still a work in progress. I have other ideas to implement and will add them when I can. This is not a full-time project but more of a hobby, so there is more to come with the data that exists through NASA and other agencies.

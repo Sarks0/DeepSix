@@ -14,8 +14,8 @@
     "test": "npm run type-check && npm run lint"
   },
   "dependencies": {
-    "@react-three/drei": "^9.109.2",
-    "@react-three/fiber": "^8.16.8",
+    "@react-three/drei": "^9.122.0",
+    "@react-three/fiber": "^8.18.0",
     "@vercel/analytics": "^1.5.0",
     "clsx": "^2.1.1",
     "framer-motion": "^12.23.12",
@@ -25,12 +25,14 @@
     "swr": "^2.3.6",
     "tailwind-merge": "^3.3.1",
     "three": "^0.180.0",
+    "xml2js": "^0.6.2",
     "zustand": "^5.0.8"
   },
   "devDependencies": {
     "@types/node": "20.19.13",
     "@types/react": "18.3.17",
     "@types/react-dom": "18.3.5",
+    "@types/xml2js": "^0.4.14",
     "eslint": "8.57.1",
     "eslint-config-next": "15.5.2",
     "postcss": "8.5.6",
