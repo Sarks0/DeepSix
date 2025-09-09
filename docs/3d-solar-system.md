@@ -4,7 +4,7 @@ A comprehensive 3D interactive solar system visualization built with React Three
 
 ## Features Implemented
 
-### 🌟 Core Components
+### Core Components
 
 1. **SolarSystemScene.tsx** - Main scene component with Canvas setup
 2. **Sun.tsx** - Animated central star with corona effects
@@ -14,7 +14,7 @@ A comprehensive 3D interactive solar system visualization built with React Three
 6. **OrbitPath.tsx** - Orbital path visualization
 7. **SolarSystemControls.tsx** - Interactive control panel
 
-### 🚀 Interactive Features
+### Interactive Features
 
 - **Mouse Controls**: Click and drag to orbit, scroll to zoom
 - **Object Focus**: Click any planet, star, or spacecraft to focus camera
@@ -22,7 +22,7 @@ A comprehensive 3D interactive solar system visualization built with React Three
 - **Mission Tracking**: Live positions of active spacecraft
 - **Performance Optimization**: Automatic quality adjustment
 
-### 🎯 Control Options
+### Control Options
 
 - Toggle orbital paths visibility
 - Show/hide labels and spacecraft
@@ -31,14 +31,14 @@ A comprehensive 3D interactive solar system visualization built with React Three
 - Quick focus buttons for major objects
 - Performance level selection
 
-### 🛸 Featured Spacecraft
+### Featured Spacecraft
 
 - **Mars Rovers**: Perseverance, Curiosity (on Mars surface)
 - **Deep Space Probes**: Voyager 1 & 2, New Horizons, Parker Solar Probe
 - **Status Indicators**: Active (green), Inactive (orange), Lost (red)
 - **Mission Information**: Launch dates, current locations, objectives
 
-### 🌍 Accurate Planetary Data
+### Accurate Planetary Data
 
 - **Orbital Mechanics**: Real AU distances and orbital periods
 - **Physical Properties**: Accurate size ratios and axial tilts

@@ -1,8 +1,8 @@
 # NASA API Analysis for Stellar Navigator
 
-## Available APIs ✅
+## Available APIs 
 
-### 1. **Mars Rover Photos API** ✅
+### 1. **Mars Rover Photos API** 
 
 - **Status**: Fully Available
 - **Endpoints**:
@@ -12,45 +12,45 @@
 - **Data**: Photos from Perseverance, Curiosity, Opportunity, Spirit
 - **Use Case**: Perfect for Mars mission tracking and latest photos
 
-### 2. **InSight Weather API** ⚠️
+### 2. **InSight Weather API** 
 
 - **Status**: Limited/Deprecated
 - **Issues**: InSight lander ceased operations in Dec 2022
 - **Alternative**: Use historical data or Mars rover environmental data
 
-### 3. **EPIC Earth Imagery** ✅
+### 3. **EPIC Earth Imagery** 
 
 - **Status**: Available
 - **Data**: Earth images from DSCOVR satellite
 - **Use Case**: Beautiful Earth imagery for context
 
-### 4. **APOD (Astronomy Picture of the Day)** ✅
+### 4. **APOD (Astronomy Picture of the Day)** 
 
 - **Status**: Available
 - **Use Case**: Daily space imagery for engagement
 
-## Missing Critical Data ❌
+## Missing Critical Data 
 
 ### Deep Space Mission Tracking
 
 NASA's public APIs **DO NOT** provide:
 
-- ❌ Voyager 1 & 2 real-time positions
-- ❌ Parker Solar Probe telemetry
-- ❌ New Horizons tracking data
-- ❌ Real-time spacecraft distances from Earth
-- ❌ Communication delay calculations
-- ❌ Deep Space Network status
+- Voyager 1 & 2 real-time positions
+- Parker Solar Probe telemetry
+- New Horizons tracking data
+- Real-time spacecraft distances from Earth
+- Communication delay calculations
+- Deep Space Network status
 
 ## Solution: JPL Horizons API 🚀
 
 ### What It Provides
 
-- ✅ Ephemeris data for ALL spacecraft
-- ✅ Position vectors (X, Y, Z coordinates)
-- ✅ Velocity and acceleration data
-- ✅ Distance from Earth/Sun
-- ✅ Historical and predicted positions
+- Ephemeris data for ALL spacecraft
+- Position vectors (X, Y, Z coordinates)
+- Velocity and acceleration data
+- Distance from Earth/Sun
+- Historical and predicted positions
 
 ### Spacecraft IDs
 
@@ -109,9 +109,9 @@ const delaySeconds = distanceKm / lightSpeedKmPerSec;
 
 ### Must Have
 
-1. ✅ Implement JPL Horizons integration immediately
-2. ✅ Build communication delay calculator
-3. ✅ Use Mars Rover API for Mars missions
+1. Implement JPL Horizons integration immediately
+2. Build communication delay calculator
+3. Use Mars Rover API for Mars missions
 
 ### Nice to Have
 

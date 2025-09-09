@@ -3,12 +3,19 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { dsnService, type DSNData } from '@/lib/api/dsn';
+import { SignalVisualizer } from '@/components/dsn/SignalVisualizer';
+import { SpacecraftTimeline } from '@/components/dsn/SpacecraftTimeline';
+import { MissionControlDashboard } from '@/components/dsn/MissionControlDashboard';
+import { EarthGlobe } from '@/components/dsn/EarthGlobe';
 
 export default function DeepSpaceNetworkPage() {
   const [dsnData, setDsnData] = useState<DSNData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [lastUpdate, setLastUpdate] = useState<Date>(new Date());
+  const [viewMode, setViewMode] = useState<'standard' | 'mission-control'>('standard');
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [selectedSpacecraft, setSelectedSpacecraft] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -33,6 +40,16 @@ export default function DeepSpaceNetworkPage() {
 
     return () => clearInterval(interval);
   }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      document.documentElement.requestFullscreen();
+      setIsFullscreen(true);
+    } else {
+      document.exitFullscreen();
+      setIsFullscreen(false);
+    }
+  };
 
   if (loading) {
     return (
@@ -61,6 +78,18 @@ export default function DeepSpaceNetworkPage() {
 
   const activeSpacecraft = dsnService.getActiveSpacecraft(dsnData);
 
+  // Mission Control Mode
+  if (viewMode === 'mission-control') {
+    return (
+      <MissionControlDashboard
+        dsnData={dsnData}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={toggleFullscreen}
+      />
+    );
+  }
+
+  // Standard View
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Header */}
@@ -69,22 +98,46 @@ export default function DeepSpaceNetworkPage() {
         animate={{ opacity: 1, y: 0 }}
         className="mb-8"
       >
-        <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
-          Deep Space Network
-        </h1>
-        <p className="text-gray-400">
-          Real-time communication status with spacecraft across the solar system
-        </p>
-        <p className="text-sm text-gray-500 mt-2">
-          Last updated: {lastUpdate.toLocaleTimeString()} • Updates every 10 seconds
-        </p>
+        <div className="flex justify-between items-start">
+          <div>
+            <h1 className="text-4xl font-bold mb-2 bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">
+              Deep Space Network
+            </h1>
+            <p className="text-gray-400">
+              Real-time communication status with spacecraft across the solar system
+            </p>
+            <p className="text-sm text-gray-500 mt-2">
+              Last updated: {lastUpdate.toLocaleTimeString()} • Updates every 10 seconds
+            </p>
+          </div>
+          
+          <div className="flex gap-2">
+            <button
+              onClick={() => setViewMode('mission-control')}
+              className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
+            >
+              Mission Control Mode
+            </button>
+          </div>
+        </div>
+      </motion.div>
+
+      {/* 3D Earth Globe */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.1 }}
+        className="mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-4">Global Station Network</h2>
+        <EarthGlobe stations={dsnData.stations} />
       </motion.div>
 
       {/* Active Communications Summary */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.2 }}
         className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8"
       >
         <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700">
@@ -103,6 +156,68 @@ export default function DeepSpaceNetworkPage() {
         </div>
       </motion.div>
 
+      {/* Signal Visualizers for Active Communications */}
+      {activeSpacecraft.length > 0 && (
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+          className="mb-8"
+        >
+          <h2 className="text-2xl font-bold mb-4">Live Signal Visualization</h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {activeSpacecraft.slice(0, 4).map((sc, idx) => {
+              const dish = dsnData.stations
+                .flatMap(s => s.dishes)
+                .find(d => d.targets.some(t => t.spacecraft?.includes(sc.spacecraft)));
+              
+              const target = dish?.targets.find(t => t.spacecraft?.includes(sc.spacecraft));
+              
+              if (!target) return null;
+
+              return (
+                <SignalVisualizer
+                  key={`${sc.spacecraft}-${idx}`}
+                  dataRate={target.downSignal?.dataRate || target.upSignal?.dataRate || 0}
+                  frequency={target.downSignal?.frequency || target.upSignal?.frequency || 0}
+                  power={target.downSignal?.power || target.upSignal?.power || 0}
+                  signalType={target.downSignal ? 'downlink' : 'uplink'}
+                  spacecraftName={dsnService.formatSpacecraftName(sc.spacecraft)}
+                  isActive={true}
+                />
+              );
+            })}
+          </div>
+        </motion.div>
+      )}
+
+      {/* Spacecraft Timeline - Show for selected spacecraft */}
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold mb-4">Spacecraft Missions</h2>
+        <div className="flex gap-2 mb-4">
+          {['VGR1', 'VGR2'].map(code => (
+            <button
+              key={code}
+              onClick={() => setSelectedSpacecraft(code)}
+              className={`px-3 py-1 rounded transition-colors ${
+                selectedSpacecraft === code
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-800 text-gray-400 hover:bg-gray-700'
+              }`}
+            >
+              {code === 'VGR1' ? 'Voyager 1' : 'Voyager 2'}
+            </button>
+          ))}
+        </div>
+        
+        {selectedSpacecraft && (
+          <SpacecraftTimeline
+            spacecraftCode={selectedSpacecraft}
+            isActive={activeSpacecraft.some(sc => sc.spacecraft === selectedSpacecraft)}
+          />
+        )}
+      </div>
+
       {/* Station Status Grid */}
       <div className="space-y-6">
         {dsnData.stations.map((station, idx) => (
@@ -110,7 +225,7 @@ export default function DeepSpaceNetworkPage() {
             key={station.name}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 + idx * 0.1 }}
+            transition={{ delay: 0.4 + idx * 0.1 }}
             className="bg-gray-800/30 rounded-lg p-6 border border-gray-700"
           >
             <div className="flex items-center justify-between mb-4">
@@ -185,41 +300,6 @@ export default function DeepSpaceNetworkPage() {
           </motion.div>
         ))}
       </div>
-
-      {/* Active Spacecraft List */}
-      {activeSpacecraft.length > 0 && (
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.5 }}
-          className="mt-8 bg-gray-800/30 rounded-lg p-6 border border-gray-700"
-        >
-          <h2 className="text-xl font-bold mb-4">Active Communications</h2>
-          <div className="space-y-2">
-            {activeSpacecraft.map((sc, idx) => (
-              <div
-                key={`${sc.spacecraft}-${sc.dish}-${idx}`}
-                className="flex items-center justify-between p-3 bg-gray-900/50 rounded-lg"
-              >
-                <div>
-                  <p className="font-medium text-white">
-                    {dsnService.formatSpacecraftName(sc.spacecraft)}
-                  </p>
-                  <p className="text-sm text-gray-400">
-                    {sc.station} • {sc.dish}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <p className="text-sm font-mono text-green-400">
-                    {formatDataRate(sc.dataRate)}
-                  </p>
-                  <p className="text-xs text-gray-500">{sc.signalType}</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </motion.div>
-      )}
     </div>
   );
 }
