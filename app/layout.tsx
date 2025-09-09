@@ -26,9 +26,9 @@ export const metadata: Metadata = {
     'NASA, space missions, Mars rover, Voyager, deep space, mission control, space exploration, DeepSix',
   authors: [{ name: 'DeepSix Team' }],
   icons: {
-    icon: '/favicon.ico',
-    shortcut: '/favicon.ico',
-    apple: '/favicon.ico',
+    icon: '/icon.svg',
+    shortcut: '/icon.svg',
+    apple: '/icon.svg',
   },
   openGraph: {
     title: 'DeepSix - Navigate the Deepest Frontiers',
