@@ -1,12 +1,10 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { useSpacecraftDelays } from '@/hooks/use-spacecraft';
 import { SolTracker } from '@/components/dashboard/SolTracker';
 import { MissionTracker } from '@/components/dashboard/MissionTracker';
 
 export default function Home() {
-  const { delays, isLoading } = useSpacecraftDelays();
   return (
     <div className="container mx-auto px-4 py-8">
       <motion.div
@@ -50,37 +48,6 @@ export default function Home() {
           <MissionTracker mission="voyager2" variant="detailed" />
           <MissionTracker mission="parker" variant="detailed" />
         </div>
-      </motion.div>
-
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg border border-gray-700 p-8"
-      >
-        <h2 className="text-2xl font-bold mb-4">Communication Delay Calculator</h2>
-        {isLoading ? (
-          <div className="text-center py-8">
-            <div className="animate-pulse text-gray-400">Loading spacecraft data...</div>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-gray-900/50 rounded-lg p-4">
-              <p className="text-sm text-gray-400 mb-1">Mars</p>
-              <p className="text-2xl font-mono font-bold text-orange-400">~14 min</p>
-              <p className="text-xs text-gray-500">varies by position</p>
-            </div>
-            {delays.slice(0, 2).map((spacecraft) => (
-              <div key={spacecraft.id} className="bg-gray-900/50 rounded-lg p-4">
-                <p className="text-sm text-gray-400 mb-1">{spacecraft.name}</p>
-                <p className="text-2xl font-mono font-bold text-purple-400">
-                  {spacecraft.oneWay || 'N/A'}
-                </p>
-                <p className="text-xs text-gray-500">{spacecraft.distanceAU} AU from Earth</p>
-              </div>
-            ))}
-          </div>
-        )}
       </motion.div>
 
     </div>
