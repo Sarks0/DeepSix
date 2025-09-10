@@ -37,7 +37,7 @@ export function RoverPhotoGallery({
   rover = 'perseverance',
   limit = 12,
   autoRotate = true,
-  rotateInterval = 30000, // 30 seconds
+  rotateInterval = 120000, // 2 minutes
 }: RoverPhotoGalleryProps) {
   const [photos, setPhotos] = useState<RoverPhoto[]>([]);
   const [displayedPhotos, setDisplayedPhotos] = useState<RoverPhoto[]>([]);
@@ -65,7 +65,7 @@ export function RoverPhotoGallery({
 
   const loadCachedPhotos = useCallback(async () => {
     try {
-      const cachedImages = await imageCache.getCachedImagesByRover(rover, 50);
+      const cachedImages = await imageCache.getCachedImagesByRover(rover, 200);
       if (cachedImages.length > 0) {
         const cachedPhotos = cachedImages.map(img => {
           // Reconstruct photo object from cached data
@@ -117,9 +117,9 @@ export function RoverPhotoGallery({
   }, [rover]);
 
   const fetchLatestPhotos = useCallback(async (forceRefresh = false) => {
-    // Prevent too frequent fetches (minimum 5 minutes between fetches)
+    // Prevent too frequent fetches (minimum 1 hour between fetches for better caching)
     const now = Date.now();
-    if (!forceRefresh && now - lastFetchTime.current < 5 * 60 * 1000) {
+    if (!forceRefresh && now - lastFetchTime.current < 60 * 60 * 1000) {
       console.log('Skipping fetch - too soon since last fetch');
       return;
     }
@@ -137,8 +137,8 @@ export function RoverPhotoGallery({
     }
 
     try {
-      // Fetch latest photos from API
-      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=50`);
+      // Fetch latest photos from API with extended range
+      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=200`);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -186,12 +186,12 @@ export function RoverPhotoGallery({
   useEffect(() => {
     fetchLatestPhotos();
 
-    // Set up periodic refresh (every hour when online)
+    // Set up periodic refresh (every 6 hours when online for better caching)
     const refreshInterval = setInterval(() => {
       if (isOnline) {
         fetchLatestPhotos(true); // Force refresh
       }
-    }, 60 * 60 * 1000); // 1 hour
+    }, 6 * 60 * 60 * 1000); // 6 hours
 
     // Cleanup
     return () => {

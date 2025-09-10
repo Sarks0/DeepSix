@@ -93,7 +93,7 @@ async function fetchRoverPhotos(
 async function fetchLatestPhotos(
   rover: RoverName,
   apiKey: string,
-  limit: number = 50
+  limit: number = 200
 ): Promise<RoverPhoto[]> {
   try {
     // First, try the latest_photos endpoint for the most recent photos
@@ -120,9 +120,9 @@ async function fetchLatestPhotos(
   const maxSol = manifest.photo_manifest.max_sol;
   const recentPhotos: RoverPhoto[] = [];
   
-  // Try to get photos from the last 30 sols with photos
+  // Try to get photos from the last 100 sols with photos (roughly 3+ months on Mars)
   const recentSols = manifest.photo_manifest.photos
-    .slice(-30)
+    .slice(-100)
     .reverse()
     .map(p => p.sol);
   
@@ -217,8 +217,20 @@ export async function GET(
     let metadata: any = {};
 
     if (latest || (!sol && !earthDate)) {
-      // Fetch latest photos (default behavior)
+      // Fetch latest photos (default behavior) plus some from September 8th, 2025
       photos = await fetchLatestPhotos(rover, apiKey, limit);
+      
+      // Add a few good photos from September 8th, 2025
+      try {
+        const sept8Photos = await getPhotosByDateRange(rover, '2025-09-08', '2025-09-08', apiKey, 7);
+        if (sept8Photos.length > 0) {
+          // Add to beginning of array to prioritize these photos
+          photos = [...sept8Photos, ...photos].slice(0, limit);
+        }
+      } catch (error) {
+        console.log('Could not fetch September 8th photos:', error);
+      }
+      
       metadata.type = 'latest';
     } else if (earthDate) {
       // Fetch by Earth date
@@ -265,9 +277,9 @@ export async function GET(
       console.error(`Error calculating sol data for ${rover}:`, error);
     }
 
-    // Add cache headers for better performance
+    // Add cache headers for extended caching (5 days)
     const headers = new Headers();
-    headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    headers.set('Cache-Control', 'public, s-maxage=432000, stale-while-revalidate=864000'); // 5 days cache, 10 days stale
 
     return NextResponse.json({
       photos,
@@ -275,7 +287,7 @@ export async function GET(
       total: photos.length,
       rover,
       metadata,
-      cached_until: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+      cached_until: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days
     }, { headers });
     
   } catch (error: any) {
