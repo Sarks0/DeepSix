@@ -371,14 +371,15 @@ export function DiscoveryFeed({ missionId, className = '', maxItems = 3 }: Disco
     imagery: '📸'
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | string) => {
     const now = new Date();
-    const diffDays = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60 * 24));
+    const targetDate = date instanceof Date ? date : new Date(date);
+    const diffDays = Math.floor((now.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24));
     
     if (diffDays === 0) return 'Today';
     if (diffDays === 1) return 'Yesterday';
     if (diffDays < 7) return `${diffDays} days ago`;
-    return date.toLocaleDateString();
+    return targetDate.toLocaleDateString();
   };
 
   return (

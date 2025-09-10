@@ -34,6 +34,14 @@ export function createCachedFunction<T extends any[], R>(
 export class ClientCache {
   private static prefix = 'deepsix-mission-';
 
+  private static dateReviver(key: string, value: any): any {
+    // Check if the value looks like a date string
+    if (typeof value === 'string' && /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z$/.test(value)) {
+      return new Date(value);
+    }
+    return value;
+  }
+
   static set(key: string, data: any, ttlMs: number): void {
     if (typeof window === 'undefined') return;
     
@@ -56,7 +64,7 @@ export class ClientCache {
       const item = localStorage.getItem(this.prefix + key);
       if (!item) return null;
 
-      const parsed = JSON.parse(item);
+      const parsed = JSON.parse(item, this.dateReviver);
       if (Date.now() > parsed.expiry) {
         localStorage.removeItem(this.prefix + key);
         return null;
@@ -83,6 +91,25 @@ export class ClientCache {
       }
     } catch (error) {
       console.warn('Failed to clear cache:', error);
+    }
+  }
+
+  // Clear cache on initialization to prevent Date serialization issues
+  static clearOldCache(): void {
+    if (typeof window === 'undefined') return;
+    
+    const cacheVersionKey = this.prefix + 'cache-version';
+    const currentVersion = '1.1'; // Increment this when cache format changes
+    
+    try {
+      const storedVersion = localStorage.getItem(cacheVersionKey);
+      if (storedVersion !== currentVersion) {
+        console.log('Cache version mismatch, clearing old cache');
+        this.clear();
+        localStorage.setItem(cacheVersionKey, currentVersion);
+      }
+    } catch (error) {
+      console.warn('Failed to check cache version:', error);
     }
   }
 }

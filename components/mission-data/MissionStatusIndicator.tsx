@@ -180,9 +180,10 @@ export function MissionStatusIndicator({ missionId, className = '' }: MissionSta
     return `${rate} bps`;
   };
 
-  const formatTimeAgo = (date: Date) => {
+  const formatTimeAgo = (date: Date | string) => {
     const now = new Date();
-    const diffMs = now.getTime() - date.getTime();
+    const targetDate = date instanceof Date ? date : new Date(date);
+    const diffMs = now.getTime() - targetDate.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     
     if (diffMins < 60) return `${diffMins}m ago`;
@@ -192,9 +193,10 @@ export function MissionStatusIndicator({ missionId, className = '' }: MissionSta
     return `${diffDays}d ago`;
   };
 
-  const formatTimeUntil = (date: Date) => {
+  const formatTimeUntil = (date: Date | string) => {
     const now = new Date();
-    const diffMs = date.getTime() - now.getTime();
+    const targetDate = date instanceof Date ? date : new Date(date);
+    const diffMs = targetDate.getTime() - now.getTime();
     const diffMins = Math.floor(diffMs / 60000);
     
     if (diffMins < 60) return `${diffMins}m`;

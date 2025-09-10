@@ -404,6 +404,9 @@ export function MissionDataFeed({ missionId, className = '' }: MissionDataFeedPr
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Clear old cache on first load to prevent Date serialization issues
+    ClientCache.clearOldCache();
+    
     async function fetchMissionData() {
       const cacheKey = `mission-data-${missionId}`;
       
@@ -493,7 +496,7 @@ export function MissionDataFeed({ missionId, className = '' }: MissionDataFeedPr
           
           <div className="flex items-center justify-between text-xs text-gray-500">
             <span>{currentItem.source}</span>
-            <span>{currentItem.timestamp.toLocaleTimeString()}</span>
+            <span>{currentItem.timestamp instanceof Date ? currentItem.timestamp.toLocaleTimeString() : new Date(currentItem.timestamp).toLocaleTimeString()}</span>
           </div>
         </motion.div>
       </AnimatePresence>
