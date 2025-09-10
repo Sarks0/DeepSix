@@ -217,8 +217,20 @@ export async function GET(
     let metadata: any = {};
 
     if (latest || (!sol && !earthDate)) {
-      // Fetch latest photos (default behavior)
+      // Fetch latest photos (default behavior) plus some from September 8th, 2025
       photos = await fetchLatestPhotos(rover, apiKey, limit);
+      
+      // Add a few good photos from September 8th, 2025
+      try {
+        const sept8Photos = await getPhotosByDateRange(rover, '2025-09-08', '2025-09-08', apiKey, 7);
+        if (sept8Photos.length > 0) {
+          // Add to beginning of array to prioritize these photos
+          photos = [...sept8Photos, ...photos].slice(0, limit);
+        }
+      } catch (error) {
+        console.log('Could not fetch September 8th photos:', error);
+      }
+      
       metadata.type = 'latest';
     } else if (earthDate) {
       // Fetch by Earth date
