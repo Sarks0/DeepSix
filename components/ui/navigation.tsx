@@ -88,16 +88,7 @@ export function Navigation() {
                       : 'text-gray-300 hover:bg-gray-700 hover:text-white'
                   )}
                 >
-                  <div className="flex items-center space-x-3">
-                    <span className="text-blue-400">
-                      {item.label === 'Dashboard' && '🏠'}
-                      {item.label === 'Missions' && '🚀'}
-                      {item.label === 'DSN' && '📡'}
-                      {item.label === 'Live Data' && '📊'}
-                      {item.label === 'About' && 'ℹ️'}
-                    </span>
-                    <span>{item.label}</span>
-                  </div>
+                  {item.label}
                 </Link>
               ))}
             </div>
