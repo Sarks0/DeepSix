@@ -93,7 +93,7 @@ async function fetchRoverPhotos(
 async function fetchLatestPhotos(
   rover: RoverName,
   apiKey: string,
-  limit: number = 50
+  limit: number = 200
 ): Promise<RoverPhoto[]> {
   try {
     // First, try the latest_photos endpoint for the most recent photos
@@ -120,9 +120,9 @@ async function fetchLatestPhotos(
   const maxSol = manifest.photo_manifest.max_sol;
   const recentPhotos: RoverPhoto[] = [];
   
-  // Try to get photos from the last 30 sols with photos
+  // Try to get photos from the last 100 sols with photos (roughly 3+ months on Mars)
   const recentSols = manifest.photo_manifest.photos
-    .slice(-30)
+    .slice(-100)
     .reverse()
     .map(p => p.sol);
   
@@ -265,9 +265,9 @@ export async function GET(
       console.error(`Error calculating sol data for ${rover}:`, error);
     }
 
-    // Add cache headers for better performance
+    // Add cache headers for extended caching (5 days)
     const headers = new Headers();
-    headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+    headers.set('Cache-Control', 'public, s-maxage=432000, stale-while-revalidate=864000'); // 5 days cache, 10 days stale
 
     return NextResponse.json({
       photos,
@@ -275,7 +275,7 @@ export async function GET(
       total: photos.length,
       rover,
       metadata,
-      cached_until: new Date(Date.now() + 5 * 60 * 1000).toISOString()
+      cached_until: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days
     }, { headers });
     
   } catch (error: any) {
