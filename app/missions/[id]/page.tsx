@@ -1,6 +1,9 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
 import { MissionMilestones } from '@/components/mission-cards/MissionMilestones';
+import { MissionDataFeed } from '@/components/mission-data/MissionDataFeed';
+import { MissionStatusIndicator } from '@/components/mission-data/MissionStatusIndicator';
+import { DiscoveryFeed } from '@/components/mission-data/DiscoveryFeed';
 
 // Dynamic page for mission details
 
@@ -558,6 +561,13 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
               ))}
             </ul>
           </div>
+
+          {/* Dynamic Mission Data */}
+          <MissionStatusIndicator missionId={id} className="mb-6" />
+          
+          <MissionDataFeed missionId={id} className="mb-6" />
+          
+          <DiscoveryFeed missionId={id} className="mb-6" />
 
           {/* Communication Delay for Deep Space */}
           {(id.includes('voyager') || id === 'parker-solar-probe') && (
