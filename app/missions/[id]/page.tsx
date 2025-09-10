@@ -463,8 +463,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
 
       {/* Featured Discovery Section */}
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4 flex items-center">
-          <span className="text-3xl mr-3">🔬</span>
+        <h2 className="text-2xl font-bold mb-4">
           Latest Scientific Discovery
         </h2>
         <DiscoveryFeed missionId={id} maxItems={1} className="bg-gradient-to-br from-purple-900/20 via-gray-900 to-blue-900/20 border-purple-500/30" />
@@ -477,8 +476,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Live Mission Data Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
             <div>
-              <h3 className="text-xl font-bold mb-4 flex items-center">
-                <span className="text-2xl mr-2">📊</span>
+              <h3 className="text-xl font-bold mb-4">
                 Live Mission Data
               </h3>
               <MissionDataFeed missionId={id} className="h-full" />
@@ -487,8 +485,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
             {/* Communication Status for Deep Space */}
             {(id.includes('voyager') || id === 'parker-solar-probe') ? (
               <div>
-                <h3 className="text-xl font-bold mb-4 flex items-center">
-                  <span className="text-2xl mr-2">📡</span>
+                <h3 className="text-xl font-bold mb-4">
                   Deep Space Communication
                 </h3>
                 <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700 h-full">
@@ -514,8 +511,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
               </div>
             ) : (
               <div>
-                <h3 className="text-xl font-bold mb-4 flex items-center">
-                  <span className="text-2xl mr-2">🏆</span>
+                <h3 className="text-xl font-bold mb-4">
                   Recent Discoveries
                 </h3>
                 <DiscoveryFeed missionId={id} maxItems={3} />
@@ -526,8 +522,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Photo Gallery for Rovers */}
           {isRover && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <span className="text-3xl mr-3">📸</span>
+              <h2 className="text-2xl font-bold mb-4">
                 Latest Photos from Mars Surface
               </h2>
               <RoverPhotoGallery rover={id as 'perseverance' | 'curiosity'} limit={12} />
@@ -537,8 +532,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Photo Gallery for InSight */}
           {isInSight && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <span className="text-3xl mr-3">📸</span>
+              <h2 className="text-2xl font-bold mb-4">
                 Mission Images from Elysium Planitia
               </h2>
               <InSightPhotoGallery />
@@ -548,8 +542,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Last Weather Data for InSight */}
           {isInSight && mission.lastData && (
             <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <span className="text-3xl mr-3">🌡️</span>
+              <h2 className="text-2xl font-bold mb-4">
                 Last Recorded Weather Data
               </h2>
               <p className="text-sm text-gray-400 mb-4">
@@ -590,8 +583,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Mission Achievements for InSight */}
           {mission.achievements && (
             <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <span className="text-3xl mr-3">🏆</span>
+              <h2 className="text-2xl font-bold mb-4">
                 Mission Achievements
               </h2>
               <ul className="space-y-2">
@@ -608,8 +600,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           {/* Mission Timeline for Voyager and Parker */}
           {(id.includes('voyager') || id === 'parker-solar-probe') && (
             <div className="mb-6">
-              <h2 className="text-2xl font-bold mb-4 flex items-center">
-                <span className="text-3xl mr-3">📅</span>
+              <h2 className="text-2xl font-bold mb-4">
                 Mission Timeline
               </h2>
               <MissionMilestones missionId={id} />
@@ -618,8 +609,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
 
           {/* Mission Objectives */}
           <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700">
-            <h2 className="text-2xl font-bold mb-4 flex items-center">
-              <span className="text-3xl mr-3">🎯</span>
+            <h2 className="text-2xl font-bold mb-4">
               Mission Objectives
             </h2>
             <ul className="space-y-2">
@@ -637,8 +627,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         <div className="xl:col-span-1">
           {/* Instruments */}
           <div className="bg-gray-900 rounded-lg p-6 mb-6 border border-gray-700 sticky top-4">
-            <h3 className="text-xl font-bold mb-4 flex items-center">
-              <span className="text-2xl mr-2">🔬</span>
+            <h3 className="text-xl font-bold mb-4">
               Scientific Instruments
             </h3>
             <ul className="space-y-2 text-sm">

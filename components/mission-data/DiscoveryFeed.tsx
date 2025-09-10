@@ -364,11 +364,11 @@ export function DiscoveryFeed({ missionId, className = '', maxItems = 3 }: Disco
     breakthrough: 'text-purple-400 bg-purple-500/20'
   };
 
-  const categoryIcons = {
-    science: '🔬',
-    engineering: '⚙️',
-    milestone: '🎯',
-    imagery: '📸'
+  const categoryLabels = {
+    science: 'Science',
+    engineering: 'Engineering',
+    milestone: 'Milestone',
+    imagery: 'Imagery'
   };
 
   const formatDate = (date: Date | string) => {
@@ -386,8 +386,10 @@ export function DiscoveryFeed({ missionId, className = '', maxItems = 3 }: Disco
     <div className={`bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-4 ${className}`}>
       <div className="flex items-center justify-between mb-4">
         <h3 className="text-sm font-semibold text-gray-300">Latest Discoveries</h3>
-        <div className="flex items-center space-x-1">
-          <span className="text-lg">{categoryIcons[currentDiscovery.category]}</span>
+        <div className="flex items-center space-x-2">
+          <span className={`px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider bg-blue-500/20 text-blue-400`}>
+            {categoryLabels[currentDiscovery.category]}
+          </span>
           <span className={`px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${significanceColors[currentDiscovery.significance]}`}>
             {currentDiscovery.significance}
           </span>
