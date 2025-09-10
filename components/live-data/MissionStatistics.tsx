@@ -67,7 +67,7 @@ export function MissionStatistics() {
         localStorage.setItem('missionMetrics', JSON.stringify(metrics));
 
         setStats({
-          activeMissions: uniqueSpacecraft.size || 5, // Fall back to known active missions
+          activeMissions: uniqueSpacecraft.size || 9, // Fall back to known active missions
           dataReceived: formatDataSize(metrics.totalData),
           commandsSent: metrics.totalCommands,
           systemUptime: `${uptimePercentage}%`,
@@ -77,7 +77,7 @@ export function MissionStatistics() {
         console.error('Failed to fetch statistics:', error);
         // Use realistic fallback values
         setStats({
-          activeMissions: 5, // Known active deep space missions
+          activeMissions: 9, // Known active deep space missions
           dataReceived: '1.2 TB',
           commandsSent: 847,
           systemUptime: '99.97%',
