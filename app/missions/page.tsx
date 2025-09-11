@@ -60,6 +60,42 @@ const missions = [
     icon: SolarIcon,
     color: 'from-yellow-500 to-orange-600',
   },
+  {
+    id: 'mars-reconnaissance-orbiter',
+    name: 'Mars Reconnaissance Orbiter',
+    description: 'High-resolution imaging and surface analysis for 19+ years',
+    status: 'Active',
+    type: 'Mars Orbiter',
+    icon: SatelliteIcon,
+    color: 'from-red-500 to-orange-500',
+  },
+  {
+    id: 'maven',
+    name: 'MAVEN',
+    description: 'Studying Mars atmospheric escape and climate evolution',
+    status: 'Active',
+    type: 'Mars Orbiter',
+    icon: SatelliteIcon,
+    color: 'from-orange-500 to-red-500',
+  },
+  {
+    id: 'mars-odyssey',
+    name: '2001 Mars Odyssey',
+    description: 'Longest-serving Mars orbiter mapping water and climate',
+    status: 'Active',
+    type: 'Mars Orbiter',
+    icon: SatelliteIcon,
+    color: 'from-red-600 to-orange-600',
+  },
+  {
+    id: 'james-webb-space-telescope',
+    name: 'James Webb Space Telescope',
+    description: 'Revolutionary infrared observatory exploring deep space',
+    status: 'Active',
+    type: 'Space Observatory',
+    icon: SatelliteIcon,
+    color: 'from-blue-500 to-purple-600',
+  },
 ];
 
 export default function MissionsPage() {
