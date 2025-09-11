@@ -4,32 +4,16 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { GallerySkeleton } from '@/components/ui/loading-skeleton';
+import { imageCache } from '@/lib/services/image-cache';
 
 interface JWSTPhoto {
-  href: string;
-  data: {
-    title: string;
-    description: string;
-    date_created: string;
-    keywords: string[];
-    media_type: string;
-    nasa_id: string;
-    center: string;
-  }[];
-  links?: {
-    href: string;
-    rel: string;
-    render?: string;
-  }[];
-}
-
-interface ProcessedJWSTPhoto {
   id: string;
   title: string;
   description: string;
   img_src: string;
   date: string;
   keywords: string[];
+  center: string;
 }
 
 interface JWSTPhotoGalleryProps {
@@ -41,106 +25,106 @@ interface JWSTPhotoGalleryProps {
 export function JWSTPhotoGallery({
   limit = 12,
   autoRotate = true,
-  rotateInterval = 180000, // 3 minutes (JWST images are more complex)
+  rotateInterval = 120000, // 2 minutes
 }: JWSTPhotoGalleryProps) {
-  const [photos, setPhotos] = useState<ProcessedJWSTPhoto[]>([]);
-  const [displayedPhotos, setDisplayedPhotos] = useState<ProcessedJWSTPhoto[]>([]);
+  const [photos, setPhotos] = useState<JWSTPhoto[]>([]);
+  const [displayedPhotos, setDisplayedPhotos] = useState<JWSTPhoto[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedPhoto, setSelectedPhoto] = useState<ProcessedJWSTPhoto | null>(null);
+  const [selectedPhoto, setSelectedPhoto] = useState<JWSTPhoto | null>(null);
   const [currentPage, setCurrentPage] = useState(0);
+  const [isOnline, setIsOnline] = useState(true);
   const rotationTimerRef = useRef<NodeJS.Timeout | null>(null);
   const lastFetchTime = useRef<number>(0);
 
-  const processJWSTPhotos = useCallback((rawPhotos: JWSTPhoto[]): ProcessedJWSTPhoto[] => {
-    return rawPhotos
-      .filter(item => 
-        item.links && 
-        item.links.length > 0 && 
-        item.data[0]?.media_type === 'image' &&
-        item.data[0]?.title?.toLowerCase().includes('webb')
-      )
-      .map(item => ({
-        id: item.data[0].nasa_id,
-        title: item.data[0].title,
-        description: item.data[0].description || 'James Webb Space Telescope observation',
-        img_src: item.links?.[0]?.href || '',
-        date: item.data[0].date_created,
-        keywords: item.data[0].keywords || []
-      }))
-      .filter(photo => photo.img_src) // Only include photos with valid image sources
-      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()); // Sort by newest first
+  // Check online status
+  useEffect(() => {
+    const updateOnlineStatus = () => setIsOnline(navigator.onLine);
+    window.addEventListener('online', updateOnlineStatus);
+    window.addEventListener('offline', updateOnlineStatus);
+    return () => {
+      window.removeEventListener('online', updateOnlineStatus);
+      window.removeEventListener('offline', updateOnlineStatus);
+    };
   }, []);
 
-  const fetchJWSTPhotos = useCallback(async (forceRefresh = false) => {
-    // Prevent too frequent fetches (minimum 2 hours between fetches)
+  const loadCachedPhotos = useCallback(async () => {
+    // For now, just return false to skip cached loading
+    // TODO: Implement JWST-specific caching when needed
+    return false;
+  }, []);
+
+  const cachePhotos = useCallback(async (photosToCache: JWSTPhoto[]) => {
+    // For now, skip caching to keep it simple
+    // TODO: Implement JWST-specific caching when needed
+    console.log(`Skipping cache of ${photosToCache.length} JWST photos`);
+  }, []);
+
+  const fetchLatestPhotos = useCallback(async (forceRefresh = false) => {
+    // Prevent too frequent fetches (minimum 1 hour between fetches)
     const now = Date.now();
-    if (!forceRefresh && now - lastFetchTime.current < 2 * 60 * 60 * 1000) {
-      console.log('Skipping JWST fetch - too soon since last fetch');
+    if (!forceRefresh && now - lastFetchTime.current < 60 * 60 * 1000) {
+      console.log('Skipping fetch - too soon since last fetch');
       return;
     }
 
     setLoading(true);
     setError(null);
 
-    try {
-      // Search for James Webb Space Telescope images
-      const searchParams = new URLSearchParams({
-        q: 'James Webb Space Telescope',
-        media_type: 'image',
-        year_start: '2022', // JWST started operations in 2022
-        page_size: '100'
-      });
+    // Load cached photos first for instant display
+    if (!forceRefresh) {
+      const hasCached = await loadCachedPhotos();
+      if (hasCached && !isOnline) {
+        setLoading(false);
+        return; // Use cached data when offline
+      }
+    }
 
-      const response = await fetch(`https://images-api.nasa.gov/search?${searchParams}`);
+    try {
+      // Fetch latest photos from our API endpoint
+      const response = await fetch(`/api/jwst-photos?latest=true&limit=${limit * 3}`);
 
       if (!response.ok) {
-        throw new Error(`Failed to fetch JWST photos (${response.status})`);
+        const errorData = await response.json();
+        throw new Error(errorData.error || `Failed to fetch photos (${response.status})`);
       }
 
       const data = await response.json();
       
-      if (!data.collection?.items) {
-        throw new Error('No photos found in NASA API response');
-      }
-
-      const processedPhotos = processJWSTPhotos(data.collection.items);
-      
-      if (processedPhotos.length === 0) {
+      if (!data.photos || data.photos.length === 0) {
         throw new Error('No James Webb Space Telescope images found');
       }
 
-      // Take the most recent photos
-      const latestPhotos = processedPhotos.slice(0, limit * 3); // Get more than needed for rotation
-      
-      setPhotos(latestPhotos);
+      setPhotos(data.photos);
       lastFetchTime.current = now;
 
-      console.log(`Fetched ${latestPhotos.length} JWST photos`);
+      // Cache new photos in the background
+      cachePhotos(data.photos.slice(0, limit));
+
+      console.log(`Fetched ${data.photos.length} JWST photos`);
 
     } catch (err) {
       console.error('Error fetching JWST photos:', err);
       setError(err instanceof Error ? err.message : 'Failed to load James Webb photos');
+      
+      // Fall back to cached photos if available and we haven't loaded any yet
+      if (photos.length === 0) {
+        const hasCached = await loadCachedPhotos();
+        if (hasCached) {
+          setError(null); // Clear error if we have cached data
+        }
+      }
     } finally {
       setLoading(false);
     }
-  }, [limit, processJWSTPhotos]);
+  }, [limit, loadCachedPhotos, cachePhotos, photos.length, isOnline]);
 
   const updateDisplayedPhotos = useCallback(() => {
     if (photos.length === 0) return;
 
     const startIdx = currentPage * limit;
     const endIdx = startIdx + limit;
-    const pagePhotos = photos.slice(startIdx, endIdx);
-    
-    // If we don't have enough photos for a full page, cycle back to beginning
-    if (pagePhotos.length < limit && photos.length >= limit) {
-      const remaining = limit - pagePhotos.length;
-      const additionalPhotos = photos.slice(0, remaining);
-      setDisplayedPhotos([...pagePhotos, ...additionalPhotos]);
-    } else {
-      setDisplayedPhotos(pagePhotos);
-    }
+    setDisplayedPhotos(photos.slice(startIdx, endIdx));
   }, [photos, currentPage, limit]);
 
   const rotatePhotos = useCallback(() => {
@@ -172,16 +156,34 @@ export function JWSTPhotoGallery({
 
   // Initial fetch
   useEffect(() => {
-    fetchJWSTPhotos();
-  }, [fetchJWSTPhotos]);
+    fetchLatestPhotos();
+  }, [fetchLatestPhotos]);
 
   // Handle photo selection
-  const handlePhotoClick = (photo: ProcessedJWSTPhoto) => {
+  const handlePhotoClick = (photo: JWSTPhoto) => {
     setSelectedPhoto(photo);
   };
 
   const closeModal = () => {
     setSelectedPhoto(null);
+  };
+
+  const handleRefresh = () => {
+    fetchLatestPhotos(true);
+  };
+
+  const handlePrevious = () => {
+    setCurrentPage((prev) => {
+      const totalPages = Math.ceil(photos.length / limit);
+      return prev === 0 ? totalPages - 1 : prev - 1;
+    });
+  };
+
+  const handleNext = () => {
+    setCurrentPage((prev) => {
+      const totalPages = Math.ceil(photos.length / limit);
+      return (prev + 1) % totalPages;
+    });
   };
 
   if (loading && photos.length === 0) {
@@ -190,76 +192,124 @@ export function JWSTPhotoGallery({
 
   if (error && photos.length === 0) {
     return (
-      <div className="bg-gray-900 rounded-lg p-8 text-center">
-        <div className="text-red-400 mb-4">
-          <svg className="w-12 h-12 mx-auto mb-4" fill="currentColor" viewBox="0 0 20 20">
-            <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-          </svg>
-          <h3 className="text-lg font-semibold mb-2">Unable to Load Images</h3>
-          <p className="text-sm text-gray-300 mb-4">{error}</p>
-          <button
-            onClick={() => fetchJWSTPhotos(true)}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
-          >
-            Try Again
-          </button>
-        </div>
+      <div className="rounded-xl bg-red-900/10 border border-red-500/20 p-6">
+        <p className="text-red-400 text-center">Error loading photos: {error}</p>
+        <button
+          onClick={handleRefresh}
+          className="mt-4 px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg mx-auto block"
+        >
+          Retry
+        </button>
       </div>
     );
   }
 
+  if (displayedPhotos.length === 0) {
+    return (
+      <div className="rounded-xl bg-gray-800/50 border border-gray-700 p-8">
+        <p className="text-gray-400 text-center">No JWST photos available</p>
+      </div>
+    );
+  }
+
+  const totalPages = Math.ceil(photos.length / limit);
+  const mostRecentDate = photos[0]?.date || 'Unknown';
+
   return (
-    <div className="space-y-6">
-      {/* Photo Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {displayedPhotos.map((photo, index) => (
-          <motion.div
-            key={`${photo.id}-${currentPage}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: index * 0.1 }}
-            className="group cursor-pointer relative bg-gray-800 rounded-lg overflow-hidden aspect-square"
-            onClick={() => handlePhotoClick(photo)}
+    <div className="space-y-4">
+      {/* Gallery Header */}
+      <div className="flex justify-between items-center">
+        <div className="text-sm text-gray-400">
+          <span>Showing {displayedPhotos.length} of {photos.length} photos</span>
+          {mostRecentDate && (
+            <span className="ml-4">Latest: {new Date(mostRecentDate).toLocaleDateString()}</span>
+          )}
+          {!isOnline && (
+            <span className="ml-4 text-yellow-400">📡 Offline - Using cached photos</span>
+          )}
+        </div>
+        <div className="flex gap-2 items-center">
+          <button
+            onClick={handleRefresh}
+            className="px-3 py-1 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-sm"
+            disabled={loading}
           >
-            <Image
-              src={photo.img_src}
-              alt={photo.title}
-              fill
-              className="object-cover transition-transform group-hover:scale-105"
-              sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-              onError={(e) => {
-                const img = e.target as HTMLImageElement;
-                img.style.display = 'none';
-              }}
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-              <div className="absolute bottom-2 left-2 right-2">
-                <p className="text-white text-xs font-medium truncate">
-                  {photo.title}
-                </p>
-                <p className="text-gray-300 text-xs">
-                  {new Date(photo.date).toLocaleDateString()}
-                </p>
+            {loading ? 'Loading...' : 'Refresh'}
+          </button>
+          {totalPages > 1 && (
+            <>
+              <button
+                onClick={handlePrevious}
+                className="p-1 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
+                aria-label="Previous page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              <div className="flex gap-1">
+                {Array.from({ length: totalPages }, (_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentPage(i)}
+                    className={`w-2 h-2 rounded-full transition-colors ${
+                      i === currentPage ? 'bg-blue-500' : 'bg-gray-600 hover:bg-gray-500'
+                    }`}
+                    aria-label={`Go to page ${i + 1}`}
+                  />
+                ))}
               </div>
-            </div>
-          </motion.div>
-        ))}
+              <button
+                onClick={handleNext}
+                className="p-1 bg-gray-700/50 hover:bg-gray-600/50 rounded-lg transition-colors"
+                aria-label="Next page"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </>
+          )}
+        </div>
       </div>
 
-      {/* Pagination Dots */}
-      {photos.length > limit && (
-        <div className="flex justify-center space-x-2">
-          {Array.from({ length: Math.ceil(photos.length / limit) }).map((_, index) => (
-            <button
-              key={index}
-              onClick={() => setCurrentPage(index)}
-              className={`w-2 h-2 rounded-full transition-colors ${
-                index === currentPage ? 'bg-blue-400' : 'bg-gray-600'
-              }`}
-            />
+      {/* Photo Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        <AnimatePresence mode="wait">
+          {displayedPhotos.map((photo, index) => (
+            <motion.div
+              key={`${photo.id}-${currentPage}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: index * 0.1 }}
+              className="group cursor-pointer relative bg-gray-800 rounded-lg overflow-hidden aspect-square"
+              onClick={() => handlePhotoClick(photo)}
+            >
+              <Image
+                src={photo.img_src}
+                alt={photo.title}
+                fill
+                className="object-cover transition-transform group-hover:scale-105"
+                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                onError={(e) => {
+                  const img = e.target as HTMLImageElement;
+                  img.style.display = 'none';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+                <div className="absolute bottom-2 left-2 right-2">
+                  <p className="text-white text-xs font-medium truncate">
+                    {photo.title}
+                  </p>
+                  <p className="text-gray-300 text-xs">
+                    {new Date(photo.date).toLocaleDateString()}
+                  </p>
+                </div>
+              </div>
+            </motion.div>
           ))}
-        </div>
-      )}
+        </AnimatePresence>
+      </div>
 
       {/* Photo Modal */}
       <AnimatePresence>
