@@ -171,32 +171,6 @@ export default function AboutPage() {
         </div>
       </motion.section>
 
-      {/* Current Missions */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="mb-12"
-      >
-        <h2 className="text-2xl font-bold mb-4">Featured Missions</h2>
-        <div className="grid gap-4">
-          <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-4">
-            <h3 className="font-semibold text-green-400 mb-2">Active Rovers</h3>
-            <p className="text-sm text-gray-300">
-              <span className="font-bold">Perseverance</span> - Exploring Jezero Crater since 2021<br/>
-              <span className="font-bold">Curiosity</span> - Investigating Gale Crater since 2012
-            </p>
-          </div>
-          <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-4">
-            <h3 className="font-semibold text-yellow-400 mb-2">Historical Missions</h3>
-            <p className="text-sm text-gray-300">
-              <span className="font-bold">Opportunity</span> - 15 years of exploration (2004-2018)<br/>
-              <span className="font-bold">Spirit</span> - Twin rover mission (2004-2010)<br/>
-              <span className="font-bold">InSight</span> - Mars seismology studies (2018-2022)
-            </p>
-          </div>
-        </div>
-      </motion.section>
 
       {/* Why DeepSix */}
       <motion.section
@@ -255,7 +229,7 @@ export default function AboutPage() {
         <h2 className="text-2xl font-bold mb-4">Contributors</h2>
         <div className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 p-6">
           <p className="text-gray-300 mb-4">
-            DeepSix is an open-source project built by passionate space enthusiasts and developers.
+            DeepSix is an open-source project built by passionate space enthusiasts.
           </p>
           <div className="flex items-center gap-4 mb-4">
             <div className="flex items-center gap-2">
