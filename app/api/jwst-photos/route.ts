@@ -13,15 +13,6 @@ interface JWSTPhoto {
 // Curated collection of JWST science images from ESA Webb CDN - all images verified accessible
 const JWST_SCIENCE_IMAGES: JWSTPhoto[] = [
   {
-    id: 'webb-deep-field-2022',
-    title: 'Webb\'s First Deep Field',
-    description: 'This image of galaxy cluster SMACS 0723, known as Webb\'s First Deep Field, is overflowing with detail. Thousands of galaxies – including the faintest objects ever observed in the infrared – have appeared in Webb\'s view for the first time.',
-    img_src: 'https://cdn.esawebb.org/archives/images/screen/ann2203a.jpg',
-    date: '2022-07-12T00:00:00Z',
-    keywords: ['Deep Field', 'Galaxy Cluster', 'SMACS 0723', 'Infrared', 'First Light'],
-    center: 'NASA/ESA'
-  },
-  {
     id: 'carina-nebula-2022',
     title: 'Carina Nebula - Cosmic Cliffs',
     description: 'This landscape of "mountains" and "valleys" speckled with glittering stars is actually the edge of a nearby, young, star-forming region called NGC 3324 in the Carina Nebula.',
