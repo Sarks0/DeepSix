@@ -83,7 +83,7 @@ const nextConfig = {
       ],
     },
   ],
-  // Allow external image sources from NASA
+  // Allow external image sources from NASA and placeholder services
   images: {
     remotePatterns: [
       {
@@ -97,6 +97,22 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images-api.nasa.gov',
+      },
+      {
+        protocol: 'https',
+        hostname: 'images.unsplash.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'via.placeholder.com',
+      },
+      {
+        protocol: 'https',
+        hostname: 'picsum.photos',
+      },
+      {
+        protocol: 'https',
+        hostname: 'dummyimage.com',
       },
     ],
     // Image optimization settings
