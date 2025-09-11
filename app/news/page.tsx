@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Link from 'next/link';
 import { NewsCard } from '@/components/news/NewsCard';
 import { NewsSkeleton } from '@/components/ui/loading-skeleton';
 

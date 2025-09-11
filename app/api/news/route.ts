@@ -126,11 +126,12 @@ async function fetchRSSFeed(feed: RSSFeed): Promise<NewsItem[]> {
 }
 
 export async function GET(request: NextRequest) {
+  const { searchParams } = new URL(request.url);
+  const category = searchParams.get('category');
+  const limit = parseInt(searchParams.get('limit') || '50');
+  const forceRefresh = searchParams.get('refresh') === 'true';
+
   try {
-    const { searchParams } = new URL(request.url);
-    const category = searchParams.get('category');
-    const limit = parseInt(searchParams.get('limit') || '50');
-    const forceRefresh = searchParams.get('refresh') === 'true';
 
     // Check cache first (unless force refresh is requested)
     if (!forceRefresh) {
