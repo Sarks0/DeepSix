@@ -474,21 +474,21 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         {/* Primary Content - 3 columns */}
         <div className="xl:col-span-3">
           {/* Live Mission Data Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <div>
-              <h3 className="text-xl font-bold mb-4">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
+            <div className="space-y-4">
+              <h3 className="text-xl font-bold">
                 Live Mission Data
               </h3>
-              <MissionDataFeed missionId={id} className="h-full" />
+              <MissionDataFeed missionId={id} />
             </div>
             
             {/* Communication Status for Deep Space */}
             {(id.includes('voyager') || id === 'parker-solar-probe') ? (
-              <div>
-                <h3 className="text-xl font-bold mb-4">
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold">
                   Deep Space Communication
                 </h3>
-                <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700 h-full">
+                <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700">
                   <div className="space-y-4">
                     <div>
                       <p className="text-sm text-gray-400">Distance from Earth</p>
@@ -510,8 +510,8 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                 </div>
               </div>
             ) : (
-              <div>
-                <h3 className="text-xl font-bold mb-4">
+              <div className="space-y-4">
+                <h3 className="text-xl font-bold">
                   Recent Discoveries
                 </h3>
                 <DiscoveryFeed missionId={id} maxItems={3} />
