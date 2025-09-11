@@ -106,53 +106,162 @@ export default function NewsPage() {
 
   if (loading && news.length === 0) {
     return (
-      <div className=\"container mx-auto px-4 py-8 max-w-6xl\">
+      <div className="container mx-auto px-4 py-8 max-w-6xl">
         <NewsSkeleton />
       </div>
     );
   }
 
   return (
-    <div className=\"container mx-auto px-4 py-8 max-w-6xl\">
+    <div className="container mx-auto px-4 py-8 max-w-6xl">
       {/* Header */}
       <motion.div 
         initial={{ opacity: 0, y: 20 }} 
         animate={{ opacity: 1, y: 0 }} 
-        className=\"mb-8\"
+        className="mb-8"
       >
-        <h1 className=\"text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent\">
+        <h1 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-purple-500 bg-clip-text text-transparent">
           Space News
         </h1>
-        <p className=\"text-xl text-gray-400 mb-6\">
+        <p className="text-xl text-gray-400 mb-6">
           Latest updates from NASA and space exploration missions
         </p>
 
         {/* Status Bar */}
-        <div className=\"flex flex-wrap justify-between items-center gap-4 mb-6\">
-          <div className=\"flex items-center gap-4 text-sm text-gray-400\">
+        <div className="flex flex-wrap justify-between items-center gap-4 mb-6">
+          <div className="flex items-center gap-4 text-sm text-gray-400">
             <span>Showing {filteredNews.length} articles</span>
             {metadata && (
               <span>Updated: {new Date(metadata.fetched_at).toLocaleTimeString()}</span>
             )}
             {!isOnline && (
-              <span className=\"text-yellow-400\">📡 Offline - Using cached news</span>
+              <span className="text-yellow-400">📡 Offline - Using cached news</span>
             )}
           </div>
           <button
             onClick={handleRefresh}
             disabled={loading}
-            className=\"px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-sm transition-colors disabled:opacity-50\"
+            className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg text-sm transition-colors disabled:opacity-50"
           >
             {loading ? 'Loading...' : 'Refresh'}
           </button>
         </div>
 
         {/* Category Filters */}
-        <div className=\"flex flex-wrap gap-2 mb-6\">
+        <div className="flex flex-wrap gap-2 mb-6">
           <button
             onClick={() => handleCategoryChange('all')}
-            className={`px-4 py-2 rounded-lg text-sm transition-colors ${\n              selectedCategory === 'all'\n                ? 'bg-blue-500 text-white'\n                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'\n            }`}
+            className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+              selectedCategory === 'all'
+                ? 'bg-blue-500 text-white'
+                : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+            }`}
           >
             All News
           </button>
-          {categories.map((category) => (\n            <button\n              key={category}\n              onClick={() => handleCategoryChange(category)}\n              className={`px-4 py-2 rounded-lg text-sm transition-colors ${\n                selectedCategory === category\n                  ? 'bg-blue-500 text-white'\n                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'\n              }`}\n            >\n              {category}\n            </button>\n          ))}\n        </div>\n      </motion.div>\n\n      {/* Error State */}\n      {error && news.length === 0 && (\n        <motion.div \n          initial={{ opacity: 0 }} \n          animate={{ opacity: 1 }}\n          className=\"rounded-xl bg-red-900/10 border border-red-500/20 p-6 text-center\"\n        >\n          <p className=\"text-red-400 mb-4\">Error loading news: {error}</p>\n          <button\n            onClick={handleRefresh}\n            className=\"px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg\"\n          >\n            Try Again\n          </button>\n        </motion.div>\n      )}\n\n      {/* News Grid */}\n      {filteredNews.length > 0 && (\n        <motion.div \n          initial={{ opacity: 0 }}\n          animate={{ opacity: 1 }}\n          className=\"grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6\"\n        >\n          <AnimatePresence mode=\"wait\">\n            {filteredNews.map((item, index) => (\n              <motion.div\n                key={item.id}\n                initial={{ opacity: 0, y: 20 }}\n                animate={{ opacity: 1, y: 0 }}\n                transition={{ duration: 0.3, delay: index * 0.05 }}\n              >\n                <NewsCard news={item} />\n              </motion.div>\n            ))}\n          </AnimatePresence>\n        </motion.div>\n      )}\n\n      {/* Empty State */}\n      {filteredNews.length === 0 && !loading && !error && (\n        <motion.div \n          initial={{ opacity: 0 }} \n          animate={{ opacity: 1 }}\n          className=\"text-center py-12\"\n        >\n          <p className=\"text-gray-400 text-lg mb-4\">No news articles found</p>\n          <p className=\"text-gray-500 text-sm mb-6\">\n            Try selecting a different category or refreshing the page\n          </p>\n          <button\n            onClick={handleRefresh}\n            className=\"px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors\"\n          >\n            Refresh News\n          </button>\n        </motion.div>\n      )}\n\n      {/* Loading More Indicator */}\n      {loading && news.length > 0 && (\n        <motion.div \n          initial={{ opacity: 0 }}\n          animate={{ opacity: 1 }}\n          className=\"text-center py-8\"\n        >\n          <div className=\"inline-flex items-center gap-2 text-gray-400\">\n            <div className=\"w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin\" />\n            <span>Loading more news...</span>\n          </div>\n        </motion.div>\n      )}\n\n      {/* Footer Info */}\n      {metadata && (\n        <motion.div \n          initial={{ opacity: 0 }}\n          animate={{ opacity: 1 }}\n          className=\"mt-12 p-4 bg-gray-900/50 rounded-lg border border-gray-800\"\n        >\n          <p className=\"text-gray-400 text-sm text-center\">\n            News aggregated from {metadata.sources.join(', ')} • \n            Cache duration: {metadata.cache_duration} • \n            Sources: {metadata.feeds_count} RSS feeds\n          </p>\n        </motion.div>\n      )}\n    </div>\n  );\n}"
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => handleCategoryChange(category)}
+              className={`px-4 py-2 rounded-lg text-sm transition-colors ${
+                selectedCategory === category
+                  ? 'bg-blue-500 text-white'
+                  : 'bg-gray-800 text-gray-300 hover:bg-gray-700'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
+      </motion.div>
+
+      {/* Error State */}
+      {error && news.length === 0 && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }}
+          className="rounded-xl bg-red-900/10 border border-red-500/20 p-6 text-center"
+        >
+          <p className="text-red-400 mb-4">Error loading news: {error}</p>
+          <button
+            onClick={handleRefresh}
+            className="px-4 py-2 bg-red-500/20 hover:bg-red-500/30 rounded-lg"
+          >
+            Try Again
+          </button>
+        </motion.div>
+      )}
+
+      {/* News Grid */}
+      {filteredNews.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+        >
+          <AnimatePresence mode="wait">
+            {filteredNews.map((item, index) => (
+              <motion.div
+                key={item.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3, delay: index * 0.05 }}
+              >
+                <NewsCard news={item} />
+              </motion.div>
+            ))}
+          </AnimatePresence>
+        </motion.div>
+      )}
+
+      {/* Empty State */}
+      {filteredNews.length === 0 && !loading && !error && (
+        <motion.div 
+          initial={{ opacity: 0 }} 
+          animate={{ opacity: 1 }}
+          className="text-center py-12"
+        >
+          <p className="text-gray-400 text-lg mb-4">No news articles found</p>
+          <p className="text-gray-500 text-sm mb-6">
+            Try selecting a different category or refreshing the page
+          </p>
+          <button
+            onClick={handleRefresh}
+            className="px-6 py-3 bg-blue-500/20 hover:bg-blue-500/30 rounded-lg transition-colors"
+          >
+            Refresh News
+          </button>
+        </motion.div>
+      )}
+
+      {/* Loading More Indicator */}
+      {loading && news.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="text-center py-8"
+        >
+          <div className="inline-flex items-center gap-2 text-gray-400">
+            <div className="w-4 h-4 border-2 border-gray-400 border-t-transparent rounded-full animate-spin" />
+            <span>Loading more news...</span>
+          </div>
+        </motion.div>
+      )}
+
+      {/* Footer Info */}
+      {metadata && (
+        <motion.div 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="mt-12 p-4 bg-gray-900/50 rounded-lg border border-gray-800"
+        >
+          <p className="text-gray-400 text-sm text-center">
+            News aggregated from {metadata.sources.join(', ')} • 
+            Cache duration: {metadata.cache_duration} • 
+            Sources: {metadata.feeds_count} RSS feeds
+          </p>
+        </motion.div>
+      )}
+    </div>
+  );
+}
