@@ -83,7 +83,7 @@ const nextConfig = {
       ],
     },
   ],
-  // Allow external image sources from NASA and placeholder services
+  // Allow external image sources from NASA and ESA Webb
   images: {
     remotePatterns: [
       {
@@ -97,6 +97,10 @@ const nextConfig = {
       {
         protocol: 'https',
         hostname: 'images-api.nasa.gov',
+      },
+      {
+        protocol: 'https',
+        hostname: 'cdn.esawebb.org',
       },
       {
         protocol: 'https',
