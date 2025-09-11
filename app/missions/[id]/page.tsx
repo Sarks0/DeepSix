@@ -1,5 +1,6 @@
 import { RoverPhotoGallery } from '@/components/mission-cards/RoverPhotoGallery';
 import { InSightPhotoGallery } from '@/components/mission-cards/InSightPhotoGallery';
+import { JWSTPhotoGallery } from '@/components/mission-cards/JWSTPhotoGallery';
 import { MissionMilestones } from '@/components/mission-cards/MissionMilestones';
 import { MissionDataFeed } from '@/components/mission-data/MissionDataFeed';
 import { MissionStatusIndicator } from '@/components/mission-data/MissionStatusIndicator';
@@ -398,6 +399,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
 
   const isRover = id === 'perseverance' || id === 'curiosity';
   const isInSight = id === 'insight';
+  const isJWST = id === 'james-webb-space-telescope';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -536,6 +538,16 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                 Mission Images from Elysium Planitia
               </h2>
               <InSightPhotoGallery />
+            </div>
+          )}
+
+          {/* Photo Gallery for James Webb Space Telescope */}
+          {isJWST && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">
+                Latest Deep Space Observatory Images
+              </h2>
+              <JWSTPhotoGallery limit={12} />
             </div>
           )}
 
