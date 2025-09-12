@@ -1,24 +1,8 @@
 'use client';
 
-import { motion } from 'framer-motion';
-
 export function GridOverlay() {
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden" style={{ zIndex: 0 }}>
-      {/* Animated scan line */}
-      <motion.div
-        className="absolute w-full h-0.5 bg-gradient-to-r from-transparent via-cyan-500/30 to-transparent"
-        initial={{ top: '-2px' }}
-        animate={{
-          top: ['0%', '100%', '0%'],
-        }}
-        transition={{
-          duration: 8,
-          repeat: Infinity,
-          ease: 'linear',
-        }}
-      />
-
       {/* Grid pattern */}
       <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
         <defs>

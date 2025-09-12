@@ -47,6 +47,40 @@ export default function Home() {
           <MissionTracker mission="voyager1" variant="detailed" />
           <MissionTracker mission="voyager2" variant="detailed" />
           <MissionTracker mission="parker" variant="detailed" />
+          <MissionTracker mission="newhorizons" variant="detailed" />
+          <MissionTracker mission="juno" variant="detailed" />
+          <MissionTracker mission="jwst" variant="detailed" />
+        </div>
+      </motion.div>
+
+      {/* Mars System Missions Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.2 }}
+        className="mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Mars System Missions</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 max-w-6xl mx-auto">
+          <MissionTracker mission="mro" variant="detailed" />
+          <MissionTracker mission="maven" variant="detailed" />
+          <MissionTracker mission="odyssey" variant="detailed" />
+        </div>
+      </motion.div>
+
+      {/* En Route Missions Section */}
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.25 }}
+        className="mb-8"
+      >
+        <h2 className="text-2xl font-bold mb-4 text-center">Missions En Route</h2>
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto">
+          <MissionTracker mission="europaclipper" variant="detailed" />
+          <MissionTracker mission="lucy" variant="detailed" />
+          <MissionTracker mission="psyche" variant="detailed" />
+          <MissionTracker mission="osirisapex" variant="detailed" />
         </div>
       </motion.div>
 

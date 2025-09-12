@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils/mission-tracking';
 
 interface MissionTrackerProps {
-  mission: 'voyager1' | 'voyager2' | 'parker' | 'newhorizons';
+  mission: 'voyager1' | 'voyager2' | 'parker' | 'newhorizons' | 'mro' | 'maven' | 'odyssey' | 'jwst' | 'juno' | 'europaclipper' | 'lucy' | 'psyche' | 'osirisapex';
   variant?: 'compact' | 'detailed' | 'minimal';
   showCommunicationDelay?: boolean;
   showMilestone?: boolean;
@@ -59,6 +59,7 @@ export function MissionTracker({
   const milestone = getMissionMilestone(mission, missionData);
   const isActive = missionData.status === 'active';
   const isExtended = missionData.status === 'extended';
+  const isEnRoute = missionData.status === 'en_route';
 
   if (variant === 'minimal') {
     return (
@@ -105,6 +106,11 @@ export function MissionTracker({
               Extended
             </span>
           )}
+          {isEnRoute && (
+            <span className="text-xs px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full uppercase">
+              En Route
+            </span>
+          )}
         </div>
         
         <div className="grid grid-cols-2 gap-2 text-xs">
@@ -148,7 +154,16 @@ export function MissionTracker({
     voyager1: 'voyager-1',
     voyager2: 'voyager-2',
     parker: 'parker-solar-probe',
-    newhorizons: 'new-horizons'
+    newhorizons: 'new-horizons',
+    mro: 'mars-reconnaissance-orbiter',
+    maven: 'maven',
+    odyssey: 'mars-odyssey',
+    jwst: 'james-webb-space-telescope',
+    juno: 'juno',
+    europaclipper: 'europa-clipper',
+    lucy: 'lucy',
+    psyche: 'psyche',
+    osirisapex: 'osiris-apex'
   };
   const missionPath = `/missions/${missionUrlMap[mission] || mission}`;
   
@@ -175,9 +190,13 @@ export function MissionTracker({
           <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full uppercase font-medium">
             Extended Mission
           </span>
+        ) : isEnRoute ? (
+          <span className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded-full uppercase font-medium">
+            En Route
+          </span>
         ) : (
           <span className="px-2 py-1 bg-gray-600/20 text-gray-400 text-xs rounded-full uppercase font-medium">
-            {missionData.status}
+            {display.statusText}
           </span>
         )}
       </div>
