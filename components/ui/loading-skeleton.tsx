@@ -198,3 +198,71 @@ export function StatusBarSkeleton({ count = 4, shimmer = true }: StatusBarSkelet
     </div>
   );
 }
+
+// News page skeleton
+interface NewsSkeletonProps {
+  count?: number;
+  shimmer?: boolean;
+}
+
+export function NewsSkeleton({ count = 9, shimmer = true }: NewsSkeletonProps) {
+  return (
+    <div className="space-y-8">
+      {/* Header skeleton */}
+      <div className="space-y-4">
+        <Skeleton className="w-1/3 h-10" shimmer={shimmer} />
+        <Skeleton variant="text" className="w-2/3" shimmer={shimmer} />
+        
+        {/* Filter buttons skeleton */}
+        <div className="flex gap-2">
+          {[...Array(5)].map((_, i) => (
+            <Skeleton
+              key={i}
+              className="w-20 h-8 rounded-lg"
+              shimmer={shimmer}
+              delay={i * 0.05}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* News grid skeleton */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {[...Array(count)].map((_, i) => (
+          <div
+            key={i}
+            className="bg-gray-900/50 backdrop-blur rounded-lg border border-gray-800 overflow-hidden"
+          >
+            {/* Image skeleton */}
+            <Skeleton className="aspect-video" shimmer={shimmer} delay={i * 0.05} />
+            
+            {/* Content skeleton */}
+            <div className="p-4 space-y-3">
+              {/* Category badge */}
+              <Skeleton className="w-20 h-6 rounded-full" shimmer={shimmer} delay={i * 0.05 + 0.1} />
+              
+              {/* Title */}
+              <div className="space-y-2">
+                <Skeleton variant="text" className="w-full" shimmer={shimmer} delay={i * 0.05 + 0.15} />
+                <Skeleton variant="text" className="w-3/4" shimmer={shimmer} delay={i * 0.05 + 0.2} />
+              </div>
+              
+              {/* Description */}
+              <div className="space-y-2">
+                <Skeleton variant="text" className="w-full" shimmer={shimmer} delay={i * 0.05 + 0.25} />
+                <Skeleton variant="text" className="w-full" shimmer={shimmer} delay={i * 0.05 + 0.3} />
+                <Skeleton variant="text" className="w-2/3" shimmer={shimmer} delay={i * 0.05 + 0.35} />
+              </div>
+              
+              {/* Footer */}
+              <div className="flex justify-between items-center">
+                <Skeleton variant="text" className="w-1/3" shimmer={shimmer} delay={i * 0.05 + 0.4} />
+                <Skeleton className="w-12 h-4" shimmer={shimmer} delay={i * 0.05 + 0.45} />
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
