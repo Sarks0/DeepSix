@@ -96,6 +96,60 @@ const missions = [
     icon: SatelliteIcon,
     color: 'from-blue-500 to-purple-600',
   },
+  {
+    id: 'new-horizons',
+    name: 'New Horizons',
+    description: 'Exploring the Kuiper Belt after Pluto flyby',
+    status: 'Extended',
+    type: 'Deep Space',
+    icon: ProbeIcon,
+    color: 'from-cyan-500 to-blue-600',
+  },
+  {
+    id: 'juno',
+    name: 'Juno',
+    description: 'Studying Jupiter\'s interior and magnetic field',
+    status: 'Extended',
+    type: 'Jupiter Orbiter',
+    icon: SatelliteIcon,
+    color: 'from-amber-500 to-orange-600',
+  },
+  {
+    id: 'europa-clipper',
+    name: 'Europa Clipper',
+    description: 'En route to study Europa\'s subsurface ocean',
+    status: 'En Route',
+    type: 'Jupiter System',
+    icon: ProbeIcon,
+    color: 'from-blue-400 to-cyan-500',
+  },
+  {
+    id: 'lucy',
+    name: 'Lucy',
+    description: 'En route to Jupiter\'s Trojan asteroids',
+    status: 'En Route',
+    type: 'Asteroid Mission',
+    icon: ProbeIcon,
+    color: 'from-purple-400 to-pink-500',
+  },
+  {
+    id: 'psyche',
+    name: 'Psyche',
+    description: 'En route to metallic asteroid Psyche',
+    status: 'En Route',
+    type: 'Asteroid Mission',
+    icon: ProbeIcon,
+    color: 'from-gray-400 to-slate-600',
+  },
+  {
+    id: 'osiris-apex',
+    name: 'OSIRIS-APEX',
+    description: 'En route to asteroid Apophis after Bennu success',
+    status: 'En Route',
+    type: 'Asteroid Mission',
+    icon: ProbeIcon,
+    color: 'from-emerald-500 to-green-600',
+  },
 ];
 
 export default function MissionsPage() {
@@ -130,6 +184,10 @@ export default function MissionsPage() {
                     className={`px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
                       mission.status === 'Active'
                         ? 'bg-green-500/20 text-green-400'
+                        : mission.status === 'Extended'
+                        ? 'bg-blue-500/20 text-blue-400'
+                        : mission.status === 'En Route'
+                        ? 'bg-orange-500/20 text-orange-400'
                         : 'bg-gray-500/20 text-gray-400'
                     }`}
                   >
