@@ -5,6 +5,7 @@ import { MissionMilestones } from '@/components/mission-cards/MissionMilestones'
 import { MissionDataFeed } from '@/components/mission-data/MissionDataFeed';
 import { MissionStatusIndicator } from '@/components/mission-data/MissionStatusIndicator';
 import { DiscoveryFeed } from '@/components/mission-data/DiscoveryFeed';
+import { LiveSpacecraftData } from '@/components/mission-data/LiveSpacecraftData';
 
 // Dynamic page for mission details
 
@@ -597,6 +598,15 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   // Missions without live data feeds (Extended missions in data collection mode or en route)
   const hasNoLiveData = isEnRoute || id === 'new-horizons' || id === 'juno';
 
+  // Check if this mission has Horizons API support
+  const hasHorizonsSupport = [
+    'europa-clipper',
+    'lucy',
+    'psyche',
+    'osiris-apex',
+    'juno',
+  ].includes(id);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Mission Header */}
@@ -733,35 +743,70 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
               <h2 className="text-2xl font-bold mb-4">
                 {isEnRoute ? 'Mission Journey Status' : 'Mission Status'}
               </h2>
-              <div className={`rounded-lg p-6 ${
-                isEnRoute
-                  ? 'bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30'
-                  : 'bg-gradient-to-r from-blue-900/20 via-gray-900 to-purple-900/20 border border-blue-500/30'
-              }`}>
-                <div className="space-y-4">
-                  <div>
-                    <p className="text-sm text-gray-400 mb-1">Current Status</p>
-                    <p className={`text-lg font-semibold ${isEnRoute ? 'text-orange-400' : 'text-blue-400'}`}>
-                      {isEnRoute ? 'En Route to Destination' : 'Extended Mission - Data Collection Mode'}
-                    </p>
-                  </div>
-                  {mission.distance && (
-                    <div>
-                      <p className="text-sm text-gray-400 mb-1">Approximate Distance from Earth</p>
-                      <p className="text-lg font-semibold text-blue-400">{mission.distance}</p>
+
+              {/* Show live data if Horizons API is supported */}
+              {hasHorizonsSupport ? (
+                <div className="space-y-6">
+                  <div className={`rounded-lg p-6 ${
+                    isEnRoute
+                      ? 'bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30'
+                      : 'bg-gradient-to-r from-blue-900/20 via-gray-900 to-purple-900/20 border border-blue-500/30'
+                  }`}>
+                    <div className="space-y-4">
+                      <div>
+                        <p className="text-sm text-gray-400 mb-1">Current Status</p>
+                        <p className={`text-lg font-semibold ${isEnRoute ? 'text-orange-400' : 'text-blue-400'}`}>
+                          {isEnRoute ? 'En Route to Destination' : 'Extended Mission - Data Collection Mode'}
+                        </p>
+                      </div>
+                      <div>
+                        <p className="text-sm text-gray-400 mb-1">Mission Progress</p>
+                        <p className="text-gray-300">
+                          {isEnRoute
+                            ? 'Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target. Real-time position tracked via NASA JPL Horizons.'
+                            : 'Spacecraft is in extended mission phase, continuing to collect valuable scientific data beyond its primary mission objectives. Real-time position tracked via NASA JPL Horizons.'
+                          }
+                        </p>
+                      </div>
                     </div>
-                  )}
+                  </div>
+
                   <div>
-                    <p className="text-sm text-gray-400 mb-1">Mission Progress</p>
-                    <p className="text-gray-300">
-                      {isEnRoute
-                        ? 'Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target. Science operations will begin upon arrival at destination.'
-                        : 'Spacecraft is in extended mission phase, continuing to collect valuable scientific data beyond its primary mission objectives. Real-time data feeds are limited during this operational phase.'
-                      }
-                    </p>
+                    <h3 className="text-xl font-bold mb-4">Live Position Data</h3>
+                    <LiveSpacecraftData spacecraftId={id} />
                   </div>
                 </div>
-              </div>
+              ) : (
+                <div className={`rounded-lg p-6 ${
+                  isEnRoute
+                    ? 'bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30'
+                    : 'bg-gradient-to-r from-blue-900/20 via-gray-900 to-purple-900/20 border border-blue-500/30'
+                }`}>
+                  <div className="space-y-4">
+                    <div>
+                      <p className="text-sm text-gray-400 mb-1">Current Status</p>
+                      <p className={`text-lg font-semibold ${isEnRoute ? 'text-orange-400' : 'text-blue-400'}`}>
+                        {isEnRoute ? 'En Route to Destination' : 'Extended Mission - Data Collection Mode'}
+                      </p>
+                    </div>
+                    {mission.distance && (
+                      <div>
+                        <p className="text-sm text-gray-400 mb-1">Approximate Distance from Earth</p>
+                        <p className="text-lg font-semibold text-blue-400">{mission.distance}</p>
+                      </div>
+                    )}
+                    <div>
+                      <p className="text-sm text-gray-400 mb-1">Mission Progress</p>
+                      <p className="text-gray-300">
+                        {isEnRoute
+                          ? 'Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target. Science operations will begin upon arrival at destination.'
+                          : 'Spacecraft is in extended mission phase, continuing to collect valuable scientific data beyond its primary mission objectives. Real-time data feeds are limited during this operational phase.'
+                        }
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
           )}
 
