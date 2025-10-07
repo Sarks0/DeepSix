@@ -594,6 +594,9 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   const isJWST = id === 'james-webb-space-telescope';
   const isEnRoute = mission.status === 'En Route';
 
+  // Missions without live data feeds (Extended missions in data collection mode or en route)
+  const hasNoLiveData = isEnRoute || id === 'new-horizons' || id === 'juno';
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Mission Header */}
@@ -655,15 +658,15 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Hero Section - Mission Status Banner - Only for active missions */}
-      {!isEnRoute && (
+      {/* Hero Section - Mission Status Banner - Only for missions with live data */}
+      {!hasNoLiveData && (
         <div className="mb-8">
           <MissionStatusIndicator missionId={id} className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-gray-700" />
         </div>
       )}
 
-      {/* Featured Discovery Section - Only for active missions */}
-      {!isEnRoute && (
+      {/* Featured Discovery Section - Only for missions with live data */}
+      {!hasNoLiveData && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">
             Latest Scientific Discovery
@@ -676,8 +679,8 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Primary Content - 3 columns */}
         <div className="xl:col-span-3">
-          {/* Live Mission Data Grid - Only for active missions */}
-          {!isEnRoute && (
+          {/* Live Mission Data Grid - Only for missions with live data */}
+          {!hasNoLiveData && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
               <div className="space-y-4">
                 <h3 className="text-xl font-bold">
@@ -724,15 +727,23 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
             </div>
           )}
 
-          {/* En Route Mission Status - Show journey progress */}
-          {isEnRoute && (
+          {/* Mission Status - Show status for missions without live data feeds */}
+          {hasNoLiveData && (
             <div className="mb-8">
-              <h2 className="text-2xl font-bold mb-4">Mission Journey Status</h2>
-              <div className="bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30 rounded-lg p-6">
+              <h2 className="text-2xl font-bold mb-4">
+                {isEnRoute ? 'Mission Journey Status' : 'Mission Status'}
+              </h2>
+              <div className={`rounded-lg p-6 ${
+                isEnRoute
+                  ? 'bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30'
+                  : 'bg-gradient-to-r from-blue-900/20 via-gray-900 to-purple-900/20 border border-blue-500/30'
+              }`}>
                 <div className="space-y-4">
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Current Status</p>
-                    <p className="text-lg font-semibold text-orange-400">En Route to Destination</p>
+                    <p className={`text-lg font-semibold ${isEnRoute ? 'text-orange-400' : 'text-blue-400'}`}>
+                      {isEnRoute ? 'En Route to Destination' : 'Extended Mission - Data Collection Mode'}
+                    </p>
                   </div>
                   {mission.distance && (
                     <div>
@@ -743,8 +754,10 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                   <div>
                     <p className="text-sm text-gray-400 mb-1">Mission Progress</p>
                     <p className="text-gray-300">
-                      Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target.
-                      Science operations will begin upon arrival at destination.
+                      {isEnRoute
+                        ? 'Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target. Science operations will begin upon arrival at destination.'
+                        : 'Spacecraft is in extended mission phase, continuing to collect valuable scientific data beyond its primary mission objectives. Real-time data feeds are limited during this operational phase.'
+                      }
                     </p>
                   </div>
                 </div>
