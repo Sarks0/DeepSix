@@ -592,6 +592,10 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   const isRover = id === 'perseverance' || id === 'curiosity';
   const isInSight = id === 'insight';
   const isJWST = id === 'james-webb-space-telescope';
+  const isEnRoute = mission.status === 'En Route';
+
+  // Missions without live data feeds (Extended missions in data collection mode or en route)
+  const hasNoLiveData = isEnRoute || id === 'new-horizons' || id === 'juno';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -602,9 +606,13 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
             {mission.name}
           </h1>
           <span
-            className={`px-3 py-1 rounded-full text-sm font-semibold ${
+            className={`px-3 py-1 rounded-full text-sm font-semibold whitespace-nowrap ${
               mission.status === 'Active'
                 ? 'bg-green-500/20 text-green-400'
+                : mission.status === 'Extended Mission'
+                ? 'bg-blue-500/20 text-blue-400'
+                : mission.status === 'En Route'
+                ? 'bg-orange-500/20 text-orange-400'
                 : 'bg-gray-500/20 text-gray-400'
             }`}
           >
@@ -650,38 +658,43 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Hero Section - Mission Status Banner */}
-      <div className="mb-8">
-        <MissionStatusIndicator missionId={id} className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-gray-700" />
-      </div>
+      {/* Hero Section - Mission Status Banner - Only for missions with live data */}
+      {!hasNoLiveData && (
+        <div className="mb-8">
+          <MissionStatusIndicator missionId={id} className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-gray-700" />
+        </div>
+      )}
 
-      {/* Featured Discovery Section */}
-      <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-4">
-          Latest Scientific Discovery
-        </h2>
-        <DiscoveryFeed missionId={id} maxItems={1} className="bg-gradient-to-br from-purple-900/20 via-gray-900 to-blue-900/20 border-purple-500/30" />
-      </div>
+      {/* Featured Discovery Section - Only for missions with live data */}
+      {!hasNoLiveData && (
+        <div className="mb-8">
+          <h2 className="text-2xl font-bold mb-4">
+            Latest Scientific Discovery
+          </h2>
+          <DiscoveryFeed missionId={id} maxItems={1} className="bg-gradient-to-br from-purple-900/20 via-gray-900 to-blue-900/20 border-purple-500/30" />
+        </div>
+      )}
 
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Primary Content - 3 columns */}
         <div className="xl:col-span-3">
-          {/* Live Mission Data Grid */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
-            <div className="space-y-4">
-              <h3 className="text-xl font-bold">
-                Live Mission Data
-              </h3>
-              <MissionDataFeed missionId={id} />
-            </div>
-            
-            {/* Communication Status for Deep Space */}
-            {(id.includes('voyager') || id === 'parker-solar-probe') ? (
+          {/* Live Mission Data Grid - Only for missions with live data */}
+          {!hasNoLiveData && (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
               <div className="space-y-4">
                 <h3 className="text-xl font-bold">
-                  Deep Space Communication
+                  Live Mission Data
                 </h3>
+                <MissionDataFeed missionId={id} />
+              </div>
+
+              {/* Communication Status for Deep Space */}
+              {(id.includes('voyager') || id === 'parker-solar-probe') ? (
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold">
+                    Deep Space Communication
+                  </h3>
                 <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700">
                   <div className="space-y-4">
                     <div>
@@ -703,15 +716,54 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                   </div>
                 </div>
               </div>
-            ) : (
-              <div className="space-y-4">
-                <h3 className="text-xl font-bold">
-                  Recent Discoveries
-                </h3>
-                <DiscoveryFeed missionId={id} maxItems={3} />
+              ) : (
+                <div className="space-y-4">
+                  <h3 className="text-xl font-bold">
+                    Recent Discoveries
+                  </h3>
+                  <DiscoveryFeed missionId={id} maxItems={3} />
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* Mission Status - Show status for missions without live data feeds */}
+          {hasNoLiveData && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">
+                {isEnRoute ? 'Mission Journey Status' : 'Mission Status'}
+              </h2>
+              <div className={`rounded-lg p-6 ${
+                isEnRoute
+                  ? 'bg-gradient-to-r from-orange-900/20 via-gray-900 to-amber-900/20 border border-orange-500/30'
+                  : 'bg-gradient-to-r from-blue-900/20 via-gray-900 to-purple-900/20 border border-blue-500/30'
+              }`}>
+                <div className="space-y-4">
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Current Status</p>
+                    <p className={`text-lg font-semibold ${isEnRoute ? 'text-orange-400' : 'text-blue-400'}`}>
+                      {isEnRoute ? 'En Route to Destination' : 'Extended Mission - Data Collection Mode'}
+                    </p>
+                  </div>
+                  {mission.distance && (
+                    <div>
+                      <p className="text-sm text-gray-400 mb-1">Approximate Distance from Earth</p>
+                      <p className="text-lg font-semibold text-blue-400">{mission.distance}</p>
+                    </div>
+                  )}
+                  <div>
+                    <p className="text-sm text-gray-400 mb-1">Mission Progress</p>
+                    <p className="text-gray-300">
+                      {isEnRoute
+                        ? 'Spacecraft is currently in cruise phase, conducting system checks and navigating towards its target. Science operations will begin upon arrival at destination.'
+                        : 'Spacecraft is in extended mission phase, continuing to collect valuable scientific data beyond its primary mission objectives. Real-time data feeds are limited during this operational phase.'
+                      }
+                    </p>
+                  </div>
+                </div>
               </div>
-            )}
-          </div>
+            </div>
+          )}
 
           {/* Photo Gallery for Rovers */}
           {isRover && (

@@ -181,7 +181,7 @@ export default function MissionsPage() {
                     </div>
                   </div>
                   <span
-                    className={`px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider ${
+                    className={`px-2 py-1 rounded-full text-xs font-semibold uppercase tracking-wider whitespace-nowrap ${
                       mission.status === 'Active'
                         ? 'bg-green-500/20 text-green-400'
                         : mission.status === 'Extended'
