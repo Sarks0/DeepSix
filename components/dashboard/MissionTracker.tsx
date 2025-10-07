@@ -97,17 +97,17 @@ export function MissionTracker({
             {missionData.name}
           </span>
           {isActive && (
-            <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full uppercase">
+            <span className="text-xs px-2 py-0.5 bg-green-500/20 text-green-400 rounded-full uppercase whitespace-nowrap">
               Active
             </span>
           )}
           {isExtended && (
-            <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full uppercase">
+            <span className="text-xs px-2 py-0.5 bg-blue-500/20 text-blue-400 rounded-full uppercase whitespace-nowrap">
               Extended
             </span>
           )}
           {isEnRoute && (
-            <span className="text-xs px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full uppercase">
+            <span className="text-xs px-2 py-0.5 bg-orange-500/20 text-orange-400 rounded-full uppercase whitespace-nowrap">
               En Route
             </span>
           )}
@@ -183,19 +183,19 @@ export function MissionTracker({
           <p className="text-sm text-gray-400 mt-1">{missionData.primaryObjective}</p>
         </div>
         {isActive ? (
-          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full uppercase font-medium">
+          <span className="px-2 py-1 bg-green-500/20 text-green-400 text-xs rounded-full uppercase font-medium whitespace-nowrap">
             Active Mission
           </span>
         ) : isExtended ? (
-          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full uppercase font-medium">
+          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 text-xs rounded-full uppercase font-medium whitespace-nowrap">
             Extended Mission
           </span>
         ) : isEnRoute ? (
-          <span className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded-full uppercase font-medium">
+          <span className="px-2 py-1 bg-orange-500/20 text-orange-400 text-xs rounded-full uppercase font-medium whitespace-nowrap">
             En Route
           </span>
         ) : (
-          <span className="px-2 py-1 bg-gray-600/20 text-gray-400 text-xs rounded-full uppercase font-medium">
+          <span className="px-2 py-1 bg-gray-600/20 text-gray-400 text-xs rounded-full uppercase font-medium whitespace-nowrap">
             {display.statusText}
           </span>
         )}
