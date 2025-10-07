@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSpacecraftPosition, calculateCommunicationDelay } from '@/lib/api/spacecraft-positions';
+import {
+  getSpacecraftPosition,
+  getSpacecraftPositionEnhanced,
+  calculateCommunicationDelay,
+} from '@/lib/api/spacecraft-positions';
 import {
   handleApiError,
   FALLBACK_DATA,
@@ -41,10 +45,10 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
 
     const spacecraftId = resolvedParams.id.toLowerCase().trim();
 
-    // Wrap spacecraft data retrieval in timeout
+    // Try enhanced version with Horizons API first, wrapped in timeout
     const positionData = await withTimeout(
-      Promise.resolve(getSpacecraftPosition(spacecraftId)),
-      5000 // 5 second timeout for individual spacecraft
+      getSpacecraftPositionEnhanced(spacecraftId),
+      10000 // 10 second timeout for Horizons API
     );
 
     if (!positionData) {
