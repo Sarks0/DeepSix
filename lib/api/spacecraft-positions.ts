@@ -1,5 +1,12 @@
 // Real spacecraft position calculations using orbital mechanics
 // Based on NASA orbital elements and Kepler's laws
+// Enhanced with JPL Horizons API for real-time data
+
+import {
+  getSpacecraftPosition as getHorizonsPosition,
+  SPACECRAFT_IDS,
+} from '@/lib/api/horizons-client';
+import type { SpacecraftId, SpacecraftPosition } from '@/lib/types/horizons';
 
 interface OrbitalElements {
   a: number; // Semi-major axis (AU)
@@ -106,7 +113,105 @@ const CURRENT_SPACECRAFT_DATA = {
     lon: 137.4417,
     light_time_minutes: 14,
   },
+  // New missions with Horizons API support
+  'europa-clipper': {
+    distance_km: 0, // Will be fetched from Horizons API
+    distance_au: 0,
+    velocity_kms: 0,
+    lat: 0,
+    lon: 0,
+    light_time_minutes: 0,
+  },
+  lucy: {
+    distance_km: 0, // Will be fetched from Horizons API
+    distance_au: 0,
+    velocity_kms: 0,
+    lat: 0,
+    lon: 0,
+    light_time_minutes: 0,
+  },
+  psyche: {
+    distance_km: 0, // Will be fetched from Horizons API
+    distance_au: 0,
+    velocity_kms: 0,
+    lat: 0,
+    lon: 0,
+    light_time_minutes: 0,
+  },
+  'osiris-apex': {
+    distance_km: 0, // Will be fetched from Horizons API
+    distance_au: 0,
+    velocity_kms: 0,
+    lat: 0,
+    lon: 0,
+    light_time_minutes: 0,
+  },
+  juno: {
+    distance_km: 0, // Will be fetched from Horizons API
+    distance_au: 0,
+    velocity_kms: 0,
+    lat: 0,
+    lon: 0,
+    light_time_minutes: 0,
+  },
 };
+
+/**
+ * Attempts to fetch real-time position from Horizons API
+ * Returns null if spacecraft not supported or API fails
+ */
+async function tryGetHorizonsPosition(spacecraftId: string): Promise<SpacecraftPosition | null> {
+  try {
+    const cleanId = spacecraftId.toLowerCase().trim();
+
+    // Check if this spacecraft is supported by Horizons API
+    if (!(cleanId in SPACECRAFT_IDS)) {
+      return null;
+    }
+
+    const horizonsData = await getHorizonsPosition(cleanId as SpacecraftId);
+    return horizonsData;
+  } catch (error) {
+    // Silently fail and fall back to static data
+    return null;
+  }
+}
+
+/**
+ * Converts Horizons API data to our internal format
+ */
+function convertHorizonsToInternalFormat(horizonsData: SpacecraftPosition) {
+  return {
+    id: horizonsData.spacecraftId,
+    name: horizonsData.spacecraftId
+      .split('-')
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' '),
+    position: {
+      x: horizonsData.positionX || 0,
+      y: horizonsData.positionY || 0,
+      z: horizonsData.positionZ || 0,
+    },
+    distance: {
+      km: horizonsData.distanceFromEarthKm,
+      au: horizonsData.distanceFromEarthAU,
+      lightTime:
+        horizonsData.lightTimeMinutes < 60
+          ? `${Math.round(horizonsData.lightTimeMinutes)} minutes`
+          : `${(horizonsData.lightTimeMinutes / 60).toFixed(2)} hours`,
+    },
+    velocity: {
+      kms: horizonsData.velocityKmPerSec || 0,
+      kmh: (horizonsData.velocityKmPerSec || 0) * 3600,
+    },
+    coordinates: {
+      lat: 0, // Horizons doesn't provide lat/lon directly
+      lon: 0,
+    },
+    lastUpdate: horizonsData.lastUpdated.toISOString(),
+    dataSource: 'JPL Horizons API (Real-time)',
+  };
+}
 
 export function getSpacecraftPosition(spacecraftId: string) {
   try {
@@ -207,11 +312,30 @@ export function getSpacecraftPosition(spacecraftId: string) {
         lon: safeLon,
       },
       lastUpdate: new Date().toISOString(),
-      dataSource: 'NASA/JPL Ephemeris',
+      dataSource: 'NASA/JPL Ephemeris (Static)',
     };
   } catch (error) {
     // Edge Runtime compatible - no console logging
     return null;
+  }
+}
+
+/**
+ * Enhanced version that tries Horizons API first, falls back to static data
+ */
+export async function getSpacecraftPositionEnhanced(spacecraftId: string) {
+  try {
+    // Try Horizons API first for supported spacecraft
+    const horizonsData = await tryGetHorizonsPosition(spacecraftId);
+    if (horizonsData) {
+      return convertHorizonsToInternalFormat(horizonsData);
+    }
+
+    // Fall back to static data
+    return getSpacecraftPosition(spacecraftId);
+  } catch (error) {
+    // If Horizons fails, use static data
+    return getSpacecraftPosition(spacecraftId);
   }
 }
 
