@@ -285,54 +285,99 @@ async function fetchRoverPhotosFromImagesAPI(
 
   try {
     trackApiCall();
-    // Query for recent rover images
     const roverName = rover.charAt(0).toUpperCase() + rover.slice(1);
-    const currentYear = new Date().getFullYear();
-    const startYear = currentYear - 2; // Last 2 years of images
 
-    const url = `https://images-api.nasa.gov/search?q=${rover}+rover+mars+raw&media_type=image&year_start=${startYear}`;
-    console.log(`Fetching ${roverName} photos from NASA Images API`);
+    // Optimized search queries for better results
+    const searchQueries = {
+      curiosity: [
+        `MSL curiosity mars`,
+        `curiosity rover mars surface`,
+        `mars science laboratory`
+      ],
+      opportunity: [
+        `MER opportunity mars`,
+        `opportunity rover mars surface`
+      ],
+      spirit: [
+        `MER spirit mars`,
+        `spirit rover mars surface`
+      ],
+      perseverance: [
+        `mars 2020 perseverance`,
+        `perseverance rover mars surface`
+      ]
+    };
 
-    const response = await fetch(url);
-    if (!response.ok) {
-      console.error(`NASA Images API error: ${response.status} ${response.statusText}`);
-      return [];
-    }
-
-    const data: NASAImagesResponse = await response.json();
+    const queries = searchQueries[rover] || [rover];
+    const allPhotos: RoverPhoto[] = [];
     const roverMetadata = getRoverMetadata(rover);
 
-    // Transform Images API format to RoverPhoto format
-    const photos: RoverPhoto[] = data.collection.items
-      .slice(0, limit)
-      .map((item, index) => {
-        const itemData = item.data[0];
-        const imageLink = item.links?.find(l => l.rel === 'preview' || l.render === 'image');
+    console.log(`🔍 [${rover.toUpperCase()}] Fetching from NASA Images API with ${queries.length} search queries`);
 
-        // Extract sol from description or title
-        const sol = extractSolFromText(itemData.description || itemData.title || '');
+    // Try multiple search queries to get diverse results
+    for (const query of queries) {
+      if (allPhotos.length >= limit) break;
 
-        return {
-          id: parseInt(itemData.nasa_id.replace(/[^\d]/g, '')) || index,
-          sol: sol,
-          camera: {
-            id: index,
-            name: 'MISSION',
-            rover_id: roverMetadata.id,
-            full_name: 'Mission Camera'
-          },
-          img_src: imageLink?.href || '',
-          earth_date: itemData.date_created.split('T')[0],
-          rover: roverMetadata
-        };
-      })
-      .filter(photo => photo.img_src); // Only include photos with valid image URLs
+      const url = `https://images-api.nasa.gov/search?q=${encodeURIComponent(query)}&media_type=image`;
+      console.log(`📍 [${rover.toUpperCase()}] Trying query: "${query}"`);
 
-    console.log(`✓ Fetched ${photos.length} ${roverName} photos from Images API`);
-    setCache(cacheKey, photos);
-    return photos;
+      try {
+        const response = await fetch(url);
+        if (!response.ok) {
+          console.warn(`⚠️  [${rover.toUpperCase()}] Query failed: ${response.status}`);
+          continue;
+        }
+
+        const data: NASAImagesResponse = await response.json();
+
+        if (!data.collection?.items || data.collection.items.length === 0) {
+          console.warn(`⚠️  [${rover.toUpperCase()}] Query returned no results`);
+          continue;
+        }
+
+        console.log(`✓ [${rover.toUpperCase()}] Found ${data.collection.items.length} items`);
+
+        // Transform Images API format to RoverPhoto format
+        const photos = data.collection.items
+          .map((item, index) => {
+            const itemData = item.data[0];
+            const imageLink = item.links?.find(l => l.rel === 'preview' || l.render === 'image');
+
+            // Extract sol from description or title
+            const sol = extractSolFromText(itemData.description || itemData.title || '');
+
+            return {
+              id: parseInt(itemData.nasa_id.replace(/[^\d]/g, '').slice(0, 10)) || Date.now() + index,
+              sol: sol,
+              camera: {
+                id: index,
+                name: 'MISSION',
+                rover_id: roverMetadata.id,
+                full_name: 'Mission Camera'
+              },
+              img_src: imageLink?.href || '',
+              earth_date: itemData.date_created.split('T')[0],
+              rover: roverMetadata
+            };
+          })
+          .filter(photo => photo.img_src && !allPhotos.find(p => p.id === photo.id)); // Only include photos with valid URLs and avoid duplicates
+
+        allPhotos.push(...photos);
+      } catch (error) {
+        console.warn(`⚠️  [${rover.toUpperCase()}] Query exception:`, error);
+        continue;
+      }
+    }
+
+    // Limit to requested amount
+    const limitedPhotos = allPhotos.slice(0, limit);
+
+    console.log(`✅ [${rover.toUpperCase()}] Successfully fetched ${limitedPhotos.length} photos from Images API`);
+
+    setCache(cacheKey, limitedPhotos);
+    return limitedPhotos;
   } catch (error) {
-    console.error(`Error fetching ${rover} photos from Images API:`, error);
+    console.error(`💥 [${rover.toUpperCase()}] Error fetching from Images API:`, error);
     return [];
   }
 }
@@ -344,27 +389,22 @@ async function fetchLatestPhotos(
   rover: RoverName,
   limit: number = 50
 ): Promise<RoverPhoto[]> {
-  if (rover === 'perseverance' || rover === 'curiosity') {
-    // Use Mars.nasa.gov RSS API for raw rover images
-    // Perseverance and Curiosity have active RSS feeds
-    console.log(`🚀 [${rover.toUpperCase()}] Attempting to fetch from RSS API...`);
+  if (rover === 'perseverance') {
+    // Perseverance: Try RSS API first, fallback to Images API
+    console.log(`🚀 [PERSEVERANCE] Attempting to fetch from RSS API...`);
     const rssPhotos = await fetchRoverPhotosFromRSS(rover, limit);
 
-    // Fallback to NASA Images API if RSS fails for Curiosity
-    // (Perseverance RSS is more reliable, so no fallback needed)
-    if (rssPhotos.length === 0 && rover === 'curiosity') {
-      console.warn(`⚠️  [CURIOSITY] RSS API returned no photos, falling back to NASA Images API`);
-      const fallbackPhotos = await fetchRoverPhotosFromImagesAPI(rover, limit);
-      if (fallbackPhotos.length > 0) {
-        console.log(`✅ [CURIOSITY] Fallback successful: ${fallbackPhotos.length} photos from Images API`);
-      }
-      return fallbackPhotos;
+    if (rssPhotos.length === 0) {
+      console.warn(`⚠️  [PERSEVERANCE] RSS API returned no photos, falling back to NASA Images API`);
+      return fetchRoverPhotosFromImagesAPI(rover, limit);
     }
 
     return rssPhotos;
   } else {
-    // Use NASA Images API for curated mission photos for legacy rovers
-    // (Mars Photos API retired October 8, 2025)
+    // Curiosity, Opportunity, Spirit: Use NASA Images API
+    // Note: Mars.nasa.gov RSS API may not be accessible in all deployment environments
+    // api.nasa.gov/mars-photos was retired October 8, 2025
+    console.log(`🚀 [${rover.toUpperCase()}] Using NASA Images API (Mars Photos API retired Oct 8, 2025)`);
     return fetchRoverPhotosFromImagesAPI(rover, limit);
   }
 }
@@ -414,22 +454,16 @@ export async function GET(
 
     // Update metadata based on which source was used
     if (photos.length > 0) {
-      // Determine which API was used based on rover and success
+      // Determine which API was used based on rover
       if (rover === 'perseverance') {
-        metadata.api_source = 'Mars.nasa.gov RSS API';
-        metadata.note = 'Raw rover camera images from Mars.nasa.gov RSS feed (Mars 2020 mission)';
-      } else if (rover === 'curiosity') {
-        // Check if we're using RSS or fallback (we'll log this in fetchLatestPhotos)
         metadata.api_source = 'Mars.nasa.gov RSS API or NASA Images API (fallback)';
-        metadata.note = 'Attempting RSS feed first, falling back to NASA Images API if needed';
+        metadata.note = 'Raw rover camera images from Mars.nasa.gov RSS feed (Mars 2020 mission), with fallback to NASA Images API';
       } else {
         metadata.api_source = 'NASA Images API';
-        metadata.note = 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.';
+        metadata.note = 'The NASA Mars Photos API (api.nasa.gov/mars-photos) was retired on October 8, 2025. Showing curated mission photos from NASA Images API.';
       }
     } else {
-      metadata.api_source = (rover === 'perseverance' || rover === 'curiosity')
-        ? 'Mars.nasa.gov RSS API'
-        : 'NASA Images API';
+      metadata.api_source = rover === 'perseverance' ? 'Mars.nasa.gov RSS API' : 'NASA Images API';
       metadata.note = 'No photos available from any source';
     }
 
@@ -464,9 +498,9 @@ export async function GET(
     if (photos.length === 0) {
       console.warn(`No photos found for ${rover}.`);
       metadata.warning = `No photos available. ${
-        (rover === 'perseverance' || rover === 'curiosity')
-          ? 'The Mars.nasa.gov RSS API may be temporarily unavailable.'
-          : 'Limited photos available from NASA Images API for legacy rovers.'
+        rover === 'perseverance'
+          ? 'The Mars.nasa.gov RSS API and NASA Images API may be temporarily unavailable.'
+          : 'The NASA Images API may be temporarily unavailable or have limited photos for this rover.'
       }`;
     }
 
