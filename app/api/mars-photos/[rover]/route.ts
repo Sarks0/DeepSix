@@ -51,14 +51,14 @@ function isValidRover(rover: string): rover is RoverName {
 
 async function fetchRoverManifest(rover: RoverName, apiKey: string): Promise<RoverManifest | null> {
   try {
-    const url = `https://api.nasa.gov/mars-photos/api/v1/manifests/${rover}?api_key=${apiKey}`;
+    const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}?api_key=${apiKey}`;
     const response = await fetch(url);
-    
+
     if (!response.ok) {
       console.error(`Failed to fetch manifest: ${response.status}`);
       return null;
     }
-    
+
     return await response.json();
   } catch (error) {
     console.error(`Error fetching manifest for ${rover}:`, error);
@@ -217,20 +217,8 @@ export async function GET(
     let metadata: any = {};
 
     if (latest || (!sol && !earthDate)) {
-      // Fetch latest photos (default behavior) plus some from September 8th, 2025
+      // Fetch latest photos (default behavior)
       photos = await fetchLatestPhotos(rover, apiKey, limit);
-      
-      // Add a few good photos from September 8th, 2025
-      try {
-        const sept8Photos = await getPhotosByDateRange(rover, '2025-09-08', '2025-09-08', apiKey, 7);
-        if (sept8Photos.length > 0) {
-          // Add to beginning of array to prioritize these photos
-          photos = [...sept8Photos, ...photos].slice(0, limit);
-        }
-      } catch (error) {
-        console.log('Could not fetch September 8th photos:', error);
-      }
-      
       metadata.type = 'latest';
     } else if (earthDate) {
       // Fetch by Earth date
