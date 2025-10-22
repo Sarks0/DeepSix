@@ -210,15 +210,32 @@ async function fetchRoverPhotosFromRSS(rover: RoverName, limit: number = 50): Pr
   try {
     trackApiCall();
     const url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=${category}&feedtype=json&num=${limit}`;
-    console.log(`Fetching ${rover} photos from Mars.nasa.gov RSS API (category: ${category})`);
+    console.log(`🔍 [${rover.toUpperCase()}] Fetching from Mars.nasa.gov RSS API`);
+    console.log(`📍 URL: ${url}`);
 
     const response = await fetch(url);
+    console.log(`📡 [${rover.toUpperCase()}] Response status: ${response.status} ${response.statusText}`);
+
     if (!response.ok) {
-      console.error(`Mars RSS API error for ${rover}: ${response.status} ${response.statusText}`);
+      console.error(`❌ [${rover.toUpperCase()}] Mars RSS API error: ${response.status} ${response.statusText}`);
+      const errorText = await response.text().catch(() => 'Unable to read error response');
+      console.error(`❌ [${rover.toUpperCase()}] Error body:`, errorText.substring(0, 200));
       return [];
     }
 
     const data: MarsRSSResponse = await response.json();
+    console.log(`📊 [${rover.toUpperCase()}] Response received:`, {
+      hasImages: !!data.images,
+      imageCount: data.images?.length || 0,
+      responseKeys: Object.keys(data)
+    });
+
+    if (!data.images || data.images.length === 0) {
+      console.warn(`⚠️  [${rover.toUpperCase()}] RSS API returned no images`);
+      console.log(`📋 [${rover.toUpperCase()}] Full response:`, JSON.stringify(data).substring(0, 500));
+      return [];
+    }
+
     const roverMetadata = getRoverMetadata(rover);
 
     // Transform RSS format to RoverPhoto format
@@ -236,11 +253,20 @@ async function fetchRoverPhotosFromRSS(rover: RoverName, limit: number = 50): Pr
       rover: roverMetadata
     }));
 
-    console.log(`✓ Fetched ${photos.length} ${rover} photos from RSS API`);
+    console.log(`✅ [${rover.toUpperCase()}] Successfully fetched ${photos.length} photos from RSS API`);
+    if (photos.length > 0) {
+      console.log(`📸 [${rover.toUpperCase()}] Sample photo: Sol ${photos[0].sol}, Camera: ${photos[0].camera.name}`);
+    }
+
     setCache(cacheKey, photos);
     return photos;
   } catch (error) {
-    console.error(`Error fetching ${rover} photos from RSS API:`, error);
+    console.error(`💥 [${rover.toUpperCase()}] Exception fetching from RSS API:`, error);
+    console.error(`💥 [${rover.toUpperCase()}] Error details:`, {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack?.substring(0, 300) : undefined
+    });
     return [];
   }
 }
@@ -321,7 +347,21 @@ async function fetchLatestPhotos(
   if (rover === 'perseverance' || rover === 'curiosity') {
     // Use Mars.nasa.gov RSS API for raw rover images
     // Perseverance and Curiosity have active RSS feeds
-    return fetchRoverPhotosFromRSS(rover, limit);
+    console.log(`🚀 [${rover.toUpperCase()}] Attempting to fetch from RSS API...`);
+    const rssPhotos = await fetchRoverPhotosFromRSS(rover, limit);
+
+    // Fallback to NASA Images API if RSS fails for Curiosity
+    // (Perseverance RSS is more reliable, so no fallback needed)
+    if (rssPhotos.length === 0 && rover === 'curiosity') {
+      console.warn(`⚠️  [CURIOSITY] RSS API returned no photos, falling back to NASA Images API`);
+      const fallbackPhotos = await fetchRoverPhotosFromImagesAPI(rover, limit);
+      if (fallbackPhotos.length > 0) {
+        console.log(`✅ [CURIOSITY] Fallback successful: ${fallbackPhotos.length} photos from Images API`);
+      }
+      return fallbackPhotos;
+    }
+
+    return rssPhotos;
   } else {
     // Use NASA Images API for curated mission photos for legacy rovers
     // (Mars Photos API retired October 8, 2025)
@@ -365,16 +405,33 @@ export async function GET(
     let photos: RoverPhoto[] = [];
     let metadata: any = {
       type: 'latest',
-      api_source: (rover === 'perseverance' || rover === 'curiosity')
-        ? 'Mars.nasa.gov RSS API'
-        : 'NASA Images API',
-      note: (rover === 'perseverance' || rover === 'curiosity')
-        ? `Raw rover camera images from Mars.nasa.gov RSS feed (${rover === 'perseverance' ? 'Mars 2020' : 'MSL'} mission)`
-        : 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.'
+      api_source: 'Unknown', // Will be updated based on actual source used
+      note: ''
     };
 
     // Fetch latest photos (only mode supported now)
     photos = await fetchLatestPhotos(rover, limit);
+
+    // Update metadata based on which source was used
+    if (photos.length > 0) {
+      // Determine which API was used based on rover and success
+      if (rover === 'perseverance') {
+        metadata.api_source = 'Mars.nasa.gov RSS API';
+        metadata.note = 'Raw rover camera images from Mars.nasa.gov RSS feed (Mars 2020 mission)';
+      } else if (rover === 'curiosity') {
+        // Check if we're using RSS or fallback (we'll log this in fetchLatestPhotos)
+        metadata.api_source = 'Mars.nasa.gov RSS API or NASA Images API (fallback)';
+        metadata.note = 'Attempting RSS feed first, falling back to NASA Images API if needed';
+      } else {
+        metadata.api_source = 'NASA Images API';
+        metadata.note = 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.';
+      }
+    } else {
+      metadata.api_source = (rover === 'perseverance' || rover === 'curiosity')
+        ? 'Mars.nasa.gov RSS API'
+        : 'NASA Images API';
+      metadata.note = 'No photos available from any source';
+    }
 
     // Add sol tracking data
     try {
