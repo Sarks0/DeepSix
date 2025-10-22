@@ -4,6 +4,60 @@ import { calculateSol, formatSolDisplay, getSolMilestone } from '@/lib/utils/mar
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
 
+// Server-side cache with aggressive TTL to conserve API calls
+// Cache for 6 hours to dramatically reduce NASA API usage
+const CACHE_TTL = 6 * 60 * 60 * 1000; // 6 hours in milliseconds
+const serverCache = new Map<string, { data: any; timestamp: number; expiresAt: number }>();
+
+// Track API calls to monitor usage
+let apiCallCount = 0;
+let lastResetTime = Date.now();
+
+function getCacheKey(rover: RoverName, params: URLSearchParams): string {
+  const sol = params.get('sol');
+  const earthDate = params.get('earth_date');
+  const camera = params.get('camera');
+  const limit = params.get('limit') || '50';
+  const latest = params.get('latest') || 'false';
+
+  return `${rover}-${sol || 'null'}-${earthDate || 'null'}-${camera || 'null'}-${limit}-${latest}`;
+}
+
+function getFromCache<T>(key: string): T | null {
+  const cached = serverCache.get(key);
+  if (!cached) return null;
+
+  const now = Date.now();
+  if (now > cached.expiresAt) {
+    serverCache.delete(key);
+    return null;
+  }
+
+  console.log(`✓ Cache HIT for ${key} (expires in ${Math.round((cached.expiresAt - now) / 1000 / 60)} minutes)`);
+  return cached.data as T;
+}
+
+function setCache<T>(key: string, data: T): void {
+  const now = Date.now();
+  serverCache.set(key, {
+    data,
+    timestamp: now,
+    expiresAt: now + CACHE_TTL
+  });
+  console.log(`✓ Cached ${key} for ${CACHE_TTL / 1000 / 60} minutes`);
+}
+
+function trackApiCall(): void {
+  const now = Date.now();
+  // Reset counter every hour
+  if (now - lastResetTime > 60 * 60 * 1000) {
+    console.log(`📊 API Usage Stats: ${apiCallCount} calls in last hour`);
+    apiCallCount = 0;
+    lastResetTime = now;
+  }
+  apiCallCount++;
+}
+
 interface RoverPhoto {
   id: number;
   sol: number;
@@ -27,21 +81,50 @@ interface RoverPhoto {
   };
 }
 
-interface RoverManifest {
-  photo_manifest: {
-    name: string;
-    landing_date: string;
-    launch_date: string;
-    status: string;
-    max_sol: number;
-    max_date: string;
-    total_photos: number;
-    photos: Array<{
-      sol: number;
-      earth_date: string;
-      total_photos: number;
-      cameras: string[];
-    }>;
+// Mars.nasa.gov RSS API interfaces (Perseverance)
+interface MarsRSSImage {
+  sol: number;
+  imageid: string;
+  camera: {
+    instrument: string;
+    filter_name: string;
+  };
+  image_files: {
+    small: string;
+    medium: string;
+    large: string;
+    full_res: string;
+  };
+  date_taken_utc: string;
+  date_taken_mars: string;
+  caption?: string;
+}
+
+interface MarsRSSResponse {
+  images: MarsRSSImage[];
+}
+
+// NASA Images API interfaces (Curiosity, Opportunity, Spirit)
+interface NASAImageItem {
+  href: string;
+  data: Array<{
+    nasa_id: string;
+    title: string;
+    description: string;
+    date_created: string;
+    keywords?: string[];
+    media_type: string;
+  }>;
+  links: Array<{
+    href: string;
+    rel: string;
+    render: string;
+  }>;
+}
+
+interface NASAImagesResponse {
+  collection: {
+    items: NASAImageItem[];
   };
 }
 
@@ -49,139 +132,185 @@ function isValidRover(rover: string): rover is RoverName {
   return ['perseverance', 'curiosity', 'opportunity', 'spirit'].includes(rover);
 }
 
-async function fetchRoverManifest(rover: RoverName, apiKey: string): Promise<RoverManifest | null> {
-  try {
-    const url = `https://api.nasa.gov/mars-photos/api/v1/manifests/${rover}?api_key=${apiKey}`;
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      console.error(`Failed to fetch manifest: ${response.status}`);
-      return null;
-    }
-    
-    return await response.json();
-  } catch (error) {
-    console.error(`Error fetching manifest for ${rover}:`, error);
-    return null;
+// Helper function to extract sol number from text
+function extractSolFromText(text: string): number {
+  const solMatch = text.match(/sol[:\s]+(\d+)/i);
+  if (solMatch) {
+    return parseInt(solMatch[1], 10);
   }
+  // Try date-based estimation for older images
+  return 0;
 }
 
-async function fetchRoverPhotos(
-  rover: RoverName,
-  sol: number,
-  apiKey: string,
-  camera?: string
-): Promise<RoverPhoto[]> {
-  const cameraParam = camera ? `&camera=${camera}` : '';
-  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${sol}&api_key=${apiKey}${cameraParam}`;
-  
+// Get rover metadata
+function getRoverMetadata(rover: RoverName): {
+  id: number;
+  name: string;
+  landing_date: string;
+  launch_date: string;
+  status: string;
+} {
+  const roverData = {
+    perseverance: {
+      id: 5,
+      name: 'Perseverance',
+      landing_date: '2021-02-18',
+      launch_date: '2020-07-30',
+      status: 'active'
+    },
+    curiosity: {
+      id: 5,
+      name: 'Curiosity',
+      landing_date: '2012-08-06',
+      launch_date: '2011-11-26',
+      status: 'active'
+    },
+    opportunity: {
+      id: 6,
+      name: 'Opportunity',
+      landing_date: '2004-01-25',
+      launch_date: '2003-07-07',
+      status: 'complete'
+    },
+    spirit: {
+      id: 7,
+      name: 'Spirit',
+      landing_date: '2004-01-04',
+      launch_date: '2003-06-10',
+      status: 'complete'
+    }
+  };
+
+  return roverData[rover];
+}
+
+/**
+ * Fetch latest photos for Perseverance using Mars.nasa.gov RSS API
+ * This provides raw rover camera images directly from the mission
+ */
+async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]> {
+  const cacheKey = `perseverance-rss-${limit}`;
+  const cached = getFromCache<RoverPhoto[]>(cacheKey);
+  if (cached) return cached;
+
   try {
+    trackApiCall();
+    const url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&num=${limit}`;
+    console.log(`Fetching Perseverance photos from Mars.nasa.gov RSS API`);
+
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`NASA API error: ${response.status} ${response.statusText}`);
+      console.error(`Mars RSS API error: ${response.status} ${response.statusText}`);
       return [];
     }
-    
-    const data = await response.json();
-    return data.photos || [];
+
+    const data: MarsRSSResponse = await response.json();
+    const roverMetadata = getRoverMetadata('perseverance');
+
+    // Transform RSS format to RoverPhoto format
+    const photos: RoverPhoto[] = data.images.map((img, index) => ({
+      id: parseInt(img.imageid.replace(/[^\d]/g, '').slice(0, 10)) || index,
+      sol: img.sol,
+      camera: {
+        id: index,
+        name: img.camera.instrument,
+        rover_id: 5,
+        full_name: `${img.camera.instrument} - ${img.camera.filter_name}`
+      },
+      img_src: img.image_files.large || img.image_files.medium,
+      earth_date: img.date_taken_utc.split('T')[0],
+      rover: roverMetadata
+    }));
+
+    console.log(`✓ Fetched ${photos.length} Perseverance photos from RSS API`);
+    setCache(cacheKey, photos);
+    return photos;
   } catch (error) {
-    console.error(`Error fetching photos for ${rover} sol ${sol}:`, error);
+    console.error(`Error fetching Perseverance photos from RSS API:`, error);
     return [];
   }
 }
 
-async function fetchLatestPhotos(
+/**
+ * Fetch photos for Curiosity, Opportunity, or Spirit using NASA Images API
+ * Since the Mars Photos API is retired, we use curated mission photos
+ */
+async function fetchRoverPhotosFromImagesAPI(
   rover: RoverName,
-  apiKey: string,
-  limit: number = 200
-): Promise<RoverPhoto[]> {
-  try {
-    // First, try the latest_photos endpoint for the most recent photos
-    const latestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
-    const latestResponse = await fetch(latestUrl);
-    
-    if (latestResponse.ok) {
-      const latestData = await latestResponse.json();
-      if (latestData.latest_photos && latestData.latest_photos.length > 0) {
-        // Return the requested number of latest photos
-        return latestData.latest_photos.slice(0, limit);
-      }
-    }
-  } catch (error) {
-    console.error(`Error fetching latest photos for ${rover}:`, error);
-  }
-  
-  // Fallback: Get manifest and fetch from recent sols
-  const manifest = await fetchRoverManifest(rover, apiKey);
-  if (!manifest) {
-    return [];
-  }
-  
-  const maxSol = manifest.photo_manifest.max_sol;
-  const recentPhotos: RoverPhoto[] = [];
-  
-  // Try to get photos from the last 100 sols with photos (roughly 3+ months on Mars)
-  const recentSols = manifest.photo_manifest.photos
-    .slice(-100)
-    .reverse()
-    .map(p => p.sol);
-  
-  for (const sol of recentSols) {
-    if (recentPhotos.length >= limit) break;
-    
-    const photos = await fetchRoverPhotos(rover, sol, apiKey);
-    if (photos.length > 0) {
-      // Add variety by selecting from different cameras
-      const byCamera = new Map<string, RoverPhoto[]>();
-      photos.forEach(photo => {
-        const cam = photo.camera.name;
-        if (!byCamera.has(cam)) {
-          byCamera.set(cam, []);
-        }
-        byCamera.get(cam)!.push(photo);
-      });
-      
-      // Take one from each camera in rotation
-      let added = 0;
-      const maxPerSol = Math.min(10, limit - recentPhotos.length);
-      while (added < maxPerSol && byCamera.size > 0) {
-        for (const [cam, camPhotos] of byCamera) {
-          if (camPhotos.length > 0 && added < maxPerSol) {
-            recentPhotos.push(camPhotos.shift()!);
-            added++;
-          }
-          if (camPhotos.length === 0) {
-            byCamera.delete(cam);
-          }
-        }
-      }
-    }
-  }
-  
-  return recentPhotos.slice(0, limit);
-}
-
-async function getPhotosByDateRange(
-  rover: RoverName,
-  startDate: string,
-  endDate: string,
-  apiKey: string,
   limit: number = 50
 ): Promise<RoverPhoto[]> {
-  // Fetch photos between two Earth dates
-  const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?earth_date=${startDate}&api_key=${apiKey}`;
-  
+  const cacheKey = `${rover}-images-api-${limit}`;
+  const cached = getFromCache<RoverPhoto[]>(cacheKey);
+  if (cached) return cached;
+
   try {
+    trackApiCall();
+    // Query for recent rover images
+    const roverName = rover.charAt(0).toUpperCase() + rover.slice(1);
+    const currentYear = new Date().getFullYear();
+    const startYear = currentYear - 2; // Last 2 years of images
+
+    const url = `https://images-api.nasa.gov/search?q=${rover}+rover+mars+raw&media_type=image&year_start=${startYear}`;
+    console.log(`Fetching ${roverName} photos from NASA Images API`);
+
     const response = await fetch(url);
     if (!response.ok) {
+      console.error(`NASA Images API error: ${response.status} ${response.statusText}`);
       return [];
     }
-    
-    const data = await response.json();
-    return (data.photos || []).slice(0, limit);
+
+    const data: NASAImagesResponse = await response.json();
+    const roverMetadata = getRoverMetadata(rover);
+
+    // Transform Images API format to RoverPhoto format
+    const photos: RoverPhoto[] = data.collection.items
+      .slice(0, limit)
+      .map((item, index) => {
+        const itemData = item.data[0];
+        const imageLink = item.links?.find(l => l.rel === 'preview' || l.render === 'image');
+
+        // Extract sol from description or title
+        const sol = extractSolFromText(itemData.description || itemData.title || '');
+
+        return {
+          id: parseInt(itemData.nasa_id.replace(/[^\d]/g, '')) || index,
+          sol: sol,
+          camera: {
+            id: index,
+            name: 'MISSION',
+            rover_id: roverMetadata.id,
+            full_name: 'Mission Camera'
+          },
+          img_src: imageLink?.href || '',
+          earth_date: itemData.date_created.split('T')[0],
+          rover: roverMetadata
+        };
+      })
+      .filter(photo => photo.img_src); // Only include photos with valid image URLs
+
+    console.log(`✓ Fetched ${photos.length} ${roverName} photos from Images API`);
+    setCache(cacheKey, photos);
+    return photos;
   } catch (error) {
-    console.error(`Error fetching photos by date for ${rover}:`, error);
+    console.error(`Error fetching ${rover} photos from Images API:`, error);
     return [];
+  }
+}
+
+/**
+ * Main function to fetch latest photos based on rover type
+ */
+async function fetchLatestPhotos(
+  rover: RoverName,
+  limit: number = 50
+): Promise<RoverPhoto[]> {
+  if (rover === 'perseverance') {
+    // Use Mars.nasa.gov RSS API for raw rover images
+    return fetchPerseverancePhotos(limit);
+  } else {
+    // Use NASA Images API for curated mission photos
+    // (Mars Photos API retired October 8, 2025)
+    return fetchRoverPhotosFromImagesAPI(rover, limit);
   }
 }
 
@@ -192,11 +321,8 @@ export async function GET(
   try {
     const { rover } = await context.params;
     const { searchParams } = new URL(request.url);
-    
+
     // Parse query parameters
-    const sol = searchParams.get('sol') ? parseInt(searchParams.get('sol')!) : undefined;
-    const earthDate = searchParams.get('earth_date');
-    const camera = searchParams.get('camera');
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
     const latest = searchParams.get('latest') === 'true';
 
@@ -210,58 +336,35 @@ export async function GET(
       );
     }
 
-    // Get API key from environment
-    const apiKey = getApiKey();
+    // Check top-level response cache to dramatically reduce API usage
+    const responseCacheKey = getCacheKey(rover, searchParams);
+    const cachedResponse = getFromCache<any>(responseCacheKey);
+    if (cachedResponse) {
+      console.log(`⚡ Returning cached response for ${rover} (API calls saved!)`);
+      const headers = new Headers();
+      headers.set('Cache-Control', 'public, s-maxage=21600, stale-while-revalidate=43200'); // 6 hours cache
+      headers.set('X-Cache', 'HIT');
+      return NextResponse.json(cachedResponse, { headers });
+    }
 
     let photos: RoverPhoto[] = [];
-    let metadata: any = {};
+    let metadata: any = {
+      type: 'latest',
+      api_source: rover === 'perseverance' ? 'Mars.nasa.gov RSS API' : 'NASA Images API',
+      note: rover === 'perseverance'
+        ? 'Raw rover camera images from Mars.nasa.gov RSS feed'
+        : 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.'
+    };
 
-    if (latest || (!sol && !earthDate)) {
-      // Fetch latest photos (default behavior) plus some from September 8th, 2025
-      photos = await fetchLatestPhotos(rover, apiKey, limit);
-      
-      // Add a few good photos from September 8th, 2025
-      try {
-        const sept8Photos = await getPhotosByDateRange(rover, '2025-09-08', '2025-09-08', apiKey, 7);
-        if (sept8Photos.length > 0) {
-          // Add to beginning of array to prioritize these photos
-          photos = [...sept8Photos, ...photos].slice(0, limit);
-        }
-      } catch (error) {
-        console.log('Could not fetch September 8th photos:', error);
-      }
-      
-      metadata.type = 'latest';
-    } else if (earthDate) {
-      // Fetch by Earth date
-      photos = await getPhotosByDateRange(rover, earthDate, earthDate, apiKey, limit);
-      metadata.type = 'earth_date';
-      metadata.earth_date = earthDate;
-    } else if (sol !== undefined) {
-      // Fetch specific sol
-      photos = await fetchRoverPhotos(rover, sol, apiKey, camera || undefined);
-      photos = photos.slice(0, limit);
-      metadata.type = 'sol';
-      metadata.sol = sol;
-    }
-
-    // Get manifest data for additional info
-    const manifest = await fetchRoverManifest(rover, apiKey);
-    if (manifest) {
-      metadata.rover_info = {
-        max_sol: manifest.photo_manifest.max_sol,
-        max_date: manifest.photo_manifest.max_date,
-        total_photos: manifest.photo_manifest.total_photos,
-        status: manifest.photo_manifest.status
-      };
-    }
+    // Fetch latest photos (only mode supported now)
+    photos = await fetchLatestPhotos(rover, limit);
 
     // Add sol tracking data
     try {
       const solData = calculateSol(rover, new Date());
       const solDisplay = formatSolDisplay(solData);
       const milestone = getSolMilestone(solData.currentSol);
-      
+
       metadata.sol_tracking = {
         current_sol: solData.currentSol,
         mission_duration_earth_days: solData.missionDurationEarthDays,
@@ -273,29 +376,57 @@ export async function GET(
         display: solDisplay,
         milestone: milestone
       };
+
+      // Add rover info
+      metadata.rover_info = {
+        ...getRoverMetadata(rover),
+        current_sol: solData.currentSol
+      };
     } catch (error) {
       console.error(`Error calculating sol data for ${rover}:`, error);
     }
 
-    // Add cache headers for extended caching (5 days)
-    const headers = new Headers();
-    headers.set('Cache-Control', 'public, s-maxage=432000, stale-while-revalidate=864000'); // 5 days cache, 10 days stale
+    // Add warning if no photos found
+    if (photos.length === 0) {
+      console.warn(`No photos found for ${rover}.`);
+      metadata.warning = `No photos available. ${
+        rover === 'perseverance'
+          ? 'The Mars.nasa.gov RSS API may be temporarily unavailable.'
+          : 'Limited photos available from NASA Images API for legacy rovers.'
+      }`;
+    }
 
-    return NextResponse.json({
+    // Log API usage stats
+    console.log(`📊 Current API usage: ${apiCallCount} calls in last hour`);
+
+    // Prepare response
+    const responseData = {
       photos,
-      success: true,
+      success: photos.length > 0,
       total: photos.length,
       rover,
       metadata,
-      cached_until: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000).toISOString() // 5 days
-    }, { headers });
-    
+      cached_until: new Date(Date.now() + CACHE_TTL).toISOString(),
+      api_calls_this_hour: apiCallCount
+    };
+
+    // Cache the entire response
+    setCache(responseCacheKey, responseData);
+
+    // Add cache headers for extended caching (6 hours)
+    const headers = new Headers();
+    headers.set('Cache-Control', 'public, s-maxage=21600, stale-while-revalidate=43200'); // 6 hours cache, 12 hours stale
+    headers.set('X-Cache', 'MISS');
+
+    return NextResponse.json(responseData, { headers });
+
   } catch (error: any) {
     console.error('Mars photos API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch Mars rover photos',
-        details: error.message
+        details: error.message,
+        note: 'The NASA Mars Photos API was retired on October 8, 2025. This endpoint now uses alternative data sources.'
       },
       { status: 500 }
     );
