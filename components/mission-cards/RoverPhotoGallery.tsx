@@ -138,11 +138,32 @@ export function RoverPhotoGallery({
 
     try {
       // Fetch latest photos from API with extended range
-      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=200`);
+      // Add cache-busting to prevent stale 404 responses
+      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=200`, {
+        cache: 'no-cache',
+        headers: {
+          'Cache-Control': 'no-cache',
+          'Pragma': 'no-cache'
+        }
+      });
 
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || `Failed to fetch photos (${response.status})`);
+        // Try to parse error as JSON, but handle non-JSON responses
+        let errorMessage = `Failed to fetch photos (${response.status})`;
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.error || errorMessage;
+        } catch {
+          // Response wasn't JSON, use status text
+          errorMessage = `${response.status}: ${response.statusText}`;
+        }
+        throw new Error(errorMessage);
+      }
+
+      // Parse response data with better error handling
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Invalid response format - expected JSON');
       }
 
       const data = await response.json();
