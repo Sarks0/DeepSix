@@ -12,6 +12,7 @@ const navItems = [
   { label: 'DSN', href: '/dsn' },
   { label: 'Live Data', href: '/live' },
   { label: 'About', href: '/about' },
+  { label: 'Privacy', href: '/privacy' },
 ];
 
 export function Navigation() {

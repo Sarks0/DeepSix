@@ -37,8 +37,10 @@ In your Vercel dashboard, add these environment variables:
 
 | Variable | Value | Description |
 |----------|-------|-------------|
-| `NEXT_PUBLIC_NASA_API_KEY` | Your NASA API key | Get from https://api.nasa.gov/ |
+| `NASA_API_KEY` | Your NASA API key | Get from https://api.nasa.gov/ (server-side only, recommended) |
 | `NEXT_PUBLIC_APP_URL` | Your Vercel URL | e.g., https://your-app.vercel.app |
+
+**Security Note:** Use `NASA_API_KEY` (without `NEXT_PUBLIC_` prefix) to keep your API key secure on the server-side. The `NEXT_PUBLIC_` prefix exposes variables in the client bundle, which is a security risk. API routes can access server-side environment variables via `process.env.NASA_API_KEY`.
 
 #### How to add environment variables in Vercel:
 1. Go to your project dashboard
@@ -46,6 +48,7 @@ In your Vercel dashboard, add these environment variables:
 3. Click "Environment Variables" in the left sidebar
 4. Add each variable with its value
 5. Ensure they're available for Production, Preview, and Development
+6. **Important:** Do NOT use `NEXT_PUBLIC_` prefix for the NASA API key
 
 ### 4. Configuration Details
 
@@ -95,9 +98,16 @@ npm install
 cp .env.example .env.local
 
 # Add your NASA API key to .env.local
+# Use NASA_API_KEY=your_key_here (NOT NEXT_PUBLIC_NASA_API_KEY)
 
 # Run development server
 npm run dev
+```
+
+**`.env.local` example:**
+```
+NASA_API_KEY=your_nasa_api_key_here
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ## Build Commands
