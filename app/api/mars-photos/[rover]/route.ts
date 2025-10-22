@@ -185,27 +185,41 @@ function getRoverMetadata(rover: RoverName): {
 }
 
 /**
- * Fetch latest photos for Perseverance using Mars.nasa.gov RSS API
+ * Fetch latest photos for Perseverance or Curiosity using Mars.nasa.gov RSS API
  * This provides raw rover camera images directly from the mission
+ * Perseverance: category=mars2020
+ * Curiosity: category=msl (Mars Science Laboratory)
  */
-async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]> {
-  const cacheKey = `perseverance-rss-${limit}`;
+async function fetchRoverPhotosFromRSS(rover: RoverName, limit: number = 50): Promise<RoverPhoto[]> {
+  const cacheKey = `${rover}-rss-${limit}`;
   const cached = getFromCache<RoverPhoto[]>(cacheKey);
   if (cached) return cached;
 
+  // Map rover names to RSS API categories
+  const categoryMap: Record<string, string> = {
+    'perseverance': 'mars2020',
+    'curiosity': 'msl'
+  };
+
+  const category = categoryMap[rover];
+  if (!category) {
+    console.log(`No RSS feed available for ${rover}`);
+    return [];
+  }
+
   try {
     trackApiCall();
-    const url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&num=${limit}`;
-    console.log(`Fetching Perseverance photos from Mars.nasa.gov RSS API`);
+    const url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=${category}&feedtype=json&num=${limit}`;
+    console.log(`Fetching ${rover} photos from Mars.nasa.gov RSS API (category: ${category})`);
 
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`Mars RSS API error: ${response.status} ${response.statusText}`);
+      console.error(`Mars RSS API error for ${rover}: ${response.status} ${response.statusText}`);
       return [];
     }
 
     const data: MarsRSSResponse = await response.json();
-    const roverMetadata = getRoverMetadata('perseverance');
+    const roverMetadata = getRoverMetadata(rover);
 
     // Transform RSS format to RoverPhoto format
     const photos: RoverPhoto[] = data.images.map((img, index) => ({
@@ -214,7 +228,7 @@ async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]
       camera: {
         id: index,
         name: img.camera.instrument,
-        rover_id: 5,
+        rover_id: roverMetadata.id,
         full_name: `${img.camera.instrument} - ${img.camera.filter_name}`
       },
       img_src: img.image_files.large || img.image_files.medium,
@@ -222,11 +236,11 @@ async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]
       rover: roverMetadata
     }));
 
-    console.log(`✓ Fetched ${photos.length} Perseverance photos from RSS API`);
+    console.log(`✓ Fetched ${photos.length} ${rover} photos from RSS API`);
     setCache(cacheKey, photos);
     return photos;
   } catch (error) {
-    console.error(`Error fetching Perseverance photos from RSS API:`, error);
+    console.error(`Error fetching ${rover} photos from RSS API:`, error);
     return [];
   }
 }
@@ -304,11 +318,12 @@ async function fetchLatestPhotos(
   rover: RoverName,
   limit: number = 50
 ): Promise<RoverPhoto[]> {
-  if (rover === 'perseverance') {
+  if (rover === 'perseverance' || rover === 'curiosity') {
     // Use Mars.nasa.gov RSS API for raw rover images
-    return fetchPerseverancePhotos(limit);
+    // Perseverance and Curiosity have active RSS feeds
+    return fetchRoverPhotosFromRSS(rover, limit);
   } else {
-    // Use NASA Images API for curated mission photos
+    // Use NASA Images API for curated mission photos for legacy rovers
     // (Mars Photos API retired October 8, 2025)
     return fetchRoverPhotosFromImagesAPI(rover, limit);
   }
@@ -350,9 +365,11 @@ export async function GET(
     let photos: RoverPhoto[] = [];
     let metadata: any = {
       type: 'latest',
-      api_source: rover === 'perseverance' ? 'Mars.nasa.gov RSS API' : 'NASA Images API',
-      note: rover === 'perseverance'
-        ? 'Raw rover camera images from Mars.nasa.gov RSS feed'
+      api_source: (rover === 'perseverance' || rover === 'curiosity')
+        ? 'Mars.nasa.gov RSS API'
+        : 'NASA Images API',
+      note: (rover === 'perseverance' || rover === 'curiosity')
+        ? `Raw rover camera images from Mars.nasa.gov RSS feed (${rover === 'perseverance' ? 'Mars 2020' : 'MSL'} mission)`
         : 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.'
     };
 
@@ -390,7 +407,7 @@ export async function GET(
     if (photos.length === 0) {
       console.warn(`No photos found for ${rover}.`);
       metadata.warning = `No photos available. ${
-        rover === 'perseverance'
+        (rover === 'perseverance' || rover === 'curiosity')
           ? 'The Mars.nasa.gov RSS API may be temporarily unavailable.'
           : 'Limited photos available from NASA Images API for legacy rovers.'
       }`;
