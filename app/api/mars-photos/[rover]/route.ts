@@ -51,7 +51,7 @@ function isValidRover(rover: string): rover is RoverName {
 
 async function fetchRoverManifest(rover: RoverName, apiKey: string): Promise<RoverManifest | null> {
   try {
-    const url = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}?api_key=${apiKey}`;
+    const url = `https://api.nasa.gov/mars-photos/api/v1/manifests/${rover}?api_key=${apiKey}`;
     const response = await fetch(url);
 
     if (!response.ok) {
@@ -98,39 +98,64 @@ async function fetchLatestPhotos(
   try {
     // First, try the latest_photos endpoint for the most recent photos
     const latestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
+    console.log(`Fetching latest photos for ${rover} from: ${latestUrl.replace(apiKey, 'API_KEY_HIDDEN')}`);
+
     const latestResponse = await fetch(latestUrl);
-    
+
     if (latestResponse.ok) {
       const latestData = await latestResponse.json();
-      if (latestData.latest_photos && latestData.latest_photos.length > 0) {
+      console.log(`Latest photos response keys for ${rover}:`, Object.keys(latestData));
+
+      // Try both possible response formats: latest_photos or photos
+      const photos = latestData.latest_photos || latestData.photos;
+
+      if (photos && photos.length > 0) {
+        console.log(`Found ${photos.length} latest photos for ${rover}`);
         // Return the requested number of latest photos
-        return latestData.latest_photos.slice(0, limit);
+        return photos.slice(0, limit);
+      } else {
+        console.log(`No photos in latest_photos response for ${rover}`);
       }
+    } else {
+      console.error(`Latest photos endpoint failed for ${rover}: ${latestResponse.status} ${latestResponse.statusText}`);
     }
   } catch (error) {
     console.error(`Error fetching latest photos for ${rover}:`, error);
   }
-  
+
   // Fallback: Get manifest and fetch from recent sols
+  console.log(`Falling back to manifest-based fetching for ${rover}`);
   const manifest = await fetchRoverManifest(rover, apiKey);
   if (!manifest) {
+    console.error(`Failed to fetch manifest for ${rover}`);
     return [];
   }
-  
-  const maxSol = manifest.photo_manifest.max_sol;
+
+  console.log(`Manifest fetched for ${rover}: max_sol=${manifest.photo_manifest.max_sol}, total_photos=${manifest.photo_manifest.total_photos}`);
+
   const recentPhotos: RoverPhoto[] = [];
-  
-  // Try to get photos from the last 100 sols with photos (roughly 3+ months on Mars)
+
+  // Limit to last 20 sols instead of 100 to avoid rate limiting
   const recentSols = manifest.photo_manifest.photos
-    .slice(-100)
+    .slice(-20)
     .reverse()
+    .filter(p => p.total_photos > 0)  // Only fetch sols that have photos
     .map(p => p.sol);
-  
+
+  console.log(`Fetching from ${recentSols.length} recent sols for ${rover}`);
+
+  // Limit number of API calls to avoid rate limiting
+  let apiCallCount = 0;
+  const maxApiCalls = 10;
+
   for (const sol of recentSols) {
-    if (recentPhotos.length >= limit) break;
-    
+    if (recentPhotos.length >= limit || apiCallCount >= maxApiCalls) break;
+
     const photos = await fetchRoverPhotos(rover, sol, apiKey);
+    apiCallCount++;
+
     if (photos.length > 0) {
+      console.log(`Found ${photos.length} photos for ${rover} on sol ${sol}`);
       // Add variety by selecting from different cameras
       const byCamera = new Map<string, RoverPhoto[]>();
       photos.forEach(photo => {
@@ -140,7 +165,7 @@ async function fetchLatestPhotos(
         }
         byCamera.get(cam)!.push(photo);
       });
-      
+
       // Take one from each camera in rotation
       let added = 0;
       const maxPerSol = Math.min(10, limit - recentPhotos.length);
@@ -157,7 +182,8 @@ async function fetchLatestPhotos(
       }
     }
   }
-  
+
+  console.log(`Returning ${recentPhotos.length} photos for ${rover} after ${apiCallCount} API calls`);
   return recentPhotos.slice(0, limit);
 }
 
@@ -265,13 +291,22 @@ export async function GET(
       console.error(`Error calculating sol data for ${rover}:`, error);
     }
 
+    // Add warning if no photos found
+    if (photos.length === 0) {
+      console.warn(`No photos found for ${rover}. This could be due to:`);
+      console.warn(`- NASA API rate limiting (DEMO_KEY limit: 30 requests/hour)`);
+      console.warn(`- API endpoint issues`);
+      console.warn(`- Invalid API key configuration`);
+      metadata.warning = 'No photos available. Check server logs for details.';
+    }
+
     // Add cache headers for extended caching (5 days)
     const headers = new Headers();
     headers.set('Cache-Control', 'public, s-maxage=432000, stale-while-revalidate=864000'); // 5 days cache, 10 days stale
 
     return NextResponse.json({
       photos,
-      success: true,
+      success: photos.length > 0,
       total: photos.length,
       rover,
       metadata,
