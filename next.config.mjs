@@ -70,6 +70,37 @@ const nextConfig = {
         {
           key: 'X-XSS-Protection',
           value: '1; mode=block'
+        },
+        {
+          key: 'Referrer-Policy',
+          value: 'strict-origin-when-cross-origin'
+        },
+        {
+          key: 'Permissions-Policy',
+          value: 'camera=(), microphone=(), geolocation=(), interest-cohort=()'
+        },
+        {
+          // Strict-Transport-Security (HSTS) - enforce HTTPS
+          key: 'Strict-Transport-Security',
+          value: 'max-age=31536000; includeSubDomains; preload'
+        },
+        {
+          // Content Security Policy
+          key: 'Content-Security-Policy',
+          value: [
+            "default-src 'self'",
+            "script-src 'self' 'unsafe-eval' 'unsafe-inline' https://va.vercel-scripts.com",
+            "style-src 'self' 'unsafe-inline'",
+            "img-src 'self' data: https: blob:",
+            "font-src 'self' data:",
+            "connect-src 'self' https://api.nasa.gov https://mars.nasa.gov https://ssd.jpl.nasa.gov https://eyes.nasa.gov https://images-api.nasa.gov https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+            "frame-src 'none'",
+            "object-src 'none'",
+            "base-uri 'self'",
+            "form-action 'self'",
+            "frame-ancestors 'none'",
+            "upgrade-insecure-requests"
+          ].join('; ')
         }
       ],
     },
@@ -79,6 +110,15 @@ const nextConfig = {
         {
           key: 'Cache-Control',
           value: 'public, s-maxage=60, stale-while-revalidate=300'
+        },
+        {
+          // Additional security for API routes
+          key: 'X-Content-Type-Options',
+          value: 'nosniff'
+        },
+        {
+          key: 'X-Frame-Options',
+          value: 'DENY'
         }
       ],
     },
