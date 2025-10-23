@@ -201,62 +201,58 @@ async function fetchFromMarsPhotosAPI(
     trackApiCall();
     const apiKey = getApiKey();
 
-    // Get manifest first to find sols with photos
-    const manifestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}?api_key=${apiKey}`;
-    console.log(`🔍 [${rover.toUpperCase()}] Fetching manifest from Mars Photos API`);
+    console.log(`🔍 [${rover.toUpperCase()}] Fetching from Mars Photos API`);
+    console.log(`🔑 [${rover.toUpperCase()}] API Key: ${apiKey.substring(0, 8)}...`);
 
-    const manifestResponse = await fetch(manifestUrl);
+    // Use the latest_photos endpoint for most recent photos
+    const latestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
+    console.log(`📍 [${rover.toUpperCase()}] URL: ${latestUrl.replace(apiKey, 'REDACTED')}`);
 
-    if (!manifestResponse.ok) {
-      console.error(`❌ [${rover.toUpperCase()}] Manifest API error: ${manifestResponse.status} ${manifestResponse.statusText}`);
+    const response = await fetch(latestUrl);
+    console.log(`📡 [${rover.toUpperCase()}] Response status: ${response.status} ${response.statusText}`);
+
+    if (!response.ok) {
+      const errorText = await response.text().catch(() => 'Unable to read error');
+      console.error(`❌ [${rover.toUpperCase()}] API error: ${response.status}`);
+      console.error(`❌ [${rover.toUpperCase()}] Error body:`, errorText.substring(0, 500));
       return [];
     }
 
-    const manifestData = await manifestResponse.json();
-    const maxSol = manifestData.rover?.max_sol;
+    const data = await response.json();
+    console.log(`📊 [${rover.toUpperCase()}] Response structure:`, {
+      hasLatestPhotos: !!data.latest_photos,
+      photoCount: data.latest_photos?.length || 0,
+      responseKeys: Object.keys(data)
+    });
 
-    if (!maxSol) {
-      console.error(`❌ [${rover.toUpperCase()}] No max_sol found in manifest`);
+    if (!data.latest_photos || data.latest_photos.length === 0) {
+      console.warn(`⚠️  [${rover.toUpperCase()}] No photos in latest_photos response`);
+      console.log(`📋 [${rover.toUpperCase()}] Full response:`, JSON.stringify(data).substring(0, 500));
       return [];
     }
 
-    console.log(`✓ [${rover.toUpperCase()}] Manifest loaded, max sol: ${maxSol}`);
+    const photos = data.latest_photos.slice(0, limit);
+    console.log(`✅ [${rover.toUpperCase()}] Successfully fetched ${photos.length} photos from Mars Photos API`);
 
-    // Fetch photos from recent sols
-    const allPhotos: RoverPhoto[] = [];
-    const solsToTry = 10; // Try last 10 sols
-
-    for (let i = 0; i < solsToTry && allPhotos.length < limit; i++) {
-      const sol = maxSol - i;
-      const photosUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/photos?sol=${sol}&api_key=${apiKey}`;
-
-      try {
-        const photosResponse = await fetch(photosUrl);
-
-        if (!photosResponse.ok) {
-          console.warn(`⚠️  [${rover.toUpperCase()}] Sol ${sol} failed: ${photosResponse.status}`);
-          continue;
-        }
-
-        const photosData = await photosResponse.json();
-
-        if (photosData.photos && photosData.photos.length > 0) {
-          console.log(`✓ [${rover.toUpperCase()}] Sol ${sol}: ${photosData.photos.length} photos`);
-          allPhotos.push(...photosData.photos);
-        }
-      } catch (error) {
-        console.warn(`⚠️  [${rover.toUpperCase()}] Sol ${sol} exception:`, error);
-        continue;
-      }
+    if (photos.length > 0) {
+      console.log(`📸 [${rover.toUpperCase()}] Sample photo:`, {
+        id: photos[0].id,
+        sol: photos[0].sol,
+        camera: photos[0].camera?.name,
+        earth_date: photos[0].earth_date,
+        img_src: photos[0].img_src?.substring(0, 50) + '...'
+      });
     }
 
-    const limitedPhotos = allPhotos.slice(0, limit);
-    console.log(`✅ [${rover.toUpperCase()}] Successfully fetched ${limitedPhotos.length} photos from Mars Photos API`);
-
-    setCache(cacheKey, limitedPhotos);
-    return limitedPhotos;
+    setCache(cacheKey, photos);
+    return photos;
   } catch (error) {
-    console.error(`💥 [${rover.toUpperCase()}] Error fetching from Mars Photos API:`, error);
+    console.error(`💥 [${rover.toUpperCase()}] Exception fetching from Mars Photos API:`, error);
+    console.error(`💥 [${rover.toUpperCase()}] Error details:`, {
+      name: error instanceof Error ? error.name : 'Unknown',
+      message: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack?.substring(0, 300) : undefined
+    });
     return [];
   }
 }
