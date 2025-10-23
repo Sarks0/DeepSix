@@ -202,7 +202,14 @@ async function fetchFromMarsPhotosAPI(
     const apiKey = getApiKey();
 
     console.log(`🔍 [${rover.toUpperCase()}] Fetching from Mars Photos API`);
-    console.log(`🔑 [${rover.toUpperCase()}] API Key: ${apiKey.substring(0, 8)}...`);
+
+    // Critical: Check if using DEMO_KEY (30 req/hour limit!)
+    if (apiKey === 'DEMO_KEY') {
+      console.warn(`⚠️  [${rover.toUpperCase()}] WARNING: Using DEMO_KEY with strict limits (30/hour, 50/day)`);
+      console.warn(`⚠️  [${rover.toUpperCase()}] Set NASA_API_KEY environment variable in Vercel for 1,000/hour limit`);
+    } else {
+      console.log(`🔑 [${rover.toUpperCase()}] API Key: ${apiKey.substring(0, 8)}... (Custom key with 1,000/hour limit)`);
+    }
 
     // Use the latest_photos endpoint for most recent photos
     const latestUrl = `https://api.nasa.gov/mars-photos/api/v1/rovers/${rover}/latest_photos?api_key=${apiKey}`;
@@ -211,10 +218,28 @@ async function fetchFromMarsPhotosAPI(
     const response = await fetch(latestUrl);
     console.log(`📡 [${rover.toUpperCase()}] Response status: ${response.status} ${response.statusText}`);
 
+    // Log rate limit headers (critical for debugging)
+    const rateLimitLimit = response.headers.get('X-RateLimit-Limit');
+    const rateLimitRemaining = response.headers.get('X-RateLimit-Remaining');
+    console.log(`⏱️  [${rover.toUpperCase()}] Rate Limits:`, {
+      limit: rateLimitLimit || 'Unknown',
+      remaining: rateLimitRemaining || 'Unknown',
+      usingDemoKey: apiKey === 'DEMO_KEY'
+    });
+
     if (!response.ok) {
       const errorText = await response.text().catch(() => 'Unable to read error');
       console.error(`❌ [${rover.toUpperCase()}] API error: ${response.status}`);
       console.error(`❌ [${rover.toUpperCase()}] Error body:`, errorText.substring(0, 500));
+
+      // Special handling for rate limit errors
+      if (response.status === 429) {
+        console.error(`🚫 [${rover.toUpperCase()}] RATE LIMIT EXCEEDED!`);
+        console.error(`🚫 [${rover.toUpperCase()}] Using DEMO_KEY: ${apiKey === 'DEMO_KEY'}`);
+        console.error(`🚫 [${rover.toUpperCase()}] If using DEMO_KEY, you're limited to 30 requests/hour`);
+        console.error(`🚫 [${rover.toUpperCase()}] Set NASA_API_KEY environment variable in Vercel for 1,000 requests/hour`);
+      }
+
       return [];
     }
 
