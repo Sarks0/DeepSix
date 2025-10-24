@@ -119,7 +119,8 @@ export async function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 10
 }
 
 /**
- * Validate spacecraft ID format
+ * Validate spacecraft ID format with whitelist
+ * Security: Uses explicit whitelist to prevent injection attacks
  */
 export function validateSpacecraftId(id: string): { valid: boolean; error?: string } {
   if (!id || typeof id !== 'string') {
@@ -132,14 +133,26 @@ export function validateSpacecraftId(id: string): { valid: boolean; error?: stri
     return { valid: false, error: 'Spacecraft ID cannot be empty' };
   }
 
-  if (cleanId.length > 50) {
-    return { valid: false, error: 'Spacecraft ID is too long' };
+  // Security: Reduce max length for tighter validation
+  if (cleanId.length > 30) {
+    return { valid: false, error: 'Spacecraft ID is too long (max 30 characters)' };
   }
 
-  // Check for valid characters (letters, numbers, hyphens, underscores)
-  const validPattern = /^[a-z0-9\-_]+$/;
+  // Check for valid characters (letters, numbers, hyphens only - removed underscores)
+  const validPattern = /^[a-z0-9\-]+$/;
   if (!validPattern.test(cleanId)) {
-    return { valid: false, error: 'Spacecraft ID contains invalid characters' };
+    return { valid: false, error: 'Spacecraft ID contains invalid characters (only lowercase letters, numbers, and hyphens allowed)' };
+  }
+
+  // Security: Prevent multiple consecutive hyphens or leading/trailing hyphens
+  if (cleanId.includes('--') || cleanId.startsWith('-') || cleanId.endsWith('-')) {
+    return { valid: false, error: 'Invalid hyphen usage in spacecraft ID' };
+  }
+
+  // Security: Explicit whitelist validation (most secure)
+  const allowedIds = getAvailableSpacecraftIds();
+  if (!allowedIds.includes(cleanId)) {
+    return { valid: false, error: `Unknown spacecraft ID. Valid IDs are: ${allowedIds.join(', ')}` };
   }
 
   return { valid: true };

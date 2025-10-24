@@ -1,5 +1,16 @@
 # Vercel Deployment Guide
 
+## 🔐 CRITICAL SECURITY NOTICE
+
+**NEVER use `NEXT_PUBLIC_NASA_API_KEY`** - This prefix exposes your API key in the client-side JavaScript bundle where anyone can steal it.
+
+✅ **CORRECT:** Use `NASA_API_KEY` (server-side only)
+❌ **WRONG:** `NEXT_PUBLIC_NASA_API_KEY` (exposed to clients)
+
+All NASA API calls must go through Next.js API routes (`app/api/*`) which run server-side and keep your key secure.
+
+---
+
 ## Quick Deploy
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/stellar-navigator)
 
@@ -69,8 +80,9 @@ After deployment:
 ### 6. Troubleshooting
 
 #### API data not loading?
-- Verify `NEXT_PUBLIC_NASA_API_KEY` is set correctly
+- Verify `NASA_API_KEY` is set correctly (server-side only, without NEXT_PUBLIC_ prefix)
 - Check the Vercel function logs for errors
+- Ensure API routes are accessible (test /api/spacecraft, /api/apod, etc.)
 
 #### Build failing?
 - Ensure all dependencies are in package.json
