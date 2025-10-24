@@ -33,21 +33,21 @@
   </p>
 
   <p align="center">
-    <a href="https://deepsix.vercel.app">🌐 Live Demo</a>
+    <a href="https://deepsix.vercel.app">Live Demo</a>
     ·
-    <a href="#features">✨ Features</a>
+    <a href="#features">Features</a>
     ·
-    <a href="#getting-started">🚀 Getting Started</a>
+    <a href="#getting-started">Getting Started</a>
     ·
-    <a href="#mission-coverage">🛰️ Missions</a>
+    <a href="#mission-coverage">Missions</a>
     ·
-    <a href="#contributing">🤝 Contributing</a>
+    <a href="#contributing">Contributing</a>
   </p>
 </div>
 
 ---
 
-## 📖 About
+## About
 
 A comprehensive real-time dashboard for tracking **15+ NASA deep space missions** across the solar system and beyond. DeepSix provides live mission data, spacecraft telemetry, Mars sol cycle monitoring, and real-time position tracking using NASA's official APIs.
 
@@ -55,30 +55,30 @@ A comprehensive real-time dashboard for tracking **15+ NASA deep space missions*
 
 ---
 
-## ✨ Features
+## Features
 
-### 🔴 Mars Mission Tracking
+### Mars Mission Tracking
 - **Real-time Sol Tracking** - Live Martian day counters for Perseverance & Curiosity
 - **Mars Local Solar Time (MLST)** - Accurate timekeeping on Mars
 - **Seasonal Information** - Current Mars season and solar longitude
 - **Latest Surface Photos** - Fresh images from Mars rovers with automatic rotation
 - **Mission Telemetry** - Health status, signal strength, and data rates
 
-### 🚀 Deep Space Missions
+### Deep Space Missions
 - **Live Position Data** - Real-time spacecraft positions via JPL Horizons API
 - **Distance & Velocity** - Current distance from Earth and travel speeds
 - **Communication Delays** - Signal travel time calculations (one-way & round-trip)
 - **Mission Status** - Health, operational status, and fuel remaining
 - **Journey Progress** - For en route missions (Europa Clipper, Lucy, Psyche, OSIRIS-APEX)
 
-### 🎯 Mission Coverage (15+ Missions)
+### Mission Coverage (15+ Missions)
 - **Mars System** - 5 active missions (rovers, orbiters, landers)
 - **Deep Space Probes** - Voyager 1 & 2, Parker Solar Probe, New Horizons
 - **Jupiter System** - Juno orbiter, Europa Clipper (en route)
 - **Asteroid Missions** - Lucy, Psyche, OSIRIS-APEX (all en route)
 - **Space Observatories** - James Webb Space Telescope
 
-### 🎨 User Experience
+### User Experience
 - **Full-Width Responsive Design** - Optimized for all screen sizes
 - **Data Source Attribution** - Clear labeling of API sources (NASA, JPL)
 - **Smooth Animations** - Powered by Framer Motion
@@ -87,49 +87,49 @@ A comprehensive real-time dashboard for tracking **15+ NASA deep space missions*
 
 ---
 
-## 🛰️ Mission Coverage
+## Mission Coverage
 
 ### Mars System (5 missions)
 | Mission | Type | Status | Tracking |
 |---------|------|--------|----------|
-| 🚗 **Perseverance** | Rover | Active | Sol tracking, Photos, Telemetry |
-| 🚗 **Curiosity** | Rover | Active | Sol tracking, Photos, Telemetry |
-| 🛸 **Mars Reconnaissance Orbiter** | Orbiter | Active (19+ years) | Status, Telemetry |
-| 🛸 **MAVEN** | Orbiter | Active | Status, Telemetry |
-| 🛸 **Mars Odyssey** | Orbiter | Active (24+ years) | Status, Telemetry |
+| **Perseverance** | Rover | Active | Sol tracking, Photos, Telemetry |
+| **Curiosity** | Rover | Active | Sol tracking, Photos, Telemetry |
+| **Mars Reconnaissance Orbiter** | Orbiter | Active (19+ years) | Status, Telemetry |
+| **MAVEN** | Orbiter | Active | Status, Telemetry |
+| **Mars Odyssey** | Orbiter | Active (24+ years) | Status, Telemetry |
 
 ### Deep Space Probes (4 missions)
 | Mission | Location | Distance | Tracking |
 |---------|----------|----------|----------|
-| 🌌 **Voyager 1** | Interstellar Space | 164+ AU | Position, Status, Telemetry |
-| 🌌 **Voyager 2** | Interstellar Space | 134+ AU | Position, Status, Telemetry |
-| ☀️ **Parker Solar Probe** | Solar Corona | Variable | Position, Status, Telemetry |
-| ❄️ **New Horizons** | Kuiper Belt | 62.2 AU | Position, Status, Telemetry |
+| **Voyager 1** | Interstellar Space | 164+ AU | Position, Status, Telemetry |
+| **Voyager 2** | Interstellar Space | 134+ AU | Position, Status, Telemetry |
+| **Parker Solar Probe** | Solar Corona | Variable | Position, Status, Telemetry |
+| **New Horizons** | Kuiper Belt | 62.2 AU | Position, Status, Telemetry |
 
 ### Jupiter System (2 missions)
 | Mission | Status | Arrival | Tracking |
 |---------|--------|---------|----------|
-| 🪐 **Juno** | Active (Extended) | In orbit | Position, Status, Telemetry |
-| 🧊 **Europa Clipper** | En Route | April 2030 | Position, Journey Status |
+| **Juno** | Active (Extended) | In orbit | Position, Status, Telemetry |
+| **Europa Clipper** | En Route | April 2030 | Position, Journey Status |
 
 ### Asteroid Missions (3 missions)
 | Mission | Target | Arrival | Tracking |
 |---------|--------|---------|----------|
-| 🎯 **Lucy** | Trojan Asteroids | 2027-2033 | Position, Journey Status |
-| 🪨 **Psyche** | Metallic Asteroid | August 2029 | Position, Journey Status |
-| ☄️ **OSIRIS-APEX** | Asteroid Apophis | April 2029 | Position, Journey Status |
+| **Lucy** | Trojan Asteroids | 2027-2033 | Position, Journey Status |
+| **Psyche** | Metallic Asteroid | August 2029 | Position, Journey Status |
+| **OSIRIS-APEX** | Asteroid Apophis | April 2029 | Position, Journey Status |
 
 ### Space Observatories (1 mission)
 | Mission | Location | Purpose | Tracking |
 |---------|----------|---------|----------|
-| 🔭 **James Webb** | L2 Lagrange | Infrared Observatory | Status, Telemetry |
+| **James Webb** | L2 Lagrange | Infrared Observatory | Status, Telemetry |
 
 ### Historical Missions (Available)
-- 🔴 **Mars InSight** - Ended December 2022 (Seismic studies)
+- **Mars InSight** - Ended December 2022 (Seismic studies)
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -178,7 +178,7 @@ npm run start
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Core Framework
 - **Next.js 15** - React framework with App Router and Server Components
@@ -212,7 +212,7 @@ npm run start
 
 ---
 
-## 📋 Development Commands
+## Development Commands
 
 | Command | Description |
 |---------|-------------|
@@ -225,9 +225,9 @@ npm run start
 
 ---
 
-## 🗺️ Roadmap
+## Roadmap
 
-### Current Features ✅
+### Current Features
 - [x] 15+ mission coverage with live data
 - [x] Real-time position tracking (JPL Horizons API)
 - [x] Mars sol tracking for active rovers
@@ -236,7 +236,7 @@ npm run start
 - [x] Full-width responsive design
 - [x] Data source attribution
 
-### Planned Features 🚧
+### Planned Features
 - [ ] Mission filtering and sorting
 - [ ] 3D visualization of spacecraft positions
 - [ ] Historical mission archives
@@ -250,15 +250,15 @@ npm run start
 
 ---
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Whether it's:
 
-- 🐛 Bug reports
-- 💡 Feature suggestions
-- 📝 Documentation improvements
-- 🎨 UI/UX enhancements
-- 🔧 Code contributions
+- Bug reports
+- Feature suggestions
+- Documentation improvements
+- UI/UX enhancements
+- Code contributions
 
 **How to contribute:**
 
@@ -270,13 +270,13 @@ Contributions are welcome! Whether it's:
 
 ---
 
-## 📄 License
+## License
 
 This project is licensed under the **Apache License 2.0** - see the [LICENSE](LICENSE) file for details.
 
 ---
 
-## 🙏 Acknowledgments
+## Acknowledgments
 
 - **NASA** - For providing incredible public APIs and mission data
 - **JPL** - For the Horizons System API and spacecraft tracking data
@@ -285,7 +285,7 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 
 ---
 
-## 📧 Contact
+## Contact
 
 **Project Maintainer:** [@Sarks0](https://github.com/Sarks0)
 
@@ -296,8 +296,8 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 ---
 
 <div align="center">
-  <p><strong>Built with passion for space exploration 🚀</strong></p>
+  <p><strong>Built with passion for space exploration</strong></p>
   <p><em>Bringing the cosmos closer to everyone, one mission at a time</em></p>
 
-  <sub>⭐ Star this repo if you find it interesting!</sub>
+  <sub>Star this repo if you find it interesting!</sub>
 </div>
