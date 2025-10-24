@@ -627,6 +627,19 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   // Missions without live data feeds (only InSight ended mission for now)
   const hasNoLiveData = id === 'insight';
 
+  // Missions with active science telemetry (have MissionDataFeed data sources)
+  const hasActiveTelemetry = [
+    'perseverance',
+    'curiosity',
+    'mars-reconnaissance-orbiter',
+    'maven',
+    'mars-odyssey',
+    'james-webb-space-telescope',
+    'voyager-1',
+    'voyager-2',
+    'parker-solar-probe'
+  ].includes(id);
+
   return (
     <div className="container mx-auto px-4 py-8">
       {/* Mission Header */}
@@ -695,8 +708,8 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         </div>
       )}
 
-      {/* Featured Discovery Section - Only for missions with live data */}
-      {!hasNoLiveData && (
+      {/* Featured Discovery Section - Only for missions with active science operations */}
+      {!hasNoLiveData && hasActiveTelemetry && (
         <div className="mb-8">
           <h2 className="text-2xl font-bold mb-4">
             Latest Scientific Discovery
@@ -709,8 +722,8 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
       <div className="grid grid-cols-1 xl:grid-cols-4 gap-8">
         {/* Primary Content - 3 columns */}
         <div className="xl:col-span-3">
-          {/* Live Mission Data Grid - Only for missions with live data */}
-          {!hasNoLiveData && (
+          {/* Live Mission Data Grid - For missions with active telemetry */}
+          {!hasNoLiveData && hasActiveTelemetry && (
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8 items-start">
               <div className="space-y-4">
                 <h3 className="text-xl font-bold">
@@ -739,6 +752,20 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                   <DiscoveryFeed missionId={id} maxItems={3} />
                 </div>
               )}
+            </div>
+          )}
+
+          {/* Live Position Data Only - For missions without telemetry but with Horizons support */}
+          {!hasNoLiveData && !hasActiveTelemetry && hasHorizonsSupport && (
+            <div className="mb-8">
+              <h2 className="text-2xl font-bold mb-4">
+                {isEnRoute ? 'Live Journey Position' : 'Live Position Data'}
+              </h2>
+              <LiveSpacecraftData
+                spacecraftId={id}
+                showVelocity={true}
+                showCommunicationDelay={true}
+              />
             </div>
           )}
 
