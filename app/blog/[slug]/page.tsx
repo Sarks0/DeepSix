@@ -72,38 +72,41 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-black via-gray-900 to-black">
-      <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8 py-12">
-        {/* Breadcrumb Navigation */}
-        <nav className="mb-8">
-          <ol className="flex items-center gap-2 text-sm">
+      {/* Breadcrumb Navigation - Full Width */}
+      <div className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 pt-8">
+        <nav className="mb-12">
+          <ol className="flex items-center gap-2 text-sm font-mono">
             <li>
               <Link
                 href="/"
-                className="text-gray-500 hover:text-gray-300 transition-colors"
+                className="text-gray-500 hover:text-blue-400 transition-colors"
               >
-                Home
+                ~
               </Link>
             </li>
             <li className="text-gray-600">/</li>
             <li>
               <Link
                 href="/blog"
-                className="text-gray-500 hover:text-gray-300 transition-colors"
+                className="text-gray-500 hover:text-blue-400 transition-colors"
               >
-                Blog
+                blog
               </Link>
             </li>
             <li className="text-gray-600">/</li>
-            <li className="text-gray-400 truncate">{post.title}</li>
+            <li className="text-gray-400">{slug}</li>
           </ol>
         </nav>
+      </div>
 
+      {/* Article */}
+      <article className="max-w-3xl mx-auto px-4 md:px-6 lg:px-8 pb-16">
         {/* Article Header */}
-        <article className="bg-gray-800/30 rounded-lg border border-gray-700 p-8 md:p-12">
+        <header className="mb-12">
           {/* Category Badge */}
-          <div className="mb-4">
+          <div className="mb-6">
             <span
-              className={`px-3 py-1 rounded-md text-xs font-medium uppercase border ${getCategoryColor(
+              className={`inline-block px-3 py-1.5 rounded-md text-xs font-semibold uppercase tracking-wider border ${getCategoryColor(
                 post.category
               )}`}
             >
@@ -112,15 +115,22 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
           </div>
 
           {/* Title */}
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent text-balance">
+          <h1 className="text-4xl md:text-5xl font-bold mb-6 leading-tight bg-gradient-to-r from-blue-400 via-purple-500 to-pink-500 bg-clip-text text-transparent">
             {post.title}
           </h1>
 
+          {/* Excerpt */}
+          {post.excerpt && (
+            <p className="text-xl text-gray-400 leading-relaxed mb-8 border-l-4 border-blue-500/30 pl-6 py-2">
+              {post.excerpt}
+            </p>
+          )}
+
           {/* Meta Information */}
-          <div className="flex flex-wrap items-center gap-4 text-sm text-gray-400 mb-8 pb-8 border-b border-gray-700/50">
+          <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-gray-500 font-mono border-t border-b border-gray-800 py-4">
             <div className="flex items-center gap-2">
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -132,11 +142,11 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                 />
               </svg>
-              <span>{post.author}</span>
+              <span className="text-gray-400">{post.author}</span>
             </div>
-            <div className="flex items-center gap-2 font-mono">
+            <div className="flex items-center gap-2">
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -152,7 +162,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             </div>
             <div className="flex items-center gap-2">
               <svg
-                className="w-4 h-4"
+                className="w-4 h-4 text-gray-600"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -164,36 +174,78 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                   d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
                 />
               </svg>
-              <span>{post.readTime} read</span>
+              <span>{post.readTime}</span>
             </div>
           </div>
+        </header>
 
-          {/* Article Content */}
-          <div
-            className="prose prose-invert prose-lg max-w-none
-              prose-headings:bg-gradient-to-r prose-headings:from-blue-400 prose-headings:to-purple-500 prose-headings:bg-clip-text prose-headings:text-transparent
-              prose-p:text-gray-300 prose-p:leading-relaxed
-              prose-a:text-blue-400 prose-a:no-underline hover:prose-a:text-blue-300 hover:prose-a:underline
-              prose-strong:text-white prose-strong:font-semibold
-              prose-code:text-purple-400 prose-code:bg-gray-900/50 prose-code:px-1.5 prose-code:py-0.5 prose-code:rounded prose-code:font-mono prose-code:text-sm prose-code:before:content-none prose-code:after:content-none
-              prose-pre:bg-gray-900/50 prose-pre:border prose-pre:border-gray-700 prose-pre:rounded-lg
-              prose-blockquote:border-l-blue-500 prose-blockquote:bg-gray-900/30 prose-blockquote:py-1 prose-blockquote:px-4 prose-blockquote:text-gray-400 prose-blockquote:not-italic
-              prose-ul:text-gray-300 prose-ol:text-gray-300
-              prose-li:text-gray-300 prose-li:leading-relaxed
-              prose-img:rounded-lg prose-img:border prose-img:border-gray-700
-              prose-hr:border-gray-700"
-            dangerouslySetInnerHTML={{ __html: post.content || '' }}
-          />
-        </article>
+        {/* Article Content */}
+        <div
+          className="prose prose-invert max-w-none
 
-        {/* Back to Blog Link */}
-        <div className="mt-8">
+            /* Headings */
+            prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-20
+            prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-800
+            prose-h2:bg-gradient-to-r prose-h2:from-blue-400 prose-h2:to-purple-500 prose-h2:bg-clip-text prose-h2:text-transparent
+            prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-gray-200
+            prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-3 prose-h4:text-gray-300
+
+            /* Paragraphs */
+            prose-p:text-gray-300 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-base
+
+            /* Links */
+            prose-a:text-blue-400 prose-a:no-underline prose-a:font-medium prose-a:transition-colors
+            hover:prose-a:text-blue-300 hover:prose-a:underline hover:prose-a:decoration-blue-400/50
+
+            /* Strong */
+            prose-strong:text-white prose-strong:font-semibold
+
+            /* Code */
+            prose-code:text-purple-400 prose-code:bg-gray-900/70 prose-code:px-2 prose-code:py-1
+            prose-code:rounded-md prose-code:font-mono prose-code:text-sm prose-code:font-normal
+            prose-code:before:content-none prose-code:after:content-none prose-code:border prose-code:border-gray-800
+
+            /* Pre/Code Blocks */
+            prose-pre:bg-gray-950/50 prose-pre:border prose-pre:border-gray-800 prose-pre:rounded-xl
+            prose-pre:p-6 prose-pre:my-8 prose-pre:overflow-x-auto prose-pre:shadow-xl
+            prose-pre:shadow-blue-500/5 prose-pre:backdrop-blur-sm
+
+            /* Blockquotes */
+            prose-blockquote:border-l-4 prose-blockquote:border-blue-500/50
+            prose-blockquote:bg-gray-900/30 prose-blockquote:py-4 prose-blockquote:px-6
+            prose-blockquote:my-8 prose-blockquote:text-gray-400 prose-blockquote:not-italic
+            prose-blockquote:rounded-r-lg prose-blockquote:font-normal
+
+            /* Lists */
+            prose-ul:my-6 prose-ul:text-gray-300 prose-ul:list-disc prose-ul:pl-6
+            prose-ol:my-6 prose-ol:text-gray-300 prose-ol:list-decimal prose-ol:pl-6
+            prose-li:my-2 prose-li:leading-relaxed prose-li:text-gray-300
+            prose-li:marker:text-blue-400
+
+            /* Images */
+            prose-img:rounded-lg prose-img:border prose-img:border-gray-800
+            prose-img:my-8 prose-img:shadow-2xl prose-img:shadow-blue-500/10
+
+            /* Horizontal Rules */
+            prose-hr:border-gray-800 prose-hr:my-12 prose-hr:border-t-2
+
+            /* Tables */
+            prose-table:border-collapse prose-table:w-full prose-table:my-8
+            prose-thead:border-b-2 prose-thead:border-gray-700
+            prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-gray-300 prose-th:bg-gray-900/50
+            prose-td:px-4 prose-td:py-3 prose-td:text-gray-400 prose-td:border-t prose-td:border-gray-800
+            prose-tr:transition-colors hover:prose-tr:bg-gray-900/30"
+          dangerouslySetInnerHTML={{ __html: post.content || '' }}
+        />
+
+        {/* Article Footer */}
+        <footer className="mt-16 pt-8 border-t border-gray-800">
           <Link
             href="/blog"
-            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors text-sm font-medium"
+            className="inline-flex items-center gap-2 text-blue-400 hover:text-blue-300 transition-colors font-mono text-sm group"
           >
             <svg
-              className="w-4 h-4"
+              className="w-4 h-4 transform group-hover:-translate-x-1 transition-transform"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -205,10 +257,10 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
                 d="M15 19l-7-7 7-7"
               />
             </svg>
-            Back to all posts
+            cd ../blog
           </Link>
-        </div>
-      </div>
+        </footer>
+      </article>
     </div>
   );
 }
