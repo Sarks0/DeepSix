@@ -215,14 +215,14 @@ export default function AsteroidDetailPage() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {phys.diameter !== null && (
+              {typeof phys.diameter === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Diameter</p>
                   <p className="text-2xl font-bold text-cyan-400">{phys.diameter.toFixed(2)} {phys.diameterUnit}</p>
                 </div>
               )}
 
-              {phys.absoluteMagnitude !== null && (
+              {typeof phys.absoluteMagnitude === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Absolute Magnitude</p>
                   <p className="text-2xl font-bold text-white">{phys.absoluteMagnitude.toFixed(2)}</p>
@@ -230,7 +230,7 @@ export default function AsteroidDetailPage() {
                 </div>
               )}
 
-              {phys.albedo !== null && (
+              {typeof phys.albedo === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Albedo</p>
                   <p className="text-2xl font-bold text-white">{phys.albedo.toFixed(3)}</p>
@@ -238,14 +238,14 @@ export default function AsteroidDetailPage() {
                 </div>
               )}
 
-              {phys.rotationPeriod !== null && (
+              {typeof phys.rotationPeriod === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Rotation Period</p>
                   <p className="text-2xl font-bold text-orange-400">{phys.rotationPeriod.toFixed(2)} {phys.rotationUnit}</p>
                 </div>
               )}
 
-              {phys.density !== null && (
+              {typeof phys.density === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Density</p>
                   <p className="text-2xl font-bold text-white">{phys.density.toFixed(2)} {phys.densityUnit}</p>
@@ -280,14 +280,14 @@ export default function AsteroidDetailPage() {
             <h2 className="text-2xl font-bold text-white mb-4">Orbital Elements</h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {orbit.semiMajorAxis !== null && (
+              {typeof orbit.semiMajorAxis === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Semi-Major Axis</p>
                   <p className="text-2xl font-bold text-cyan-400">{orbit.semiMajorAxis.toFixed(3)} {orbit.semiMajorAxisUnit}</p>
                 </div>
               )}
 
-              {orbit.eccentricity !== null && (
+              {typeof orbit.eccentricity === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Eccentricity</p>
                   <p className="text-2xl font-bold text-white">{orbit.eccentricity.toFixed(4)}</p>
@@ -295,14 +295,14 @@ export default function AsteroidDetailPage() {
                 </div>
               )}
 
-              {orbit.inclination !== null && (
+              {typeof orbit.inclination === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Inclination</p>
                   <p className="text-2xl font-bold text-orange-400">{orbit.inclination.toFixed(2)}°</p>
                 </div>
               )}
 
-              {orbit.perihelionDistance !== null && (
+              {typeof orbit.perihelionDistance === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Perihelion Distance</p>
                   <p className="text-2xl font-bold text-white">{orbit.perihelionDistance.toFixed(3)} AU</p>
@@ -310,7 +310,7 @@ export default function AsteroidDetailPage() {
                 </div>
               )}
 
-              {orbit.orbitalPeriod !== null && (
+              {typeof orbit.orbitalPeriod === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Orbital Period</p>
                   <p className="text-2xl font-bold text-purple-400">
@@ -322,21 +322,21 @@ export default function AsteroidDetailPage() {
                 </div>
               )}
 
-              {orbit.longitudeAscendingNode !== null && (
+              {typeof orbit.longitudeAscendingNode === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Longitude of Asc. Node</p>
                   <p className="text-xl font-bold text-white">{orbit.longitudeAscendingNode.toFixed(2)}°</p>
                 </div>
               )}
 
-              {orbit.argumentPerihelion !== null && (
+              {typeof orbit.argumentPerihelion === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Argument of Perihelion</p>
                   <p className="text-xl font-bold text-white">{orbit.argumentPerihelion.toFixed(2)}°</p>
                 </div>
               )}
 
-              {orbit.meanAnomaly !== null && (
+              {typeof orbit.meanAnomaly === 'number' && (
                 <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
                   <p className="text-gray-400 text-sm mb-1">Mean Anomaly</p>
                   <p className="text-xl font-bold text-white">{orbit.meanAnomaly.toFixed(2)}°</p>

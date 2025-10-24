@@ -199,7 +199,7 @@ export function ScoutTracker() {
                   <span className="text-white font-medium">{obj.uncertaintyDescription}</span>
                 </div>
 
-                {obj.absoluteMagnitude && (
+                {typeof obj.absoluteMagnitude === 'number' && (
                   <div className="flex justify-between">
                     <span className="text-gray-400">Magnitude (H):</span>
                     <span className="text-white font-medium">{obj.absoluteMagnitude.toFixed(1)}</span>
