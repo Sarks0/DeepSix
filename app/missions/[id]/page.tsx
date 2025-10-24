@@ -611,9 +611,6 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
   const isJWST = id === 'james-webb-space-telescope';
   const isEnRoute = mission.status === 'En Route';
 
-  // Missions without live data feeds (Extended missions in data collection mode or en route)
-  const hasNoLiveData = isEnRoute || id === 'new-horizons' || id === 'juno';
-
   // Check if this mission has Horizons API support
   const hasHorizonsSupport = [
     'europa-clipper',
@@ -621,7 +618,14 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
     'psyche',
     'osiris-apex',
     'juno',
+    'new-horizons',
+    'voyager-1',
+    'voyager-2',
+    'parker-solar-probe',
   ].includes(id);
+
+  // Missions without live data feeds (only InSight ended mission for now)
+  const hasNoLiveData = id === 'insight';
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -715,33 +719,18 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                 <MissionDataFeed missionId={id} />
               </div>
 
-              {/* Communication Status for Deep Space */}
-              {(id.includes('voyager') || id === 'parker-solar-probe') ? (
+              {/* Live Position Data for missions with Horizons API support */}
+              {hasHorizonsSupport ? (
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">
-                    Deep Space Communication
+                    {isEnRoute ? 'Live Journey Position' : 'Live Position Data'}
                   </h3>
-                <div className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg p-6 border border-gray-700">
-                  <div className="space-y-4">
-                    <div>
-                      <p className="text-sm text-gray-400">Distance from Earth</p>
-                      <p className="text-3xl font-mono font-bold text-purple-400">
-                        {mission.distance || 'Calculating...'}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Signal Travel Time</p>
-                      <p className="text-xl font-mono text-blue-400">One-way: ~{id.includes('voyager-1') ? '23' : '18'} hours</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-gray-400">Mission Duration</p>
-                      <p className="text-lg font-mono text-green-400">
-                        {id.includes('voyager') ? '47+ years' : '6+ years'} operational
-                      </p>
-                    </div>
-                  </div>
+                  <LiveSpacecraftData
+                    spacecraftId={id}
+                    showVelocity={true}
+                    showCommunicationDelay={true}
+                  />
                 </div>
-              </div>
               ) : (
                 <div className="space-y-4">
                   <h3 className="text-xl font-bold">
