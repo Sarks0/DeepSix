@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils/cn';
 const navItems = [
   { label: 'Dashboard', href: '/' },
   { label: 'Missions', href: '/missions' },
+  { label: 'Asteroids', href: '/asteroids' },
   { label: 'News', href: '/news' },
   { label: 'DSN', href: '/dsn' },
   { label: 'Live Data', href: '/live' },
