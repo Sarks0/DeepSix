@@ -701,8 +701,8 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {/* Hero Section - Mission Status Banner - Only for missions with active telemetry */}
-      {!hasNoLiveData && hasActiveTelemetry && (
+      {/* Hero Section - Mission Status Banner - For all missions with live data */}
+      {!hasNoLiveData && (
         <div className="mb-8">
           <MissionStatusIndicator missionId={id} className="bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 border-gray-700" />
         </div>
