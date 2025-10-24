@@ -28,23 +28,12 @@ async function parseXMLToJSON(xml: string): Promise<any> {
       mergeAttrs: false,
       // Security: Disable external entities and DTD processing
       xmlns: false,
-      strict: true,
-      // Prevent type coercion attacks
-      parseNumbers: false,
-      parseBooleans: false
+      strict: true
     });
 
     if (!result.dsn) {
       return { stations: [], timestamp: Date.now() };
     }
-
-    // Parse stations and dishes separately since they're siblings in XML
-    const stationElements = result.dsn.station || [];
-    const dishElements = result.dsn.dish || [];
-    
-    // Ensure arrays
-    const stationsArray = Array.isArray(stationElements) ? stationElements : [stationElements];
-    const dishesArray = Array.isArray(dishElements) ? dishElements : [dishElements];
 
     // Create station map
     const stations = new Map();
@@ -174,9 +163,7 @@ async function parseXMLToJSON(xml: string): Promise<any> {
         ignoreAttrs: false,
         // Security: Same protections for fallback parser
         xmlns: false,
-        strict: true,
-        parseNumbers: false,
-        parseBooleans: false
+        strict: true
       });
 
       const stations: any[] = [];

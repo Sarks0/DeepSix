@@ -131,9 +131,6 @@ function extractImageUrl(xml: string): string | undefined {
 
 // Security: Extract XML content without ReDoS-vulnerable regex
 function extractXMLContent(xml: string, tag: string): string {
-  // Escape special regex characters in tag name
-  const safeTag = tag.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-
   // Use simpler, non-backtracking string operations
   const startTag = `<${tag}`;
   const endTag = `</${tag}>`;
