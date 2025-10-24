@@ -74,7 +74,7 @@ export default function AsteroidsPage() {
                   </span>
                 </div>
                 <p className="text-sm text-gray-400 mb-4">
-                  Exploring Jupiter's Trojan asteroids - ancient remnants from the solar system's formation
+                  Exploring Jupiter&apos;s Trojan asteroids - ancient remnants from the solar system&apos;s formation
                 </p>
                 <div className="space-y-2 text-xs text-gray-500">
                   <div>Target: Trojan Asteroids</div>

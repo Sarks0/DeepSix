@@ -103,7 +103,7 @@ export async function GET(request: NextRequest) {
 
     // Flatten and enrich the data
     const allAsteroids: any[] = [];
-    Object.entries(neowsData.near_earth_objects).forEach(([date, asteroids]) => {
+    Object.entries(neowsData.near_earth_objects).forEach(([_date, asteroids]) => {
       asteroids.forEach((asteroid) => {
         const approach = asteroid.close_approach_data[0]; // Get first/closest approach
 
