@@ -255,13 +255,13 @@ export function AdvancedSearch() {
                       <span className="text-gray-400">Orbit:</span>
                       <span className="text-white font-medium">{asteroid.orbitClass}</span>
                     </div>
-                    {asteroid.diameter && (
+                    {typeof asteroid.diameter === 'number' && (
                       <div className="flex justify-between">
                         <span className="text-gray-400">Diameter:</span>
                         <span className="text-cyan-400 font-medium">{asteroid.diameter.toFixed(2)} {asteroid.diameterUnit}</span>
                       </div>
                     )}
-                    {asteroid.absoluteMagnitude && (
+                    {typeof asteroid.absoluteMagnitude === 'number' && (
                       <div className="flex justify-between">
                         <span className="text-gray-400">Magnitude:</span>
                         <span className="text-white font-medium">{asteroid.absoluteMagnitude.toFixed(1)}</span>
