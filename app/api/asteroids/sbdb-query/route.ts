@@ -35,11 +35,9 @@ export async function GET(request: NextRequest) {
     // Build query constraints
     const constraints: Record<string, string> = {};
 
-    // Object kind filter
-    const kind = searchParams.get('kind');
-    if (kind) {
-      constraints['kind'] = kind;
-    }
+    // Always set kind to asteroids by default (required by API)
+    const kind = searchParams.get('kind') || 'a'; // 'a' = asteroids
+    constraints['kind'] = kind;
 
     // NEO filter
     const neo = searchParams.get('neo');
@@ -74,10 +72,8 @@ export async function GET(request: NextRequest) {
 
     // Build query string
     const queryParams = new URLSearchParams();
-    if (Object.keys(constraints).length > 0) {
-      // SBDB Query API expects constraints as JSON
-      queryParams.append('sb-cdata', JSON.stringify(constraints));
-    }
+    // SBDB Query API expects constraints as JSON
+    queryParams.append('sb-cdata', JSON.stringify(constraints));
     queryParams.append('limit', limit);
     queryParams.append('fields', 'des,name,neo,pha,H,diameter,class,orbit-class');
 
