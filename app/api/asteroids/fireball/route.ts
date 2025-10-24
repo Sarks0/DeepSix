@@ -92,9 +92,10 @@ export async function GET(request: NextRequest) {
     });
 
     // Sort by date (most recent first)
-    const sortedData = enrichedData.sort((a, b) =>
-      new Date(b.date).getTime() - new Date(a.date).getTime()
-    );
+    const sortedData = enrichedData.sort((a, b) => {
+      if (!a.date || !b.date) return 0;
+      return new Date(b.date).getTime() - new Date(a.date).getTime();
+    });
 
     // Calculate statistics
     const totalEnergy = sortedData.reduce((sum, f) => sum + f.energy, 0);
