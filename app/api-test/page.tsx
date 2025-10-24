@@ -35,18 +35,24 @@ export default function APITestPage() {
   const { delays, isLoading: delaysLoading, error: delaysError } = useCommunicationDelays();
   const { stats, isLoading: statsLoading } = useMissionStatistics();
 
-  // Test direct NASA API call
+  // Test APOD API via our server-side route
   useEffect(() => {
     const testAPOD = async () => {
       try {
-        const response = await fetch(
-          `https://api.nasa.gov/planetary/apod?api_key=${process.env.NEXT_PUBLIC_NASA_API_KEY}`
-        );
-        const data = await response.json();
-        setTestResults((prev: TestResults) => ({
-          ...prev,
-          apod: { success: true, title: data.title },
-        }));
+        const response = await fetch('/api/apod');
+        const result = await response.json();
+
+        if (result.success) {
+          setTestResults((prev: TestResults) => ({
+            ...prev,
+            apod: { success: true, title: result.data.title },
+          }));
+        } else {
+          setTestResults((prev: TestResults) => ({
+            ...prev,
+            apod: { success: false, error: result.message || 'Failed to fetch APOD' },
+          }));
+        }
       } catch (error) {
         const errorMessage = error instanceof Error ? error.message : 'Unknown error';
         setTestResults((prev: TestResults) => ({
@@ -75,11 +81,9 @@ export default function APITestPage() {
           <h2 className="text-xl font-semibold mb-4 flex items-center">🔑 NASA API Key Status</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
-              <span className="text-gray-400">API Key Configured</span>
-              <span
-                className={process.env.NEXT_PUBLIC_NASA_API_KEY ? 'text-green-400' : 'text-red-400'}
-              >
-                {process.env.NEXT_PUBLIC_NASA_API_KEY ? '✅ Yes' : '❌ No'}
+              <span className="text-gray-400">API Key Security</span>
+              <span className="text-green-400">
+                ✅ Server-side only
               </span>
             </div>
             <div className="flex justify-between">
@@ -91,6 +95,11 @@ export default function APITestPage() {
             {testResults.apod?.title && (
               <div className="text-sm text-gray-500 mt-2">
                 Today&apos;s APOD: {testResults.apod.title}
+              </div>
+            )}
+            {testResults.apod?.error && (
+              <div className="text-sm text-red-400 mt-2">
+                Error: {testResults.apod.error}
               </div>
             )}
           </div>

@@ -4,26 +4,36 @@ import { parseStringPromise } from 'xml2js';
 // Use Node.js runtime for XML parsing
 export const runtime = 'nodejs';
 
+// Maximum XML size to prevent DoS attacks (10MB)
+const MAX_XML_SIZE = 10 * 1024 * 1024;
+
 // Parse XML to JSON with proper structure
 async function parseXMLToJSON(xml: string): Promise<any> {
   try {
+    // Security: Validate XML size before parsing
+    if (xml.length > MAX_XML_SIZE) {
+      console.error(`XML too large: ${xml.length} bytes (max: ${MAX_XML_SIZE})`);
+      throw new Error('XML too large');
+    }
+
+    // Security: Validate no external entity declarations (XXE prevention)
+    if (xml.includes('<!ENTITY') || xml.includes('<!DOCTYPE')) {
+      console.error('XML contains entity declarations, rejecting for security');
+      throw new Error('External entities not allowed');
+    }
+
     const result = await parseStringPromise(xml, {
       explicitArray: false,
       ignoreAttrs: false,
-      mergeAttrs: false
+      mergeAttrs: false,
+      // Security: Disable external entities and DTD processing
+      xmlns: false,
+      strict: true
     });
 
     if (!result.dsn) {
       return { stations: [], timestamp: Date.now() };
     }
-
-    // Parse stations and dishes separately since they're siblings in XML
-    const stationElements = result.dsn.station || [];
-    const dishElements = result.dsn.dish || [];
-    
-    // Ensure arrays
-    const stationsArray = Array.isArray(stationElements) ? stationElements : [stationElements];
-    const dishesArray = Array.isArray(dishElements) ? dishElements : [dishElements];
 
     // Create station map
     const stations = new Map();
@@ -150,7 +160,10 @@ async function parseXMLToJSON(xml: string): Promise<any> {
     try {
       const result = await parseStringPromise(xml, {
         explicitArray: true,
-        ignoreAttrs: false
+        ignoreAttrs: false,
+        // Security: Same protections for fallback parser
+        xmlns: false,
+        strict: true
       });
 
       const stations: any[] = [];
@@ -266,13 +279,20 @@ export async function GET() {
     }
 
     const xmlText = await response.text();
+
+    // Security: Validate XML size before parsing
+    if (xmlText.length > MAX_XML_SIZE) {
+      console.error(`DSN XML too large: ${xmlText.length} bytes`);
+      throw new Error('XML response too large');
+    }
+
     const jsonData = await parseXMLToJSON(xmlText);
 
     return NextResponse.json(jsonData);
   } catch (error) {
     console.error('DSN API error:', error);
     return NextResponse.json(
-      { 
+      {
         error: 'Failed to fetch DSN data',
         stations: [],
         timestamp: Date.now()

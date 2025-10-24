@@ -38,44 +38,49 @@ export function MarsWeather() {
   useEffect(() => {
     async function fetchMarsWeather() {
       try {
-        // InSight mission ended in December 2022
-        // Using last known data from the mission
-        // Future: Could integrate Perseverance/Curiosity environmental data
-
-        // Set the last known InSight data
-        setWeather({
-          sol: '1410',
-          temperature: { min: -101, max: -20, avg: -60 },
-          pressure: { min: 721, max: 747, avg: 734 },
-          windSpeed: { min: 0.2, max: 9.8, avg: 4.3 },
-          windDirection: { most_common: 'WNW', compass_degrees: 292.5 },
-          season: 'Northern Winter',
-          firstUTC: '2022-12-15T00:00:00Z',
-          lastUTC: '2022-12-15T23:59:59Z',
-        });
-
-        // Note: The InSight API is still available but returns no new data
-        // Attempting to fetch in case NASA reactivates or provides historical access
-        const response = await fetch(
-          `https://api.nasa.gov/insight_weather/?api_key=${process.env.NEXT_PUBLIC_NASA_API_KEY || 'DEMO_KEY'}&feedtype=json&ver=1.0`
-        );
+        // Fetch Mars weather data from our API route (server-side)
+        // InSight mission ended December 2022, returns historical data
+        const response = await fetch('/api/mars-weather?limit=1');
 
         if (response.ok) {
-          const data = await response.json();
-          const solKeys = data.sol_keys;
+          const result = await response.json();
 
-          if (solKeys && solKeys.length > 0) {
-            // If somehow new data appears, use it
-            // const latestSol = solKeys[solKeys.length - 1];
-            // const solData = data[latestSol];
-            // ... rest of parsing logic would go here
+          if (result.success && result.data?.recentSols?.length > 0) {
+            const latestSol = result.data.recentSols[0];
+
+            setWeather({
+              sol: latestSol.sol,
+              temperature: {
+                min: latestSol.temperature?.minimum || -101,
+                max: latestSol.temperature?.maximum || -20,
+                avg: latestSol.temperature?.average || -60,
+              },
+              pressure: {
+                min: latestSol.pressure?.minimum || 721,
+                max: latestSol.pressure?.maximum || 747,
+                avg: latestSol.pressure?.average || 734,
+              },
+              windSpeed: {
+                min: latestSol.windSpeed?.minimum || 0.2,
+                max: latestSol.windSpeed?.maximum || 9.8,
+                avg: latestSol.windSpeed?.average || 4.3,
+              },
+              windDirection: {
+                most_common: latestSol.windDirection?.mostCommon?.compassPoint || 'WNW',
+                compass_degrees: latestSol.windDirection?.mostCommon?.degrees || 292.5,
+              },
+              season: latestSol.season || 'Northern Winter',
+              firstUTC: latestSol.earthDate || '2022-12-15T00:00:00Z',
+              lastUTC: latestSol.earthDate || '2022-12-15T23:59:59Z',
+            });
+
+            setError('Using last known data from InSight (mission ended Dec 2022)');
+          } else {
+            throw new Error('No weather data available');
           }
+        } else {
+          throw new Error('Failed to fetch weather data');
         }
-
-        // This code is unreachable as solKeys and data are undefined here
-        // Keeping the fallback data set above
-
-        // This code is unreachable - weather data is already set above with fallback values
       } catch (err) {
         console.error('Mars weather error:', err);
         // Use realistic fallback data from InSight's last transmission

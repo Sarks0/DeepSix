@@ -109,3 +109,9 @@ build/
 yarn.lock
 pnpm-lock.yaml
 bun.lockb
+
+# Security reports and assessments (sensitive information)
+docs/SECURITY-ASSESSMENT-*.md
+docs/security-*.md
+**/security-report*.md
+SECURITY_ASSESSMENT.md

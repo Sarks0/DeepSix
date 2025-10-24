@@ -27,15 +27,21 @@ function validateApiKeyFormat(key: string): boolean {
  * This checks for common mistake of using NEXT_PUBLIC_ prefix
  */
 function checkForKeyExposure(): void {
-  // Only run in development to warn developers
-  if (process.env.NODE_ENV === 'development') {
-    if (process.env.NEXT_PUBLIC_NASA_API_KEY) {
-      console.error(
-        '⚠️  SECURITY WARNING: NASA_API_KEY is exposed via NEXT_PUBLIC_ prefix!\n' +
-        'This key will be visible in the client bundle.\n' +
-        'Remove NEXT_PUBLIC_ prefix and use NASA_API_KEY instead.\n' +
-        'API routes can access process.env.NASA_API_KEY server-side.'
-      );
+  if (process.env.NEXT_PUBLIC_NASA_API_KEY) {
+    const errorMessage =
+      '🚨 CRITICAL SECURITY ERROR: NASA_API_KEY is exposed via NEXT_PUBLIC_ prefix!\n' +
+      'This key WILL BE VISIBLE in the client bundle and can be stolen.\n' +
+      'IMMEDIATE ACTION REQUIRED:\n' +
+      '1. Remove NEXT_PUBLIC_NASA_API_KEY from environment variables\n' +
+      '2. Use NASA_API_KEY instead (server-side only)\n' +
+      '3. Regenerate your NASA API key at https://api.nasa.gov\n' +
+      '4. All NASA API calls MUST go through Next.js API routes (app/api/*)';
+
+    console.error(errorMessage);
+
+    // In production, throw an error to prevent deployment with exposed keys
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('SECURITY: NASA API key exposed via NEXT_PUBLIC_ prefix');
     }
   }
 }
@@ -47,9 +53,8 @@ export function getApiKey(): string {
   // Check for potential security issues
   checkForKeyExposure();
 
-  // Prefer server-side only API key (not exposed to client)
-  // Only use NEXT_PUBLIC_ version if absolutely necessary (not recommended)
-  const apiKey = process.env.NASA_API_KEY || process.env.NEXT_PUBLIC_NASA_API_KEY;
+  // Only use server-side API key (never NEXT_PUBLIC_)
+  const apiKey = process.env.NASA_API_KEY;
 
   if (!apiKey) {
     // Use demo key as fallback (rate limited to 30 requests/hour)
@@ -57,7 +62,9 @@ export function getApiKey(): string {
       console.warn(
         '⚠️  No NASA API key found in environment variables.\n' +
         'Using DEMO_KEY with strict rate limits (30 requests/hour).\n' +
-        'Get a free API key at https://api.nasa.gov for better performance.'
+        'Set NASA_API_KEY environment variable (server-side only).\n' +
+        'Get a free API key at https://api.nasa.gov for better performance.\n' +
+        'IMPORTANT: Never use NEXT_PUBLIC_NASA_API_KEY as it exposes the key to clients.'
       );
       apiKeyUsage.isDemo = true;
     }
