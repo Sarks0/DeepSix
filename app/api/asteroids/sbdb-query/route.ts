@@ -32,50 +32,40 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Build query constraints
-    const constraints: Record<string, string> = {};
+    // Build query parameters directly (not JSON)
+    const queryParams = new URLSearchParams();
 
-    // Always set kind to asteroids by default (required by API)
-    const kind = searchParams.get('kind') || 'a'; // 'a' = asteroids
-    constraints['kind'] = kind;
+    // Always set kind to asteroids (required by API)
+    queryParams.append('sb-kind', 'a');
 
     // NEO filter
     const neo = searchParams.get('neo');
     if (neo === 'true') {
-      constraints['neo'] = '1';
+      queryParams.append('sb-neo', '1');
     } else if (neo === 'false') {
-      constraints['neo'] = '0';
+      queryParams.append('sb-neo', '0');
     }
 
     // PHA filter
     const pha = searchParams.get('pha');
     if (pha === 'true') {
-      constraints['pha'] = '1';
+      queryParams.append('sb-pha', '1');
     } else if (pha === 'false') {
-      constraints['pha'] = '0';
+      queryParams.append('sb-pha', '0');
     }
 
     // Absolute magnitude range
     const hMin = searchParams.get('h-min');
     const hMax = searchParams.get('h-max');
-    if (hMin) constraints['H[min]'] = hMin;
-    if (hMax) constraints['H[max]'] = hMax;
-
-    // Diameter range (in km)
-    const diameterMin = searchParams.get('diameter-min');
-    const diameterMax = searchParams.get('diameter-max');
-    if (diameterMin) constraints['diameter[min]'] = diameterMin;
-    if (diameterMax) constraints['diameter[max]'] = diameterMax;
+    if (hMin) queryParams.append('sb-h-min', hMin);
+    if (hMax) queryParams.append('sb-h-max', hMax);
 
     // Limit
     const limit = searchParams.get('limit') || '100';
-
-    // Build query string
-    const queryParams = new URLSearchParams();
-    // SBDB Query API expects constraints as JSON
-    queryParams.append('sb-cdata', JSON.stringify(constraints));
     queryParams.append('limit', limit);
-    queryParams.append('fields', 'des,name,neo,pha,H,diameter,class,orbit-class');
+
+    // Fields to return (no hyphens allowed in field names)
+    queryParams.append('fields', 'full_name,H,diameter,neo,pha,class');
 
     const sbdbQueryUrl = `https://ssd-api.jpl.nasa.gov/sbdb_query.api?${queryParams.toString()}`;
 
@@ -101,16 +91,20 @@ export async function GET(request: NextRequest) {
     // Transform array data to objects
     const fieldNames = queryData.fields;
     const asteroids = queryData.data.map((row) => {
+      // Map array values to field names
       const obj: Record<string, any> = {};
       fieldNames.forEach((field, index) => {
         obj[field] = row[index];
       });
 
-      // Enrich data
-      const designation = obj.des || obj.spkid;
-      const name = obj.name || obj.full_name || designation;
-      const isNEO = obj.neo === '1' || obj.neo === 1 || obj.neo === true;
-      const isPHA = obj.pha === '1' || obj.pha === 1 || obj.pha === true;
+      // Parse designation from full_name (e.g., "     1 Ceres (A801 AA)")
+      const fullName = obj.full_name || '';
+      // Extract designation (first part before any parentheses or spaces)
+      const designationMatch = fullName.trim().match(/^(\d+\s+\S+)|^(\S+)/);
+      const designation = designationMatch ? designationMatch[0].trim() : fullName.trim();
+
+      const isNEO = obj.neo === 'Y' || obj.neo === 'y';
+      const isPHA = obj.pha === 'Y' || obj.pha === 'y';
       const absoluteMagnitude = obj.H ? parseFloat(obj.H) : null;
       const diameter = obj.diameter ? parseFloat(obj.diameter) : null;
 
@@ -135,14 +129,14 @@ export async function GET(request: NextRequest) {
 
       return {
         designation,
-        name,
-        fullName: name,
+        name: fullName,
+        fullName: fullName,
         isNEO,
         isPHA,
         absoluteMagnitude,
         diameter,
         diameterUnit: 'km',
-        orbitClass: obj['orbit-class'] || obj.class || 'Unknown',
+        orbitClass: obj.class || 'Unknown',
         sizeCategory,
         hazardLevel,
         // Raw data for additional fields
@@ -170,7 +164,8 @@ export async function GET(request: NextRequest) {
       dataSource: 'NASA JPL Small-Body Database Query',
       timestamp: new Date().toISOString(),
       query: {
-        constraints,
+        neo: neo || 'any',
+        pha: pha || 'any',
         limit: parseInt(limit),
       },
       summary,
