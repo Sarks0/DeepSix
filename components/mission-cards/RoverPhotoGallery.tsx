@@ -364,9 +364,7 @@ export function RoverPhotoGallery({
                 loading="lazy"
                 unoptimized
                 onError={(e) => {
-                  console.error(`Failed to load image: ${photo.img_src}`, e);
-                  const target = e.target as HTMLImageElement;
-                  target.style.display = 'none';
+                  console.error(`Failed to load image: ${photo.img_src}`);
                 }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
