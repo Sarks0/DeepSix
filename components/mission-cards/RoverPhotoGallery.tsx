@@ -230,7 +230,6 @@ export function RoverPhotoGallery({
       const startIdx = currentPage * limit;
       const endIdx = startIdx + limit;
       const sliced = photos.slice(startIdx, endIdx);
-      console.log(`[${rover}] Pagination: page=${currentPage}, limit=${limit}, total=${photos.length}, displaying=${sliced.length}, range=[${startIdx},${endIdx}]`);
       setDisplayedPhotos(sliced);
     }
   }, [photos, currentPage, limit, rover]);
@@ -349,7 +348,6 @@ export function RoverPhotoGallery({
 
       {/* Photo Grid */}
       <div key={`grid-page-${currentPage}`} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        {console.log(`[${rover}] RENDERING ${displayedPhotos.length} photos in grid`)}
         {displayedPhotos.map((photo, index) => (
           <div
             key={`${photo.id}-${photo.sol}`}
@@ -361,7 +359,7 @@ export function RoverPhotoGallery({
               src={photo.img_src}
               alt={`Mars ${rover} - Sol ${photo.sol}`}
               className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-              onError={(e) => {
+              onError={() => {
                 console.error(`Failed to load image: ${photo.img_src}`);
               }}
             />
