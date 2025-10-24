@@ -33,8 +33,6 @@
   </p>
 
   <p align="center">
-    <a href="https://deepsix.vercel.app">Live Demo</a>
-    ·
     <a href="#features">Features</a>
     ·
     <a href="#getting-started">Getting Started</a>
