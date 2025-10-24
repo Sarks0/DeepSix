@@ -54,8 +54,8 @@ const missions = [
   {
     id: 'parker-solar-probe',
     name: 'Parker Solar Probe',
-    description: 'Touching the Sun&apos;s corona for the first time',
-    status: 'Active',
+    description: 'Completed primary mission with 24 perihelion passes, now in extended operations',
+    status: 'Extended',
     type: 'Solar',
     icon: SolarIcon,
     color: 'from-yellow-500 to-orange-600',
@@ -81,7 +81,7 @@ const missions = [
   {
     id: 'mars-odyssey',
     name: '2001 Mars Odyssey',
-    description: 'Longest-serving Mars orbiter mapping water and climate',
+    description: 'Record holder: 24+ years as longest-serving planetary orbiter',
     status: 'Active',
     type: 'Mars Orbiter',
     icon: SatelliteIcon,
@@ -117,7 +117,7 @@ const missions = [
   {
     id: 'europa-clipper',
     name: 'Europa Clipper',
-    description: 'En route to study Europa\'s subsurface ocean',
+    description: 'En route to Jupiter - completed Mars gravity assist March 2025',
     status: 'En Route',
     type: 'Jupiter System',
     icon: ProbeIcon,
@@ -126,7 +126,7 @@ const missions = [
   {
     id: 'lucy',
     name: 'Lucy',
-    description: 'En route to Jupiter\'s Trojan asteroids',
+    description: 'Visited 2 of 8 Trojan asteroids - Eurybates arrival August 2027',
     status: 'En Route',
     type: 'Asteroid Mission',
     icon: ProbeIcon,

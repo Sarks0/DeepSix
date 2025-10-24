@@ -70,19 +70,20 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     name: 'Parker Solar Probe',
     type: 'probe',
     launchDate: new Date('2018-08-12T07:31:00Z'),
-    status: 'active',
+    status: 'extended',
     location: 'Solar system (Sun proximity)',
     currentDistance: 0.1, // Varies, close to Sun
     currentSpeed: 200, // Maximum speed near Sun
     primaryObjective: 'Study the solar corona',
     keyMetric: {
       label: 'Perihelion Passes',
-      value: 18,
+      value: 24,
       unit: 'completed'
     },
     achievements: [
       'Fastest human-made object ever',
-      'Closest approach to the Sun',
+      'Closest approach to the Sun (3.8 million miles)',
+      'Completed primary mission 24 perihelion passes (June 2025)',
       'First spacecraft to "touch" the Sun\'s corona'
     ]
   },
@@ -92,17 +93,18 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     launchDate: new Date('2006-01-19T19:00:00Z'),
     status: 'extended',
     location: 'Kuiper Belt',
-    currentDistance: 58.6, // AU from Earth
+    currentDistance: 62.2, // AU from Earth (September 2025)
     currentSpeed: 14.1, // km/s
     primaryObjective: 'Kuiper Belt exploration',
     keyMetric: {
       label: 'Distance from Earth',
-      value: 58.6,
+      value: 62.2,
       unit: 'AU'
     },
     achievements: [
       'First detailed images of Pluto (2015)',
       'Flyby of Kuiper Belt object Arrokoth (2019)',
+      'Detected extended Kuiper Belt dust (2025)',
       'Fastest Earth departure speed at launch'
     ]
   },
@@ -117,14 +119,15 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 1.5, // Variable distance to Mars
     primaryObjective: 'High-resolution Mars surface imaging and climate monitoring',
     keyMetric: {
-      label: 'Images Captured',
-      value: '500,000+',
-      unit: 'images'
+      label: 'Years at Mars',
+      value: '19+',
+      unit: 'years'
     },
     achievements: [
+      '19+ years active at Mars (October 2025)',
       'Highest resolution images of Mars surface',
       'Discovered recurring slope lineae (possible water flows)',
-      'Long-term climate monitoring'
+      'Third longest-lived Mars orbiter'
     ]
   },
   maven: {
@@ -137,10 +140,11 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     primaryObjective: 'Study Martian upper atmosphere and atmospheric escape',
     keyMetric: {
       label: 'Atmospheric Measurements',
-      value: '9+ years',
+      value: '11+ years',
       unit: 'of data'
     },
     achievements: [
+      'Over 11 years operational (2025)',
       'Measured atmospheric escape to space',
       'Discovered Mars aurora phenomena',
       'Tracked solar wind interactions'
@@ -156,13 +160,14 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     primaryObjective: 'Global mapping and water ice detection',
     keyMetric: {
       label: 'Mission Duration',
-      value: '23+ years',
+      value: '24+ years',
       unit: 'active'
     },
     achievements: [
-      'Longest-serving Mars mission',
+      'Longest-serving Mars mission (24+ years)',
+      'Record holder for planetary orbit longevity',
       'Discovered widespread water ice',
-      'Communications relay for surface missions'
+      'Critical communications relay for surface missions'
     ]
   },
 
@@ -176,14 +181,15 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 0.01, // ~1.5 million km from Earth
     primaryObjective: 'Infrared astronomy and early universe observation',
     keyMetric: {
-      label: 'Scientific Images',
-      value: '1,000+',
-      unit: 'captured'
+      label: 'Years Operational',
+      value: '3+',
+      unit: 'years'
     },
     achievements: [
+      'Discovered most distant galaxy ever observed (280 million years after Big Bang)',
       'Deepest infrared images of universe',
-      'First direct exoplanet atmosphere analysis',
-      'Discovery of earliest galaxies (13+ billion years old)'
+      'First direct exoplanet atmosphere measurements',
+      'Performance exceeding expectations (2025)'
     ]
   },
 
@@ -204,7 +210,8 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     achievements: [
       'First polar orbits of Jupiter',
       'Discovered Jupiter\'s interior structure',
-      'Detailed magnetic field mapping'
+      'Close flybys of Ganymede, Europa, and Io',
+      'Extended mission through 2025'
     ]
   },
   europaclipper: {
@@ -216,14 +223,15 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 2.0, // En route, approximate
     primaryObjective: 'Study Europa\'s subsurface ocean and habitability',
     keyMetric: {
-      label: 'Transit Time',
-      value: '5.5 years',
-      unit: 'to Jupiter'
+      label: 'Jupiter Arrival',
+      value: 'April 2030',
+      unit: ''
     },
     achievements: [
-      'Successfully launched on Falcon Heavy',
+      'Successfully launched on Falcon Heavy (October 2024)',
+      'Mars gravity assist completed (March 2025)',
       'Largest planetary mission spacecraft',
-      'Advanced ice-penetrating radar'
+      'All instruments deploying nominally'
     ]
   },
 
@@ -237,14 +245,15 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 2.5, // Approximate current distance
     primaryObjective: 'Study Jupiter\'s Trojan asteroids',
     keyMetric: {
-      label: 'Target Asteroids',
-      value: '8',
-      unit: 'planned visits'
+      label: 'Asteroids Visited',
+      value: '2 of 8',
+      unit: 'completed'
     },
     achievements: [
       'First mission to Jupiter Trojans',
-      'Successful solar array deployment',
-      'Flyby of asteroid Dinkinesh (2023)'
+      'Flyby of asteroid Dinkinesh (2023)',
+      'Flyby of asteroid Donaldjohanson (April 2025)',
+      'Eurybates arrival August 2027'
     ]
   },
   psyche: {
@@ -256,14 +265,15 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 1.8, // Approximate current distance
     primaryObjective: 'Study metallic asteroid composition',
     keyMetric: {
-      label: 'Transit Time',
-      value: '6 years',
-      unit: 'to Psyche'
+      label: 'Psyche Arrival',
+      value: 'August 2029',
+      unit: ''
     },
     achievements: [
       'First mission to a metallic asteroid',
-      'Advanced ion propulsion system',
-      'Deep space optical communications test'
+      'Propulsion system issue resolved (June 2025)',
+      'Mars flyby scheduled May 2026',
+      'Deep space optical communications operational'
     ]
   },
   osirisapex: {
@@ -275,12 +285,13 @@ export const MISSION_DATA: Record<string, Omit<MissionData, 'missionDurationDays
     currentDistance: 1.2, // Approximate current distance
     primaryObjective: 'Study asteroid Apophis during 2029 close approach',
     keyMetric: {
-      label: 'Years to Apophis',
-      value: '4',
-      unit: 'remaining'
+      label: 'Apophis Arrival',
+      value: 'April 2029',
+      unit: ''
     },
     achievements: [
       'Successful sample return from Bennu (2023)',
+      'Survived multiple close solar approaches (2025)',
       'Extended mission to Apophis',
       'First U.S. asteroid sample return'
     ]

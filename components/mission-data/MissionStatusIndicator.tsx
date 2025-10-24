@@ -107,6 +107,66 @@ const missionStatusData: Record<string, () => Promise<MissionStatus>> = {
     dataRate: Math.floor(Math.random() * 150000) + 25000,
     signalStrength: Math.floor(Math.random() * 25) + 65,
     fuelRemaining: Math.floor(Math.random() * 15) + 80
+  }),
+
+  'new-horizons': async () => ({
+    operational: true,
+    health: 'good',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 604800000)), // Within last week
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 604800000)), // Next week
+    dataRate: Math.floor(Math.random() * 1000) + 200,
+    signalStrength: Math.floor(Math.random() * 20) + 30,
+    fuelRemaining: Math.floor(Math.random() * 10) + 45
+  }),
+
+  'juno': async () => ({
+    operational: true,
+    health: Math.random() > 0.85 ? 'good' : 'excellent',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 7200000)), // Within 2 hours
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 14400000)), // Next 4 hours
+    dataRate: Math.floor(Math.random() * 100000) + 30000,
+    signalStrength: Math.floor(Math.random() * 20) + 70,
+    fuelRemaining: Math.floor(Math.random() * 15) + 25
+  }),
+
+  'europa-clipper': async () => ({
+    operational: true,
+    health: 'excellent',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 43200000)), // Within 12 hours
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 86400000)), // Next 24 hours
+    dataRate: Math.floor(Math.random() * 50000) + 10000,
+    signalStrength: Math.floor(Math.random() * 25) + 60,
+    fuelRemaining: Math.floor(Math.random() * 10) + 85
+  }),
+
+  'lucy': async () => ({
+    operational: true,
+    health: 'excellent',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 86400000)), // Within 24 hours
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 172800000)), // Next 48 hours
+    dataRate: Math.floor(Math.random() * 30000) + 5000,
+    signalStrength: Math.floor(Math.random() * 25) + 55,
+    fuelRemaining: Math.floor(Math.random() * 15) + 75
+  }),
+
+  'psyche': async () => ({
+    operational: true,
+    health: 'excellent',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 86400000)), // Within 24 hours
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 172800000)), // Next 48 hours
+    dataRate: Math.floor(Math.random() * 25000) + 8000,
+    signalStrength: Math.floor(Math.random() * 25) + 60,
+    fuelRemaining: Math.floor(Math.random() * 15) + 70
+  }),
+
+  'osiris-apex': async () => ({
+    operational: true,
+    health: Math.random() > 0.9 ? 'good' : 'excellent',
+    lastContact: new Date(Date.now() - Math.floor(Math.random() * 86400000)), // Within 24 hours
+    nextContact: new Date(Date.now() + Math.floor(Math.random() * 172800000)), // Next 48 hours
+    dataRate: Math.floor(Math.random() * 20000) + 5000,
+    signalStrength: Math.floor(Math.random() * 30) + 50,
+    fuelRemaining: Math.floor(Math.random() * 20) + 55
   })
 };
 

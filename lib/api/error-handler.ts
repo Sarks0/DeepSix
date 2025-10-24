@@ -169,6 +169,11 @@ export function getAvailableSpacecraftIds(): string[] {
     'parker-solar-probe',
     'perseverance',
     'curiosity',
+    'europa-clipper',
+    'lucy',
+    'psyche',
+    'osiris-apex',
+    'juno',
   ];
 }
 
