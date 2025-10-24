@@ -362,6 +362,12 @@ export function RoverPhotoGallery({
                 className="object-cover transition-transform duration-300 group-hover:scale-110"
                 sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 loading="lazy"
+                unoptimized
+                onError={(e) => {
+                  console.error(`Failed to load image: ${photo.img_src}`, e);
+                  const target = e.target as HTMLImageElement;
+                  target.style.display = 'none';
+                }}
               />
               <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
                 <div className="absolute bottom-0 left-0 right-0 p-2">
@@ -398,6 +404,7 @@ export function RoverPhotoGallery({
                 className="object-contain"
                 sizes="100vw"
                 priority
+                unoptimized
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h3 className="text-lg font-semibold text-white">
