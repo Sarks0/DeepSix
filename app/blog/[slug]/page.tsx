@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getAllPosts, getPostBySlug } from '@/lib/blog';
+import 'highlight.js/styles/github-dark.css';
 
 interface BlogPostPageProps {
   params: Promise<{
