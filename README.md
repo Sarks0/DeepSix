@@ -39,8 +39,6 @@
     ·
     <a href="#getting-started">Getting Started</a>
     ·
-    <a href="#mission-coverage">Missions</a>
-    ·
     <a href="#contributing">Contributing</a>
   </p>
 </div>
@@ -84,48 +82,6 @@ A comprehensive real-time dashboard for tracking **15+ NASA deep space missions*
 - **Smooth Animations** - Powered by Framer Motion
 - **Offline Support** - Image caching with IndexedDB
 - **Real-time Updates** - Live data feeds with configurable refresh rates
-
----
-
-## Mission Coverage
-
-### Mars System (5 missions)
-| Mission | Type | Status | Tracking |
-|---------|------|--------|----------|
-| **Perseverance** | Rover | Active | Sol tracking, Photos, Telemetry |
-| **Curiosity** | Rover | Active | Sol tracking, Photos, Telemetry |
-| **Mars Reconnaissance Orbiter** | Orbiter | Active (19+ years) | Status, Telemetry |
-| **MAVEN** | Orbiter | Active | Status, Telemetry |
-| **Mars Odyssey** | Orbiter | Active (24+ years) | Status, Telemetry |
-
-### Deep Space Probes (4 missions)
-| Mission | Location | Distance | Tracking |
-|---------|----------|----------|----------|
-| **Voyager 1** | Interstellar Space | 164+ AU | Position, Status, Telemetry |
-| **Voyager 2** | Interstellar Space | 134+ AU | Position, Status, Telemetry |
-| **Parker Solar Probe** | Solar Corona | Variable | Position, Status, Telemetry |
-| **New Horizons** | Kuiper Belt | 62.2 AU | Position, Status, Telemetry |
-
-### Jupiter System (2 missions)
-| Mission | Status | Arrival | Tracking |
-|---------|--------|---------|----------|
-| **Juno** | Active (Extended) | In orbit | Position, Status, Telemetry |
-| **Europa Clipper** | En Route | April 2030 | Position, Journey Status |
-
-### Asteroid Missions (3 missions)
-| Mission | Target | Arrival | Tracking |
-|---------|--------|---------|----------|
-| **Lucy** | Trojan Asteroids | 2027-2033 | Position, Journey Status |
-| **Psyche** | Metallic Asteroid | August 2029 | Position, Journey Status |
-| **OSIRIS-APEX** | Asteroid Apophis | April 2029 | Position, Journey Status |
-
-### Space Observatories (1 mission)
-| Mission | Location | Purpose | Tracking |
-|---------|----------|---------|----------|
-| **James Webb** | L2 Lagrange | Infrared Observatory | Status, Telemetry |
-
-### Historical Missions (Available)
-- **Mars InSight** - Ended December 2022 (Seismic studies)
 
 ---
 
@@ -222,31 +178,6 @@ npm run start
 | `npm run lint` | Run ESLint code linting |
 | `npm run type-check` | TypeScript type checking |
 | `npm run format` | Format code with Prettier |
-
----
-
-## Roadmap
-
-### Current Features
-- [x] 15+ mission coverage with live data
-- [x] Real-time position tracking (JPL Horizons API)
-- [x] Mars sol tracking for active rovers
-- [x] Mission status indicators and telemetry
-- [x] Communication delay calculations
-- [x] Full-width responsive design
-- [x] Data source attribution
-
-### Planned Features
-- [ ] Mission filtering and sorting
-- [ ] 3D visualization of spacecraft positions
-- [ ] Historical mission archives
-- [ ] International missions (ESA, JAXA)
-- [ ] Timeline view for mission milestones
-- [ ] Deep Space Network (DSN) status dashboard
-- [ ] Mission comparison tools
-- [ ] Export mission data (CSV, JSON)
-- [ ] Dark/Light theme toggle
-- [ ] Notification system for mission events
 
 ---
 
