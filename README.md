@@ -33,7 +33,7 @@
   </p>
 
   <p align="center">
-    <a href="https://deepsix.vercel.app">Live Demo</a>
+    <a href="https://deepsix.io">Visit DeepSix</a>
     ·
     <a href="#features">Features</a>
     ·
@@ -222,7 +222,7 @@ This project is licensed under the **Apache License 2.0** - see the [LICENSE](LI
 
 **Project Link:** [https://github.com/Sarks0/DeepSix](https://github.com/Sarks0/DeepSix)
 
-**Live Demo:** [https://deepsix.vercel.app](https://deepsix.vercel.app)
+**Website:** [https://deepsix.io](https://deepsix.io)
 
 ---
 
