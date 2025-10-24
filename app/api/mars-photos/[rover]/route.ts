@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiKey } from '@/lib/api/config';
 import { calculateSol, formatSolDisplay, getSolMilestone } from '@/lib/utils/mars-sol';
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
