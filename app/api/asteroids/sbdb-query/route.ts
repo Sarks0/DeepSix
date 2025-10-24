@@ -32,33 +32,46 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
 
-    // Build query parameters directly (not JSON)
+    // Build query parameters
     const queryParams = new URLSearchParams();
 
     // Always set kind to asteroids (required by API)
     queryParams.append('sb-kind', 'a');
 
-    // NEO filter
+    // NEO/PHA filter using sb-group
     const neo = searchParams.get('neo');
-    if (neo === 'true') {
-      queryParams.append('sb-neo', '1');
-    } else if (neo === 'false') {
-      queryParams.append('sb-neo', '0');
-    }
-
-    // PHA filter
     const pha = searchParams.get('pha');
+
     if (pha === 'true') {
-      queryParams.append('sb-pha', '1');
-    } else if (pha === 'false') {
-      queryParams.append('sb-pha', '0');
+      // PHA is a subset of NEO, so use pha group
+      queryParams.append('sb-group', 'pha');
+    } else if (neo === 'true') {
+      queryParams.append('sb-group', 'neo');
     }
 
-    // Absolute magnitude range
+    // Absolute magnitude range using sb-cdata
+    // Format: {"AND":["H|LT|18"]} with pipe-delimited constraints
     const hMin = searchParams.get('h-min');
     const hMax = searchParams.get('h-max');
-    if (hMin) queryParams.append('sb-h-min', hMin);
-    if (hMax) queryParams.append('sb-h-max', hMax);
+
+    if (hMin || hMax) {
+      const constraints: string[] = [];
+
+      if (hMin && hMax) {
+        // Range constraint: H|RG|min|max
+        constraints.push(`H|RG|${hMin}|${hMax}`);
+      } else if (hMax) {
+        // Less than constraint: H|LT|max
+        constraints.push(`H|LT|${hMax}`);
+      } else if (hMin) {
+        // Greater than constraint: H|GT|min
+        constraints.push(`H|GT|${hMin}`);
+      }
+
+      if (constraints.length > 0) {
+        queryParams.append('sb-cdata', JSON.stringify({ AND: constraints }));
+      }
+    }
 
     // Limit
     const limit = searchParams.get('limit') || '100';
