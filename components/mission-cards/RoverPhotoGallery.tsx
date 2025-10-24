@@ -347,35 +347,31 @@ export function RoverPhotoGallery({
 
       {/* Photo Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <AnimatePresence mode="wait">
-          {displayedPhotos.map((photo, index) => (
-            <motion.div
-              key={`${photo.id}-${currentPage}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group"
-              onClick={() => setSelectedPhoto(photo)}
-            >
-              <img
-                src={photo.img_src}
-                alt={`Mars ${rover} - Sol ${photo.sol}`}
-                className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                loading="lazy"
-                onError={(e) => {
-                  console.error(`Failed to load image: ${photo.img_src}`);
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className="text-xs text-white">Sol {photo.sol}</p>
-                  <p className="text-xs text-gray-300">{photo.camera.name}</p>
-                </div>
+        {displayedPhotos.map((photo, index) => (
+          <motion.div
+            key={`page${currentPage}-photo${photo.id}`}
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.2, delay: index * 0.03 }}
+            className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group"
+            onClick={() => setSelectedPhoto(photo)}
+          >
+            <img
+              src={photo.img_src}
+              alt={`Mars ${rover} - Sol ${photo.sol}`}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              onError={(e) => {
+                console.error(`Failed to load image: ${photo.img_src}`);
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 p-2">
+                <p className="text-xs text-white">Sol {photo.sol}</p>
+                <p className="text-xs text-gray-300">{photo.camera.name}</p>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+          </motion.div>
+        ))}
       </div>
 
       {/* Full Screen Modal */}
