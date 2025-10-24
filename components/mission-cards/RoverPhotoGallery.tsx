@@ -229,9 +229,11 @@ export function RoverPhotoGallery({
     if (photos.length > 0) {
       const startIdx = currentPage * limit;
       const endIdx = startIdx + limit;
-      setDisplayedPhotos(photos.slice(startIdx, endIdx));
+      const sliced = photos.slice(startIdx, endIdx);
+      console.log(`[${rover}] Pagination: page=${currentPage}, limit=${limit}, total=${photos.length}, displaying=${sliced.length}, range=[${startIdx},${endIdx}]`);
+      setDisplayedPhotos(sliced);
     }
-  }, [photos, currentPage, limit]);
+  }, [photos, currentPage, limit, rover]);
 
   const rotatePhotos = () => {
     setCurrentPage((prev) => {
@@ -346,14 +348,13 @@ export function RoverPhotoGallery({
       </div>
 
       {/* Photo Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div key={`grid-page-${currentPage}`} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {console.log(`[${rover}] RENDERING ${displayedPhotos.length} photos in grid`)}
         {displayedPhotos.map((photo, index) => (
-          <motion.div
-            key={`page${currentPage}-photo${photo.id}`}
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.2, delay: index * 0.03 }}
-            className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group"
+          <div
+            key={`${photo.id}-${photo.sol}`}
+            className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group animate-fade-in"
+            style={{ animationDelay: `${index * 30}ms` }}
             onClick={() => setSelectedPhoto(photo)}
           >
             <img
@@ -370,7 +371,7 @@ export function RoverPhotoGallery({
                 <p className="text-xs text-gray-300">{photo.camera.name}</p>
               </div>
             </div>
-          </motion.div>
+          </div>
         ))}
       </div>
 
