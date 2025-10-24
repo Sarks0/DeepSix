@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getApiKey } from '@/lib/api/config';
 import { calculateSol, formatSolDisplay, getSolMilestone } from '@/lib/utils/mars-sol';
 
 type RoverName = 'perseverance' | 'curiosity' | 'opportunity' | 'spirit';
@@ -185,8 +184,8 @@ function getRoverMetadata(rover: RoverName): {
 }
 
 /**
- * Fetch latest photos for Perseverance using Mars.nasa.gov RSS API
- * This provides raw rover camera images directly from the mission
+ * Fetch Perseverance photos using official NASA Mars 2020 RSS API
+ * This provides raw rover camera images directly from the Mars 2020 mission
  */
 async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]> {
   const cacheKey = `perseverance-rss-${limit}`;
@@ -196,33 +195,38 @@ async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]
   try {
     trackApiCall();
     const url = `https://mars.nasa.gov/rss/api/?feed=raw_images&category=mars2020&feedtype=json&num=${limit}`;
-    console.log(`Fetching Perseverance photos from Mars.nasa.gov RSS API`);
+    console.log(`Fetching Perseverance photos from official NASA Mars 2020 RSS API`);
 
     const response = await fetch(url);
     if (!response.ok) {
-      console.error(`Mars RSS API error: ${response.status} ${response.statusText}`);
+      console.error(`NASA Mars 2020 RSS API error: ${response.status} ${response.statusText}`);
       return [];
     }
 
     const data: MarsRSSResponse = await response.json();
     const roverMetadata = getRoverMetadata('perseverance');
 
-    // Transform RSS format to RoverPhoto format
+    if (!data.images || data.images.length === 0) {
+      console.warn(`No photos returned from Mars 2020 RSS API`);
+      return [];
+    }
+
+    // Transform RSS format to RoverPhoto format (same as Curiosity MSL API format)
     const photos: RoverPhoto[] = data.images.map((img, index) => ({
       id: parseInt(img.imageid.replace(/[^\d]/g, '').slice(0, 10)) || index,
       sol: img.sol,
       camera: {
         id: index,
         name: img.camera.instrument,
-        rover_id: 5,
+        rover_id: roverMetadata.id,
         full_name: `${img.camera.instrument} - ${img.camera.filter_name}`
       },
       img_src: img.image_files.large || img.image_files.medium,
       earth_date: img.date_taken_utc.split('T')[0],
       rover: roverMetadata
-    }));
+    })).filter((photo: RoverPhoto) => photo.img_src);
 
-    console.log(`✓ Fetched ${photos.length} Perseverance photos from RSS API`);
+    console.log(`✓ Fetched ${photos.length} Perseverance photos from RSS API (Sol ${photos[0]?.sol})`);
     setCache(cacheKey, photos);
     return photos;
   } catch (error) {
@@ -232,7 +236,59 @@ async function fetchPerseverancePhotos(limit: number = 50): Promise<RoverPhoto[]
 }
 
 /**
- * Fetch photos for Curiosity, Opportunity, or Spirit using NASA Images API
+ * Fetch Curiosity photos using official NASA MSL Raw Images API
+ * This is the official NASA API for Curiosity raw rover images
+ */
+async function fetchCuriosityPhotos(limit: number = 50): Promise<RoverPhoto[]> {
+  const cacheKey = `curiosity-msl-api-${limit}`;
+  const cached = getFromCache<RoverPhoto[]>(cacheKey);
+  if (cached) return cached;
+
+  try {
+    trackApiCall();
+    const url = `https://mars.nasa.gov/api/v1/raw_image_items/?order=sol+desc%2Cinstrument_sort+asc%2Csample_type_sort+asc%2Cdate_taken+desc&per_page=${limit}&page=0&mission=msl`;
+    console.log(`Fetching Curiosity photos from official NASA MSL API`);
+
+    const response = await fetch(url);
+    if (!response.ok) {
+      console.error(`NASA MSL API error: ${response.status} ${response.statusText}`);
+      return [];
+    }
+
+    const data = await response.json();
+    const roverMetadata = getRoverMetadata('curiosity');
+
+    if (!data.items || data.items.length === 0) {
+      console.warn(`No photos returned from MSL API`);
+      return [];
+    }
+
+    // Transform MSL API format to RoverPhoto format
+    const photos: RoverPhoto[] = data.items.map((item: any, index: number) => ({
+      id: item.id || index,
+      sol: item.sol || 0,
+      camera: {
+        id: index,
+        name: item.instrument || 'UNKNOWN',
+        rover_id: roverMetadata.id,
+        full_name: item.title || item.instrument || 'Unknown Camera'
+      },
+      img_src: item.https_url || item.url || '',
+      earth_date: item.date_taken ? item.date_taken.split('T')[0] : new Date().toISOString().split('T')[0],
+      rover: roverMetadata
+    })).filter((photo: RoverPhoto) => photo.img_src);
+
+    console.log(`✓ Fetched ${photos.length} Curiosity photos from MSL API (Sol ${photos[0]?.sol})`);
+    setCache(cacheKey, photos);
+    return photos;
+  } catch (error) {
+    console.error(`Error fetching Curiosity photos from MSL API:`, error);
+    return [];
+  }
+}
+
+/**
+ * Fetch photos for Opportunity or Spirit using NASA Images API
  * Since the Mars Photos API is retired, we use curated mission photos
  */
 async function fetchRoverPhotosFromImagesAPI(
@@ -307,8 +363,11 @@ async function fetchLatestPhotos(
   if (rover === 'perseverance') {
     // Use Mars.nasa.gov RSS API for raw rover images
     return fetchPerseverancePhotos(limit);
+  } else if (rover === 'curiosity') {
+    // Use official NASA MSL Raw Images API for Curiosity
+    return fetchCuriosityPhotos(limit);
   } else {
-    // Use NASA Images API for curated mission photos
+    // Use NASA Images API for curated mission photos (Opportunity, Spirit)
     // (Mars Photos API retired October 8, 2025)
     return fetchRoverPhotosFromImagesAPI(rover, limit);
   }
@@ -324,7 +383,6 @@ export async function GET(
 
     // Parse query parameters
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
-    const latest = searchParams.get('latest') === 'true';
 
     // Validate rover name
     if (!isValidRover(rover)) {
@@ -348,11 +406,17 @@ export async function GET(
     }
 
     let photos: RoverPhoto[] = [];
-    let metadata: any = {
+    const metadata: any = {
       type: 'latest',
-      api_source: rover === 'perseverance' ? 'Mars.nasa.gov RSS API' : 'NASA Images API',
+      api_source: rover === 'perseverance'
+        ? 'NASA Mars 2020 Raw Images API'
+        : rover === 'curiosity'
+        ? 'NASA MSL Raw Images API'
+        : 'NASA Images API',
       note: rover === 'perseverance'
-        ? 'Raw rover camera images from Mars.nasa.gov RSS feed'
+        ? 'Raw rover camera images from official NASA Mars 2020 API at mars.nasa.gov'
+        : rover === 'curiosity'
+        ? 'Raw rover camera images from official NASA MSL API at mars.nasa.gov'
         : 'The NASA Mars Photos API was retired on October 8, 2025. Showing curated mission photos from NASA Images API.'
     };
 
@@ -391,7 +455,9 @@ export async function GET(
       console.warn(`No photos found for ${rover}.`);
       metadata.warning = `No photos available. ${
         rover === 'perseverance'
-          ? 'The Mars.nasa.gov RSS API may be temporarily unavailable.'
+          ? 'The NASA Mars 2020 Raw Images API may be temporarily unavailable.'
+          : rover === 'curiosity'
+          ? 'The NASA MSL Raw Images API may be temporarily unavailable.'
           : 'Limited photos available from NASA Images API for legacy rovers.'
       }`;
     }

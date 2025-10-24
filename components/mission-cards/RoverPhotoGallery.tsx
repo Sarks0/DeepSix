@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { GallerySkeleton } from '@/components/ui/loading-skeleton';
 import { imageCache } from '@/lib/services/image-cache';
 
@@ -65,7 +64,7 @@ export function RoverPhotoGallery({
 
   const loadCachedPhotos = useCallback(async () => {
     try {
-      const cachedImages = await imageCache.getCachedImagesByRover(rover, 200);
+      const cachedImages = await imageCache.getCachedImagesByRover(rover, 50);
       if (cachedImages.length > 0) {
         const cachedPhotos = cachedImages.map(img => {
           // Reconstruct photo object from cached data
@@ -117,18 +116,22 @@ export function RoverPhotoGallery({
   }, [rover]);
 
   const fetchLatestPhotos = useCallback(async (forceRefresh = false) => {
-    // Prevent too frequent fetches (minimum 1 hour between fetches for better caching)
     const now = Date.now();
-    if (!forceRefresh && now - lastFetchTime.current < 60 * 60 * 1000) {
-      console.log('Skipping fetch - too soon since last fetch');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
-    // Load cached photos first for instant display
+    // Load cached photos first for instant display (skip if forcing refresh)
     if (!forceRefresh) {
+      // Prevent too frequent fetches (minimum 1 hour between fetches for better caching)
+      if (now - lastFetchTime.current < 60 * 60 * 1000) {
+        console.log('Skipping fetch - too soon since last fetch');
+        const hasCached = await loadCachedPhotos();
+        if (hasCached) {
+          setLoading(false);
+          return;
+        }
+      }
+
       const hasCached = await loadCachedPhotos();
       if (hasCached && !isOnline) {
         setLoading(false);
@@ -137,8 +140,8 @@ export function RoverPhotoGallery({
     }
 
     try {
-      // Fetch latest photos from API with extended range
-      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=200`);
+      // Fetch latest photos from API
+      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=50`);
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -226,9 +229,10 @@ export function RoverPhotoGallery({
     if (photos.length > 0) {
       const startIdx = currentPage * limit;
       const endIdx = startIdx + limit;
-      setDisplayedPhotos(photos.slice(startIdx, endIdx));
+      const sliced = photos.slice(startIdx, endIdx);
+      setDisplayedPhotos(sliced);
     }
-  }, [photos, currentPage, limit]);
+  }, [photos, currentPage, limit, rover]);
 
   const rotatePhotos = () => {
     setCurrentPage((prev) => {
@@ -343,35 +347,30 @@ export function RoverPhotoGallery({
       </div>
 
       {/* Photo Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-        <AnimatePresence mode="wait">
-          {displayedPhotos.map((photo, index) => (
-            <motion.div
-              key={`${photo.id}-${currentPage}`}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.8 }}
-              transition={{ duration: 0.3, delay: index * 0.05 }}
-              className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group"
-              onClick={() => setSelectedPhoto(photo)}
-            >
-              <Image
-                src={photo.img_src}
-                alt={`Mars ${rover} - Sol ${photo.sol}`}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                loading="lazy"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
-                <div className="absolute bottom-0 left-0 right-0 p-2">
-                  <p className="text-xs text-white">Sol {photo.sol}</p>
-                  <p className="text-xs text-gray-300">{photo.camera.name}</p>
-                </div>
+      <div key={`grid-page-${currentPage}`} className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+        {displayedPhotos.map((photo, index) => (
+          <div
+            key={`${photo.id}-${photo.sol}`}
+            className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group animate-fade-in"
+            style={{ animationDelay: `${index * 30}ms` }}
+            onClick={() => setSelectedPhoto(photo)}
+          >
+            <img
+              src={photo.img_src}
+              alt={`Mars ${rover} - Sol ${photo.sol}`}
+              className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+              onError={() => {
+                console.error(`Failed to load image: ${photo.img_src}`);
+              }}
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="absolute bottom-0 left-0 right-0 p-2">
+                <p className="text-xs text-white">Sol {photo.sol}</p>
+                <p className="text-xs text-gray-300">{photo.camera.name}</p>
               </div>
-            </motion.div>
-          ))}
-        </AnimatePresence>
+            </div>
+          </div>
+        ))}
       </div>
 
       {/* Full Screen Modal */}
@@ -391,13 +390,10 @@ export function RoverPhotoGallery({
               className="relative max-w-5xl max-h-[90vh] w-full h-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
+              <img
                 src={selectedPhoto.img_src}
                 alt={`Mars ${rover} - Sol ${selectedPhoto.sol}`}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
+                className="absolute inset-0 w-full h-full object-contain"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h3 className="text-lg font-semibold text-white">
