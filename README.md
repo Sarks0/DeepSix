@@ -51,7 +51,7 @@
 
 A comprehensive real-time dashboard for tracking **15+ NASA deep space missions** across the solar system and beyond. DeepSix provides live mission data, spacecraft telemetry, Mars sol cycle monitoring, and real-time position tracking using NASA's official APIs.
 
-> **Note:** This is an active hobby project with continuous improvements and new features being added regularly. More data sources and mission coverage coming soon!
+> **Work in Progress** - This project is actively under development and may contain bugs or incomplete features. Data may not always be available or accurate. We appreciate your patience as we continue to improve DeepSix.
 
 ---
 
