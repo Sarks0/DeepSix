@@ -77,8 +77,8 @@ export async function GET(request: NextRequest) {
     const limit = searchParams.get('limit') || '100';
     queryParams.append('limit', limit);
 
-    // Fields to return (no hyphens allowed in field names)
-    queryParams.append('fields', 'full_name,H,diameter,neo,pha,class');
+    // Fields to return (using pdes for permanent designation identifier)
+    queryParams.append('fields', 'pdes,full_name,H,diameter,neo,pha,class');
 
     const sbdbQueryUrl = `https://ssd-api.jpl.nasa.gov/sbdb_query.api?${queryParams.toString()}`;
 
@@ -110,11 +110,9 @@ export async function GET(request: NextRequest) {
         obj[field] = row[index];
       });
 
-      // Parse designation from full_name (e.g., "     1 Ceres (A801 AA)")
-      const fullName = obj.full_name || '';
-      // Extract designation (first part before any parentheses or spaces)
-      const designationMatch = fullName.trim().match(/^(\d+\s+\S+)|^(\S+)/);
-      const designation = designationMatch ? designationMatch[0].trim() : fullName.trim();
+      // Use pdes (primary designation) as the permanent identifier
+      const designation = obj.pdes || '';
+      const fullName = obj.full_name || designation;
 
       const isNEO = obj.neo === 'Y' || obj.neo === 'y';
       const isPHA = obj.pha === 'Y' || obj.pha === 'y';
