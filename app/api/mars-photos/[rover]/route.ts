@@ -271,7 +271,7 @@ async function fetchCuriosityPhotos(limit: number = 50): Promise<RoverPhoto[]> {
       img_src: item.https_url || item.url || '',
       earth_date: item.date_taken ? item.date_taken.split('T')[0] : new Date().toISOString().split('T')[0],
       rover: roverMetadata
-    })).filter(photo => photo.img_src);
+    })).filter((photo: RoverPhoto) => photo.img_src);
 
     console.log(`✓ Fetched ${photos.length} Curiosity photos from MSL API (Sol ${photos[0]?.sol})`);
     setCache(cacheKey, photos);
@@ -378,7 +378,6 @@ export async function GET(
 
     // Parse query parameters
     const limit = searchParams.get('limit') ? parseInt(searchParams.get('limit')!) : 50;
-    const latest = searchParams.get('latest') === 'true';
 
     // Validate rover name
     if (!isValidRover(rover)) {
@@ -402,7 +401,7 @@ export async function GET(
     }
 
     let photos: RoverPhoto[] = [];
-    let metadata: any = {
+    const metadata: any = {
       type: 'latest',
       api_source: rover === 'perseverance'
         ? 'Mars.nasa.gov RSS API'
