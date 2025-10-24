@@ -1,4 +1,5 @@
 import { Metadata } from 'next';
+import { ScoutTracker } from '@/components/asteroids/ScoutTracker';
 import { SentryMonitor } from '@/components/asteroids/SentryMonitor';
 import { NHATSList } from '@/components/asteroids/NHATSList';
 import { CloseApproachFeed } from '@/components/asteroids/CloseApproachCard';
@@ -25,6 +26,10 @@ export default function AsteroidsPage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 text-sm">
             <div className="flex items-center px-4 py-2 bg-gray-800/50 rounded-full border border-gray-700/50">
+              <span className="w-2 h-2 bg-green-400 rounded-full mr-2 animate-pulse"></span>
+              <span className="text-gray-300">Scout New Discoveries</span>
+            </div>
+            <div className="flex items-center px-4 py-2 bg-gray-800/50 rounded-full border border-gray-700/50">
               <span className="w-2 h-2 bg-orange-400 rounded-full mr-2"></span>
               <span className="text-gray-300">Sentry Impact Monitoring</span>
             </div>
@@ -46,6 +51,11 @@ export default function AsteroidsPage() {
             </div>
           </div>
         </div>
+
+        {/* Scout: Newly Discovered Objects */}
+        <section className="mb-12">
+          <ScoutTracker />
+        </section>
 
         {/* Sentry Impact Monitoring - Primary Feature */}
         <section className="mb-12">
