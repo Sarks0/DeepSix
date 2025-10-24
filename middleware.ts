@@ -83,19 +83,9 @@ function markSuspicious(ip: string) {
   }
 }
 
-// Generate CSP nonce using Web Crypto API (Edge Runtime compatible)
-function generateNonce(): string {
-  const array = new Uint8Array(16);
-  crypto.getRandomValues(array);
-  return btoa(String.fromCharCode(...array));
-}
-
 export function middleware(request: NextRequest) {
   // Clean up old entries periodically
   cleanupOldEntries();
-
-  // Generate CSP nonce for this request
-  const nonce = generateNonce();
 
   // Check if this is an API route for rate limiting
   const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
@@ -182,29 +172,34 @@ export function middleware(request: NextRequest) {
     response.headers.set('X-RateLimit-Remaining', (maxRequests - record.count).toString());
     response.headers.set('X-RateLimit-Reset', record.resetTime.toString());
 
-    // Add CSP and nonce headers
-    addSecurityHeaders(response, nonce);
+    // Add security headers
+    addSecurityHeaders(response);
 
     return response;
   }
 
   // For non-API routes, just add security headers
   const response = NextResponse.next();
-  addSecurityHeaders(response, nonce);
+  addSecurityHeaders(response);
 
   return response;
 }
 
-// Add security headers including CSP with nonce
-function addSecurityHeaders(response: NextResponse, nonce: string) {
-  // Content Security Policy with nonce
+// Add security headers including CSP
+// Note: CSP uses 'unsafe-inline' because Next.js requires it for hydration
+// Full nonce implementation requires deeper Next.js integration (RSC, Script components)
+// This is a known limitation: https://github.com/vercel/next.js/discussions/54907
+function addSecurityHeaders(response: NextResponse) {
+  // Content Security Policy - balanced security without breaking Next.js
   const cspHeader = [
     "default-src 'self'",
-    `script-src 'self' 'nonce-${nonce}' https://va.vercel-scripts.com`,
-    `style-src 'self' 'nonce-${nonce}'`,
+    // Allow inline scripts for Next.js hydration, but restrict eval
+    "script-src 'self' 'unsafe-inline' https://va.vercel-scripts.com https://vercel.live",
+    // Allow inline styles for Next.js
+    "style-src 'self' 'unsafe-inline'",
     "img-src 'self' data: https: blob:",
     "font-src 'self' data:",
-    "connect-src 'self' https://api.nasa.gov https://mars.nasa.gov https://ssd.jpl.nasa.gov https://eyes.nasa.gov https://images-api.nasa.gov https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+    "connect-src 'self' https://api.nasa.gov https://mars.nasa.gov https://ssd.jpl.nasa.gov https://eyes.nasa.gov https://images-api.nasa.gov https://va.vercel-scripts.com https://vitals.vercel-insights.com https://vercel.live",
     "frame-src 'none'",
     "object-src 'none'",
     "base-uri 'self'",
@@ -214,9 +209,6 @@ function addSecurityHeaders(response: NextResponse, nonce: string) {
   ].join('; ');
 
   response.headers.set('Content-Security-Policy', cspHeader);
-
-  // Make nonce available to the app via custom header
-  response.headers.set('x-nonce', nonce);
 }
 
 export const config = {
