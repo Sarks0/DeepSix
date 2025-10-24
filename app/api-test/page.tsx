@@ -78,18 +78,18 @@ export default function APITestPage() {
           animate={{ opacity: 1, y: 0 }}
           className="bg-gray-900 rounded-lg border border-gray-800 p-6"
         >
-          <h2 className="text-xl font-semibold mb-4 flex items-center">🔑 NASA API Key Status</h2>
+          <h2 className="text-xl font-semibold mb-4 flex items-center">NASA API Key Status</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400">API Key Security</span>
               <span className="text-green-400">
-                ✅ Server-side only
+                Server-side only
               </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-400">APOD Test</span>
               <span className={testResults.apod?.success ? 'text-green-400' : 'text-yellow-400'}>
-                {testResults.apod?.success ? '✅ Working' : '⏳ Testing...'}
+                {testResults.apod?.success ? 'Working' : 'Testing...'}
               </span>
             </div>
             {testResults.apod?.title && (
@@ -125,7 +125,7 @@ export default function APITestPage() {
                       : 'text-green-400'
                 }
               >
-                {photosError ? '❌ Error' : photosLoading ? '⏳ Loading...' : '✅ Working'}
+                {photosError ? 'Error' : photosLoading ? 'Loading...' : 'Working'}
               </span>
             </div>
             {photos && photos.length > 0 && (
@@ -168,7 +168,7 @@ export default function APITestPage() {
                       : 'text-green-400'
                 }
               >
-                {delaysError ? '❌ Error' : delaysLoading ? '⏳ Loading...' : '✅ Working'}
+                {delaysError ? 'Error' : delaysLoading ? 'Loading...' : 'Working'}
               </span>
             </div>
             {delays && delays.length > 0 && (
@@ -196,7 +196,7 @@ export default function APITestPage() {
           transition={{ delay: 0.3 }}
           className="bg-gray-900 rounded-lg border border-gray-800 p-6"
         >
-          <h2 className="text-xl font-semibold mb-4 flex items-center">📊 Mission Statistics</h2>
+          <h2 className="text-xl font-semibold mb-4 flex items-center">Mission Statistics</h2>
           <div className="space-y-2">
             <div className="flex justify-between">
               <span className="text-gray-400">Data Status</span>
@@ -205,7 +205,7 @@ export default function APITestPage() {
                   statsLoading ? 'text-yellow-400' : stats ? 'text-green-400' : 'text-gray-400'
                 }
               >
-                {statsLoading ? '⏳ Loading...' : stats ? '✅ Available' : '⚠️ No Data'}
+                {statsLoading ? 'Loading...' : stats ? 'Available' : 'No Data'}
               </span>
             </div>
             {stats && (
@@ -249,7 +249,7 @@ export default function APITestPage() {
                       : 'text-green-400'
                 }
               >
-                {weatherError ? '⚠️ Deprecated' : weatherLoading ? '⏳ Loading...' : '✅ Working'}
+                {weatherError ? 'Deprecated' : weatherLoading ? 'Loading...' : 'Working'}
               </span>
             </div>
             {weatherData && weatherData.length > 0 && (
@@ -273,22 +273,22 @@ export default function APITestPage() {
           transition={{ delay: 0.5 }}
           className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-lg border border-gray-700 p-6 lg:col-span-2"
         >
-          <h2 className="text-xl font-semibold mb-4">📋 API Integration Summary</h2>
+          <h2 className="text-xl font-semibold mb-4">API Integration Summary</h2>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
             <div className="text-center">
-              <div className="text-2xl mb-1">✅</div>
+              <div className="text-2xl mb-1 text-green-400">OK</div>
               <div className="text-sm text-gray-400">NASA API Key</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl mb-1">{photos && photos.length > 0 ? '✅' : '⏳'}</div>
+              <div className={`text-2xl mb-1 ${photos && photos.length > 0 ? 'text-green-400' : 'text-yellow-400'}`}>{photos && photos.length > 0 ? 'OK' : '...'}</div>
               <div className="text-sm text-gray-400">Mars Photos</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl mb-1">{delays && delays.length > 0 ? '✅' : '⚠️'}</div>
+              <div className={`text-2xl mb-1 ${delays && delays.length > 0 ? 'text-green-400' : 'text-yellow-400'}`}>{delays && delays.length > 0 ? 'OK' : '!'}</div>
               <div className="text-sm text-gray-400">JPL Horizons</div>
             </div>
             <div className="text-center">
-              <div className="text-2xl mb-1">⚠️</div>
+              <div className="text-2xl mb-1 text-yellow-400">!</div>
               <div className="text-sm text-gray-400">Mars Weather</div>
             </div>
           </div>

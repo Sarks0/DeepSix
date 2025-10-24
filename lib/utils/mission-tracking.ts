@@ -445,31 +445,31 @@ export function getMissionMilestone(missionName: string, missionData: MissionDat
   
   // Voyager milestones
   if (missionName.includes('voyager')) {
-    if (years === 40) return '40 Years in Space! 🚀';
-    if (years === 45) return '45 Years of Exploration! ⭐';
-    if (years === 50) return 'Half a Century in Space! 🎉';
+    if (years === 40) return '40 Years in Space!';
+    if (years === 45) return '45 Years of Exploration!';
+    if (years === 50) return 'Half a Century in Space!';
     if (missionData.currentDistance && missionData.currentDistance > 150) {
-      return 'Beyond 150 AU! 🌌';
+      return 'Beyond 150 AU!';
     }
     if (missionData.currentDistance && missionData.currentDistance > 200) {
-      return 'Interstellar Pioneer! 🌟';
+      return 'Interstellar Pioneer!';
     }
   }
 
   // Parker Solar Probe milestones
   if (missionName === 'parker') {
-    if (missionData.keyMetric.value === 10) return '10 Solar Encounters! ☀️';
-    if (missionData.keyMetric.value === 20) return '20 Perihelion Passes! 🔥';
-    if (missionData.keyMetric.value === 24) return 'Mission Complete! 🏆';
+    if (missionData.keyMetric.value === 10) return '10 Solar Encounters!';
+    if (missionData.keyMetric.value === 20) return '20 Perihelion Passes!';
+    if (missionData.keyMetric.value === 24) return 'Mission Complete!';
   }
 
   // New Horizons milestones
   if (missionName === 'newhorizons') {
     if (missionData.currentDistance && missionData.currentDistance > 50) {
-      return '50 AU from Earth! 🛸';
+      return '50 AU from Earth!';
     }
     if (missionData.currentDistance && missionData.currentDistance > 60) {
-      return 'Deep in the Kuiper Belt! ❄️';
+      return 'Deep in the Kuiper Belt!';
     }
   }
 

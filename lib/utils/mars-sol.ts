@@ -186,12 +186,12 @@ export function formatSolDisplay(solData: SolData): {
  * Get milestone text for significant sols
  */
 export function getSolMilestone(sol: number): string | null {
-  if (sol === 100) return '100 Sols on Mars! 🎉';
-  if (sol === 365) return 'One Earth Year on Mars! 🌍';
-  if (sol === 500) return '500 Sols Milestone! ⭐';
-  if (sol === 668) return 'One Martian Year! 🔴';
-  if (sol === 1000) return '1000 Sols on Mars! 🚀';
-  if (sol % 1000 === 0 && sol > 1000) return `${sol} Sols Milestone! 🏆`;
+  if (sol === 100) return '100 Sols on Mars!';
+  if (sol === 365) return 'One Earth Year on Mars!';
+  if (sol === 500) return '500 Sols Milestone!';
+  if (sol === 668) return 'One Martian Year!';
+  if (sol === 1000) return '1000 Sols on Mars!';
+  if (sol % 1000 === 0 && sol > 1000) return `${sol} Sols Milestone!`;
   if (sol % 500 === 0 && sol > 500) return `${sol} Sols on Mars!`;
   return null;
 }

@@ -27,10 +27,10 @@ export default function LiveDataPage() {
       >
         <div className="flex flex-wrap gap-3">
           <Link href="/dsn" className="px-4 py-2 bg-blue-600/20 hover:bg-blue-600/30 border border-blue-500/30 rounded-lg text-blue-400 hover:text-blue-300 transition-colors">
-            🛰️ Deep Space Network
+            Deep Space Network
           </Link>
           <Link href="/missions" className="px-4 py-2 bg-purple-600/20 hover:bg-purple-600/30 border border-purple-500/30 rounded-lg text-purple-400 hover:text-purple-300 transition-colors">
-            🚀 Mission Details
+            Mission Details
           </Link>
         </div>
       </motion.div>

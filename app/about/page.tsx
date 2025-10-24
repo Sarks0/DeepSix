@@ -59,10 +59,10 @@ export default function AboutPage() {
         className="mb-8 p-4 bg-yellow-900/20 border border-yellow-600/50 rounded-lg"
       >
         <div className="flex items-start gap-3">
-          <span className="text-2xl">⚠️</span>
+          <span className="text-2xl text-yellow-400">!</span>
           <div>
             <p className="text-lg font-bold text-yellow-400 mb-1">
-              🚧 Work in Progress
+              Work in Progress
             </p>
             <p className="text-sm text-yellow-200/80">
               <strong>This project is actively under development and may contain bugs or incomplete features.</strong> 
