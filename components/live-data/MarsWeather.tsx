@@ -139,9 +139,9 @@ export function MarsWeather() {
         <div>
           <div className="text-xs text-gray-400 uppercase tracking-wider mb-1">Temperature</div>
           <div className="flex justify-between items-center">
-            <span className="text-blue-400 text-sm">❄️ {weather.temperature.min}°C</span>
+            <span className="text-blue-400 text-sm">Low: {weather.temperature.min}°C</span>
             <span className="text-white font-mono">{weather.temperature.avg}°C</span>
-            <span className="text-orange-400 text-sm">🔥 {weather.temperature.max}°C</span>
+            <span className="text-orange-400 text-sm">High: {weather.temperature.max}°C</span>
           </div>
         </div>
 

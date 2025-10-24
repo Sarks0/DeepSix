@@ -60,7 +60,7 @@ export function getApiKey(): string {
     // Use demo key as fallback (rate limited to 30 requests/hour)
     if (!apiKeyUsage.isDemo) {
       console.warn(
-        '⚠️  No NASA API key found in environment variables.\n' +
+        'WARNING: No NASA API key found in environment variables.\n' +
         'Using DEMO_KEY with strict rate limits (30 requests/hour).\n' +
         'Set NASA_API_KEY environment variable (server-side only).\n' +
         'Get a free API key at https://api.nasa.gov for better performance.\n' +
@@ -74,7 +74,7 @@ export function getApiKey(): string {
   // Validate API key format
   if (!validateApiKeyFormat(apiKey)) {
     console.error(
-      '⚠️  Invalid API key format detected.\n' +
+      'WARNING: Invalid API key format detected.\n' +
       'NASA API keys should be 40 character alphanumeric strings.\n' +
       'Falling back to DEMO_KEY.'
     );
@@ -107,7 +107,7 @@ export function getAppUrl(): string {
     new URL(appUrl);
     return appUrl;
   } catch {
-    console.warn('⚠️  Invalid NEXT_PUBLIC_APP_URL format, using default');
+    console.warn('WARNING: Invalid NEXT_PUBLIC_APP_URL format, using default');
     return 'http://localhost:3000';
   }
 }

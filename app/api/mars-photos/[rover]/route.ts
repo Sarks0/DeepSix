@@ -50,7 +50,7 @@ function trackApiCall(): void {
   const now = Date.now();
   // Reset counter every hour
   if (now - lastResetTime > 60 * 60 * 1000) {
-    console.log(`📊 API Usage Stats: ${apiCallCount} calls in last hour`);
+    console.log(`API Usage Stats: ${apiCallCount} calls in last hour`);
     apiCallCount = 0;
     lastResetTime = now;
   }
@@ -398,7 +398,7 @@ export async function GET(
     const responseCacheKey = getCacheKey(rover, searchParams);
     const cachedResponse = getFromCache<any>(responseCacheKey);
     if (cachedResponse) {
-      console.log(`⚡ Returning cached response for ${rover} (API calls saved!)`);
+      console.log(`Returning cached response for ${rover} (API calls saved!)`);
       const headers = new Headers();
       headers.set('Cache-Control', 'public, s-maxage=21600, stale-while-revalidate=43200'); // 6 hours cache
       headers.set('X-Cache', 'HIT');
@@ -463,7 +463,7 @@ export async function GET(
     }
 
     // Log API usage stats
-    console.log(`📊 Current API usage: ${apiCallCount} calls in last hour`);
+    console.log(`Current API usage: ${apiCallCount} calls in last hour`);
 
     // Prepare response
     const responseData = {

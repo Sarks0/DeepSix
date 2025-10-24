@@ -10,6 +10,7 @@ const navItems = [
   { label: 'Missions', href: '/missions' },
   { label: 'Asteroids', href: '/asteroids' },
   { label: 'News', href: '/news' },
+  { label: 'Blog', href: '/blog' },
   { label: 'DSN', href: '/dsn' },
   { label: 'Live Data', href: '/live' },
   { label: 'About', href: '/about' },

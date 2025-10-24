@@ -138,7 +138,7 @@ export class PerformanceMonitor {
     try {
       const result = await fn();
       const duration = this.markEnd(operation);
-      console.log(`⚡ ${operation}: ${duration.toFixed(2)}ms`);
+      console.log(`${operation}: ${duration.toFixed(2)}ms`);
       return result;
     } catch (error) {
       this.markEnd(operation);
