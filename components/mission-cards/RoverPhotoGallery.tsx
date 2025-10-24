@@ -64,7 +64,7 @@ export function RoverPhotoGallery({
 
   const loadCachedPhotos = useCallback(async () => {
     try {
-      const cachedImages = await imageCache.getCachedImagesByRover(rover, 200);
+      const cachedImages = await imageCache.getCachedImagesByRover(rover, 50);
       if (cachedImages.length > 0) {
         const cachedPhotos = cachedImages.map(img => {
           // Reconstruct photo object from cached data
@@ -136,8 +136,8 @@ export function RoverPhotoGallery({
     }
 
     try {
-      // Fetch latest photos from API with extended range
-      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=200`);
+      // Fetch latest photos from API
+      const response = await fetch(`/api/mars-photos/${rover}?latest=true&limit=50`);
 
       if (!response.ok) {
         const errorData = await response.json();
