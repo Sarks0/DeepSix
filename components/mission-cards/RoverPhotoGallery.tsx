@@ -2,7 +2,6 @@
 
 import { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import Image from 'next/image';
 import { GallerySkeleton } from '@/components/ui/loading-skeleton';
 import { imageCache } from '@/lib/services/image-cache';
 
@@ -355,14 +354,11 @@ export function RoverPhotoGallery({
               className="relative aspect-square rounded-lg overflow-hidden bg-gray-800/50 cursor-pointer group"
               onClick={() => setSelectedPhoto(photo)}
             >
-              <Image
+              <img
                 src={photo.img_src}
                 alt={`Mars ${rover} - Sol ${photo.sol}`}
-                fill
-                className="object-cover transition-transform duration-300 group-hover:scale-110"
-                sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                className="absolute inset-0 w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
                 loading="lazy"
-                unoptimized
                 onError={(e) => {
                   console.error(`Failed to load image: ${photo.img_src}`);
                 }}
@@ -395,14 +391,10 @@ export function RoverPhotoGallery({
               className="relative max-w-5xl max-h-[90vh] w-full h-full"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
+              <img
                 src={selectedPhoto.img_src}
                 alt={`Mars ${rover} - Sol ${selectedPhoto.sol}`}
-                fill
-                className="object-contain"
-                sizes="100vw"
-                priority
-                unoptimized
+                className="absolute inset-0 w-full h-full object-contain"
               />
               <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-6">
                 <h3 className="text-lg font-semibold text-white">
