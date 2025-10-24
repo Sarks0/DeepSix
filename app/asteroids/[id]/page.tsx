@@ -52,12 +52,40 @@ interface AsteroidData {
   };
 }
 
+interface RadarObservation {
+  designation: string;
+  epoch: string;
+  value: number;
+  sigma: number;
+  units: string;
+  frequency: number;
+  receiver: number;
+  transmitter: number;
+  bouncePoint: string;
+  receiverName: string;
+  transmitterName: string;
+  measurementType: string;
+  fullName?: string;
+  observer?: string;
+  notes?: string;
+  reference?: string;
+}
+
+interface RadarData {
+  success: boolean;
+  dataSource: string;
+  totalObservations: number;
+  observations: RadarObservation[];
+}
+
 export default function AsteroidDetailPage() {
   const params = useParams();
   const asteroidId = params.id as string;
 
   const [data, setData] = useState<AsteroidData | null>(null);
+  const [radarData, setRadarData] = useState<RadarData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [radarLoading, setRadarLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -78,7 +106,24 @@ export default function AsteroidDetailPage() {
       }
     }
 
+    async function fetchRadarData() {
+      try {
+        const response = await fetch(`/api/asteroids/radar?des=${encodeURIComponent(asteroidId)}&fullname=true&observer=true`);
+        const result = await response.json();
+
+        if (response.ok && result.success && result.totalObservations > 0) {
+          setRadarData(result);
+        }
+      } catch (_err) {
+        // Silently fail - not all asteroids have radar data
+        console.log('No radar data available for this asteroid');
+      } finally {
+        setRadarLoading(false);
+      }
+    }
+
     fetchAsteroidData();
+    fetchRadarData();
   }, [asteroidId]);
 
   if (loading) {
@@ -353,6 +398,101 @@ export default function AsteroidDetailPage() {
             </div>
           </div>
         </motion.section>
+
+        {/* Radar Observations */}
+        {radarData && radarData.totalObservations > 0 && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mb-8"
+          >
+            <div className="bg-gradient-to-br from-green-900/30 to-teal-900/30 backdrop-blur-sm rounded-lg border border-green-800/50 p-6">
+              <div className="flex items-center justify-between mb-4">
+                <h2 className="text-2xl font-bold text-white">Radar Observations</h2>
+                <span className="px-3 py-1 bg-green-600/30 text-green-300 text-sm font-semibold rounded-full">
+                  {radarData.totalObservations} observations
+                </span>
+              </div>
+
+              <div className="mb-4 p-4 bg-teal-900/20 border border-teal-800/50 rounded-lg">
+                <p className="text-teal-200 text-sm">
+                  Radar observations provide precise measurements used to determine shape models, rotation rates, and surface characteristics.
+                  Data from planetary radar systems like Goldstone and Arecibo.
+                </p>
+              </div>
+
+              {/* Recent Observations Summary */}
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                  <p className="text-gray-400 text-sm mb-1">Total Observations</p>
+                  <p className="text-2xl font-bold text-green-400">{radarData.totalObservations}</p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                  <p className="text-gray-400 text-sm mb-1">Latest Observation</p>
+                  <p className="text-lg font-bold text-white">
+                    {new Date(radarData.observations[0].epoch).toLocaleDateString()}
+                  </p>
+                </div>
+                <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                  <p className="text-gray-400 text-sm mb-1">Primary Station</p>
+                  <p className="text-lg font-bold text-cyan-400">
+                    {radarData.observations[0].transmitterName}
+                  </p>
+                </div>
+              </div>
+
+              {/* Observation Details */}
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {radarData.observations.slice(0, 10).map((obs, idx) => (
+                  <div
+                    key={idx}
+                    className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50 hover:border-green-700/50 transition-colors"
+                  >
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-3 text-sm">
+                      <div>
+                        <p className="text-gray-400 mb-1">Date</p>
+                        <p className="text-white font-semibold">{obs.epoch}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 mb-1">Type</p>
+                        <p className="text-white font-semibold">{obs.measurementType}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 mb-1">Station</p>
+                        <p className="text-cyan-400 font-semibold">{obs.transmitterName}</p>
+                      </div>
+                      <div>
+                        <p className="text-gray-400 mb-1">Frequency</p>
+                        <p className="text-white font-semibold">{obs.frequency} MHz</p>
+                      </div>
+                    </div>
+                    {obs.observer && (
+                      <div className="mt-2 pt-2 border-t border-gray-700/50">
+                        <p className="text-gray-400 text-xs">Observer: <span className="text-gray-300">{obs.observer}</span></p>
+                      </div>
+                    )}
+                  </div>
+                ))}
+                {radarData.observations.length > 10 && (
+                  <div className="text-center py-2 text-gray-400 text-sm">
+                    Showing 10 of {radarData.totalObservations} observations
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.section>
+        )}
+
+        {radarLoading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="mb-8 text-center text-gray-500 text-sm"
+          >
+            <p>Loading radar data...</p>
+          </motion.div>
+        )}
 
         {/* Data Source */}
         <div className="text-center text-gray-500 text-sm">

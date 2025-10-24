@@ -5,6 +5,7 @@ import { NHATSList } from '@/components/asteroids/NHATSList';
 import { CloseApproachFeed } from '@/components/asteroids/CloseApproachCard';
 import { FireballMap } from '@/components/asteroids/FireballMap';
 import { AdvancedSearch } from '@/components/asteroids/AdvancedSearch';
+import MissionDesignTool from '@/components/asteroids/MissionDesignTool';
 import Link from 'next/link';
 
 export const metadata: Metadata = {
@@ -47,6 +48,10 @@ export default function AsteroidsPage() {
             </div>
             <div className="flex items-center px-4 py-2 bg-gray-800/50 rounded-full border border-gray-700/50">
               <span className="w-2 h-2 bg-purple-400 rounded-full mr-2"></span>
+              <span className="text-gray-300">Mission Design Tool</span>
+            </div>
+            <div className="flex items-center px-4 py-2 bg-gray-800/50 rounded-full border border-gray-700/50">
+              <span className="w-2 h-2 bg-pink-400 rounded-full mr-2"></span>
               <span className="text-gray-300">Advanced Search</span>
             </div>
           </div>
@@ -65,6 +70,11 @@ export default function AsteroidsPage() {
         {/* NHATS Mission-Accessible Asteroids */}
         <section className="mb-12">
           <NHATSList />
+        </section>
+
+        {/* Mission Design Tool */}
+        <section className="mb-12">
+          <MissionDesignTool />
         </section>
 
         {/* Close Approaches This Week */}
