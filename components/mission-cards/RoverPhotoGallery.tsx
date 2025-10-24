@@ -116,18 +116,22 @@ export function RoverPhotoGallery({
   }, [rover]);
 
   const fetchLatestPhotos = useCallback(async (forceRefresh = false) => {
-    // Prevent too frequent fetches (minimum 1 hour between fetches for better caching)
     const now = Date.now();
-    if (!forceRefresh && now - lastFetchTime.current < 60 * 60 * 1000) {
-      console.log('Skipping fetch - too soon since last fetch');
-      return;
-    }
-
     setLoading(true);
     setError(null);
 
-    // Load cached photos first for instant display
+    // Load cached photos first for instant display (skip if forcing refresh)
     if (!forceRefresh) {
+      // Prevent too frequent fetches (minimum 1 hour between fetches for better caching)
+      if (now - lastFetchTime.current < 60 * 60 * 1000) {
+        console.log('Skipping fetch - too soon since last fetch');
+        const hasCached = await loadCachedPhotos();
+        if (hasCached) {
+          setLoading(false);
+          return;
+        }
+      }
+
       const hasCached = await loadCachedPhotos();
       if (hasCached && !isOnline) {
         setLoading(false);
