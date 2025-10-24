@@ -201,7 +201,9 @@ export function SentryMonitor() {
                   </span>
                 </td>
                 <td className="py-4 px-4 text-center">
-                  <span className="text-white font-medium">{obj.palermoScale.toFixed(2)}</span>
+                  <span className="text-white font-medium">
+                    {typeof obj.palermoScale === 'number' ? obj.palermoScale.toFixed(2) : 'N/A'}
+                  </span>
                 </td>
                 <td className="py-4 px-4 text-center">
                   <span className={`inline-flex px-3 py-1 rounded-full text-xs font-semibold border ${getHazardBadgeColor(obj.hazardColor)}`}>
