@@ -83,98 +83,151 @@ function markSuspicious(ip: string) {
   }
 }
 
+// Generate CSP nonce using Web Crypto API (Edge Runtime compatible)
+function generateNonce(): string {
+  const array = new Uint8Array(16);
+  crypto.getRandomValues(array);
+  return btoa(String.fromCharCode(...array));
+}
+
 export function middleware(request: NextRequest) {
   // Clean up old entries periodically
   cleanupOldEntries();
 
-  // Only apply rate limiting to API routes
-  if (!request.nextUrl.pathname.startsWith('/api/')) {
-    return NextResponse.next();
-  }
+  // Generate CSP nonce for this request
+  const nonce = generateNonce();
 
-  // Get client IP with enhanced detection
-  const ip = getClientIP(request);
+  // Check if this is an API route for rate limiting
+  const isApiRoute = request.nextUrl.pathname.startsWith('/api/');
 
-  // Check if IP is banned due to suspicious activity
-  const banCheck = isIPBanned(ip);
-  if (banCheck.banned) {
-    return new NextResponse(
-      JSON.stringify({
-        error: 'Access temporarily restricted',
-        message: 'Your IP has been temporarily restricted due to suspicious activity. Please try again later.',
-        retryAfter: banCheck.retryAfter,
-      }),
-      {
-        status: 403,
-        headers: {
-          'Content-Type': 'application/json',
-          'Retry-After': banCheck.retryAfter!.toString(),
-        },
-      }
+  // Apply rate limiting only to API routes
+  if (isApiRoute) {
+    // Get client IP with enhanced detection
+    const ip = getClientIP(request);
+
+    // Check if IP is banned due to suspicious activity
+    const banCheck = isIPBanned(ip);
+    if (banCheck.banned) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Access temporarily restricted',
+          message: 'Your IP has been temporarily restricted due to suspicious activity. Please try again later.',
+          retryAfter: banCheck.retryAfter,
+        }),
+        {
+          status: 403,
+          headers: {
+            'Content-Type': 'application/json',
+            'Retry-After': banCheck.retryAfter!.toString(),
+          },
+        }
+      );
+    }
+
+    // Determine rate limit based on endpoint type
+    const isIntensive = INTENSIVE_ENDPOINTS.some(endpoint =>
+      request.nextUrl.pathname.startsWith(endpoint)
     );
+    const maxRequests = isIntensive ? MAX_REQUESTS_INTENSIVE : MAX_REQUESTS;
+
+    const identifier = `${ip}-${request.nextUrl.pathname}`;
+    const now = Date.now();
+
+    // Get or create rate limit record
+    let record = rateLimitMap.get(identifier);
+
+    if (!record || now > record.resetTime) {
+      // Create new record or reset expired one
+      record = {
+        count: 1,
+        resetTime: now + WINDOW_MS,
+        violations: record?.violations || 0,
+      };
+      rateLimitMap.set(identifier, record);
+    } else {
+      // Increment count
+      record.count++;
+    }
+
+    // Check if rate limit exceeded
+    if (record.count > maxRequests) {
+      // Increment violations for suspicious activity tracking
+      record.violations++;
+      markSuspicious(ip);
+
+      const retryAfter = Math.ceil((record.resetTime - now) / 1000);
+
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Too many requests',
+          message: `Rate limit exceeded. Please try again in ${retryAfter} seconds.`,
+          retryAfter,
+        }),
+        {
+          status: 429,
+          headers: {
+            'Content-Type': 'application/json',
+            'X-RateLimit-Limit': maxRequests.toString(),
+            'X-RateLimit-Remaining': '0',
+            'X-RateLimit-Reset': record.resetTime.toString(),
+            'Retry-After': retryAfter.toString(),
+          },
+        }
+      );
+    }
+
+    // Add rate limit headers to response
+    const response = NextResponse.next();
+    response.headers.set('X-RateLimit-Limit', maxRequests.toString());
+    response.headers.set('X-RateLimit-Remaining', (maxRequests - record.count).toString());
+    response.headers.set('X-RateLimit-Reset', record.resetTime.toString());
+
+    // Add CSP and nonce headers
+    addSecurityHeaders(response, nonce);
+
+    return response;
   }
 
-  // Determine rate limit based on endpoint type
-  const isIntensive = INTENSIVE_ENDPOINTS.some(endpoint =>
-    request.nextUrl.pathname.startsWith(endpoint)
-  );
-  const maxRequests = isIntensive ? MAX_REQUESTS_INTENSIVE : MAX_REQUESTS;
-
-  const identifier = `${ip}-${request.nextUrl.pathname}`;
-  const now = Date.now();
-
-  // Get or create rate limit record
-  let record = rateLimitMap.get(identifier);
-
-  if (!record || now > record.resetTime) {
-    // Create new record or reset expired one
-    record = {
-      count: 1,
-      resetTime: now + WINDOW_MS,
-      violations: record?.violations || 0,
-    };
-    rateLimitMap.set(identifier, record);
-  } else {
-    // Increment count
-    record.count++;
-  }
-
-  // Check if rate limit exceeded
-  if (record.count > maxRequests) {
-    // Increment violations for suspicious activity tracking
-    record.violations++;
-    markSuspicious(ip);
-
-    const retryAfter = Math.ceil((record.resetTime - now) / 1000);
-
-    return new NextResponse(
-      JSON.stringify({
-        error: 'Too many requests',
-        message: `Rate limit exceeded. Please try again in ${retryAfter} seconds.`,
-        retryAfter,
-      }),
-      {
-        status: 429,
-        headers: {
-          'Content-Type': 'application/json',
-          'X-RateLimit-Limit': maxRequests.toString(),
-          'X-RateLimit-Remaining': '0',
-          'X-RateLimit-Reset': record.resetTime.toString(),
-          'Retry-After': retryAfter.toString(),
-        },
-      }
-    );
-  }
-
-  // Add rate limit headers to response
+  // For non-API routes, just add security headers
   const response = NextResponse.next();
-  response.headers.set('X-RateLimit-Limit', maxRequests.toString());
-  response.headers.set('X-RateLimit-Remaining', (maxRequests - record.count).toString());
-  response.headers.set('X-RateLimit-Reset', record.resetTime.toString());
+  addSecurityHeaders(response, nonce);
 
   return response;
 }
 
+// Add security headers including CSP with nonce
+function addSecurityHeaders(response: NextResponse, nonce: string) {
+  // Content Security Policy with nonce
+  const cspHeader = [
+    "default-src 'self'",
+    `script-src 'self' 'nonce-${nonce}' https://va.vercel-scripts.com`,
+    `style-src 'self' 'nonce-${nonce}'`,
+    "img-src 'self' data: https: blob:",
+    "font-src 'self' data:",
+    "connect-src 'self' https://api.nasa.gov https://mars.nasa.gov https://ssd.jpl.nasa.gov https://eyes.nasa.gov https://images-api.nasa.gov https://va.vercel-scripts.com https://vitals.vercel-insights.com",
+    "frame-src 'none'",
+    "object-src 'none'",
+    "base-uri 'self'",
+    "form-action 'self'",
+    "frame-ancestors 'none'",
+    "upgrade-insecure-requests"
+  ].join('; ');
+
+  response.headers.set('Content-Security-Policy', cspHeader);
+
+  // Make nonce available to the app via custom header
+  response.headers.set('x-nonce', nonce);
+}
+
 export const config = {
-  matcher: '/api/:path*',
+  matcher: [
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder files
+     */
+    '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
+  ],
 };
