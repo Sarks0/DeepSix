@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface Asteroid {
   id: string;
@@ -172,9 +173,13 @@ export function CloseApproachFeed() {
           >
             {/* Header with Hazard Badge */}
             <div className="flex items-start justify-between mb-3">
-              <h3 className="text-sm font-bold text-white truncate pr-2" title={asteroid.name}>
+              <Link
+                href={`/asteroids/${encodeURIComponent(asteroid.id)}`}
+                className="text-sm font-bold text-white hover:text-cyan-400 transition-colors truncate pr-2"
+                title={asteroid.name}
+              >
                 {asteroid.name}
-              </h3>
+              </Link>
               {asteroid.isPotentiallyHazardous && (
                 <span className="flex-shrink-0 px-2 py-0.5 rounded-full text-xs font-bold bg-orange-500/20 text-orange-400 border border-orange-500/50">
                   PHA

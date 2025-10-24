@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface SentryObject {
   designation: string;
@@ -182,7 +183,12 @@ export function SentryMonitor() {
                 className="border-b border-gray-800 hover:bg-gray-800/30 transition-colors"
               >
                 <td className="py-4 px-4">
-                  <p className="font-semibold text-white">{obj.fullName}</p>
+                  <Link
+                    href={`/asteroids/${encodeURIComponent(obj.designation)}`}
+                    className="font-semibold text-white hover:text-cyan-400 transition-colors"
+                  >
+                    {obj.fullName}
+                  </Link>
                   <p className="text-xs text-gray-500">Last obs: {obj.lastObservation}</p>
                 </td>
                 <td className="py-4 px-4">

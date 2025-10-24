@@ -142,9 +142,14 @@ export function NHATSList() {
             className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50 hover:border-cyan-500/50 transition-all"
           >
             {/* Asteroid Name */}
-            <h3 className="text-lg font-bold text-white mb-2 truncate" title={obj.fullName}>
-              {obj.fullName}
-            </h3>
+            <Link
+              href={`/asteroids/${encodeURIComponent(obj.designation)}`}
+              className="block mb-2"
+            >
+              <h3 className="text-lg font-bold text-white hover:text-cyan-400 transition-colors truncate" title={obj.fullName}>
+                {obj.fullName}
+              </h3>
+            </Link>
 
             {/* Accessibility Rating Badge */}
             <div className="mb-3">
