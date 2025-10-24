@@ -181,14 +181,20 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
         {/* Article Content */}
         <div
-          className="prose prose-invert max-w-none
+          className="prose prose-invert prose-lg max-w-none
+
+            /* Base prose spacing */
+            [&>*]:mb-6 [&>*:last-child]:mb-0
 
             /* Headings */
             prose-headings:font-bold prose-headings:tracking-tight prose-headings:scroll-mt-20
-            prose-h2:text-3xl prose-h2:mt-12 prose-h2:mb-6 prose-h2:pb-2 prose-h2:border-b prose-h2:border-gray-800
+            prose-h1:text-4xl prose-h1:mt-0 prose-h1:mb-8 prose-h1:text-white
+            prose-h2:text-3xl prose-h2:mt-16 prose-h2:mb-6 prose-h2:pb-3 prose-h2:border-b prose-h2:border-gray-800
             prose-h2:bg-gradient-to-r prose-h2:from-blue-400 prose-h2:to-purple-500 prose-h2:bg-clip-text prose-h2:text-transparent
-            prose-h3:text-2xl prose-h3:mt-10 prose-h3:mb-4 prose-h3:text-gray-200
-            prose-h4:text-xl prose-h4:mt-8 prose-h4:mb-3 prose-h4:text-gray-300
+            prose-h3:text-2xl prose-h3:mt-12 prose-h3:mb-5 prose-h3:text-gray-200
+            prose-h4:text-xl prose-h4:mt-10 prose-h4:mb-4 prose-h4:text-gray-300
+            prose-h5:text-lg prose-h5:mt-8 prose-h5:mb-3 prose-h5:text-gray-400
+            prose-h6:text-base prose-h6:mt-6 prose-h6:mb-2 prose-h6:text-gray-400
 
             /* Paragraphs */
             prose-p:text-gray-300 prose-p:leading-[1.8] prose-p:mb-6 prose-p:text-base
@@ -197,8 +203,9 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             prose-a:text-blue-400 prose-a:no-underline prose-a:font-medium prose-a:transition-colors
             hover:prose-a:text-blue-300 hover:prose-a:underline hover:prose-a:decoration-blue-400/50
 
-            /* Strong */
+            /* Strong & Em */
             prose-strong:text-white prose-strong:font-semibold
+            prose-em:text-gray-300 prose-em:italic
 
             /* Code */
             prose-code:text-purple-400 prose-code:bg-gray-900/70 prose-code:px-2 prose-code:py-1
@@ -207,7 +214,7 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
 
             /* Pre/Code Blocks */
             prose-pre:bg-gray-950/50 prose-pre:border prose-pre:border-gray-800 prose-pre:rounded-xl
-            prose-pre:p-6 prose-pre:my-8 prose-pre:overflow-x-auto prose-pre:shadow-xl
+            prose-pre:p-6 prose-pre:my-10 prose-pre:overflow-x-auto prose-pre:shadow-xl
             prose-pre:shadow-blue-500/5 prose-pre:backdrop-blur-sm
 
             /* Blockquotes */
@@ -217,24 +224,34 @@ export default async function BlogPostPage({ params }: BlogPostPageProps) {
             prose-blockquote:rounded-r-lg prose-blockquote:font-normal
 
             /* Lists */
-            prose-ul:my-6 prose-ul:text-gray-300 prose-ul:list-disc prose-ul:pl-6
-            prose-ol:my-6 prose-ol:text-gray-300 prose-ol:list-decimal prose-ol:pl-6
-            prose-li:my-2 prose-li:leading-relaxed prose-li:text-gray-300
+            prose-ul:my-8 prose-ul:text-gray-300 prose-ul:list-disc prose-ul:pl-6 prose-ul:space-y-3
+            prose-ol:my-8 prose-ol:text-gray-300 prose-ol:list-decimal prose-ol:pl-6 prose-ol:space-y-3
+            prose-li:my-0 prose-li:leading-relaxed prose-li:text-gray-300
             prose-li:marker:text-blue-400
+
+            /* Nested lists */
+            [&_ul_ul]:mt-3 [&_ul_ul]:mb-0
+            [&_ol_ol]:mt-3 [&_ol_ol]:mb-0
+            [&_ul_li]:my-1.5
+            [&_ol_li]:my-1.5
 
             /* Images */
             prose-img:rounded-lg prose-img:border prose-img:border-gray-800
-            prose-img:my-8 prose-img:shadow-2xl prose-img:shadow-blue-500/10
+            prose-img:my-10 prose-img:shadow-2xl prose-img:shadow-blue-500/10
 
             /* Horizontal Rules */
             prose-hr:border-gray-800 prose-hr:my-12 prose-hr:border-t-2
 
             /* Tables */
-            prose-table:border-collapse prose-table:w-full prose-table:my-8
+            prose-table:border-collapse prose-table:w-full prose-table:my-10
             prose-thead:border-b-2 prose-thead:border-gray-700
             prose-th:px-4 prose-th:py-3 prose-th:text-left prose-th:font-semibold prose-th:text-gray-300 prose-th:bg-gray-900/50
             prose-td:px-4 prose-td:py-3 prose-td:text-gray-400 prose-td:border-t prose-td:border-gray-800
-            prose-tr:transition-colors hover:prose-tr:bg-gray-900/30"
+            prose-tr:transition-colors hover:prose-tr:bg-gray-900/30
+
+            /* Figure & figcaption */
+            prose-figure:my-10
+            prose-figcaption:text-sm prose-figcaption:text-gray-500 prose-figcaption:mt-3 prose-figcaption:text-center"
           dangerouslySetInnerHTML={{ __html: post.content || '' }}
         />
 
