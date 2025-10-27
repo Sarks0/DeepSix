@@ -19,29 +19,31 @@ interface SBDBResponse {
     neo?: boolean;
   };
   orbit?: {
-    elements: {
-      e: string;    // Eccentricity
-      a: string;    // Semi-major axis (AU)
-      q: string;    // Perihelion distance (AU)
-      i: string;    // Inclination (deg)
-      om: string;   // Longitude of ascending node (deg)
-      w: string;    // Argument of perihelion (deg)
-      ma: string;   // Mean anomaly (deg)
-      per: string;  // Orbital period (days)
-    };
+    elements: Array<{
+      name: string;
+      value: string;
+      sigma?: string;
+      title?: string;
+      units?: string | null;
+      label?: string;
+    }>;
     epoch?: string;
+    first_obs?: string;
+    last_obs?: string;
+    data_arc?: string;
+    condition_code?: string;
+    moid?: string;
   };
-  phys_par?: {
-    H?: string;           // Absolute magnitude
-    diameter?: string;    // Diameter (km)
-    extent?: string;      // Tri-axial dimensions
-    albedo?: string;      // Geometric albedo
-    rot_per?: string;     // Rotation period (hours)
-    GM?: string;          // Standard gravitational parameter
-    density?: string;     // Bulk density (g/cm^3)
-    spec_B?: string;      // Spectral taxonomic type (SMASSII)
-    spec_T?: string;      // Spectral taxonomic type (Tholen)
-  };
+  phys_par?: Array<{
+    name: string;
+    value: string;
+    sigma?: string | null;
+    units?: string | null;
+    title?: string;
+    desc?: string;
+    ref?: string;
+    notes?: string | null;
+  }>;
 }
 
 /**
@@ -72,7 +74,8 @@ export async function GET(request: NextRequest) {
     }
 
     // Build SBDB API URL
-    const sbdbUrl = `https://ssd-api.jpl.nasa.gov/sbdb.api?sstr=${encodeURIComponent(sstr)}&phys-par=true&close-appr=true&full-prec=false`;
+    // Note: close-appr is not a valid parameter for SBDB API
+    const sbdbUrl = `https://ssd-api.jpl.nasa.gov/sbdb.api?sstr=${encodeURIComponent(sstr)}&phys-par=true&full-prec=false`;
 
     const fetchSBDBData = async (): Promise<SBDBResponse> => {
       const response = await fetch(sbdbUrl, {
@@ -110,22 +113,45 @@ export async function GET(request: NextRequest) {
     const orbit = sbdbData.orbit;
     const physPar = sbdbData.phys_par;
 
-    // Calculate derived values
-    const absoluteMagnitude = physPar?.H ? parseFloat(physPar.H) : null;
-    const diameter = physPar?.diameter ? parseFloat(physPar.diameter) : null;
-    const albedo = physPar?.albedo ? parseFloat(physPar.albedo) : null;
-    const rotationPeriod = physPar?.rot_per ? parseFloat(physPar.rot_per) : null;
-    const density = physPar?.density ? parseFloat(physPar.density) : null;
+    // Helper function to get value from phys_par array
+    const getPhysParam = (name: string): number | null => {
+      const param = physPar?.find(p => p.name === name);
+      return param?.value ? parseFloat(param.value) : null;
+    };
+
+    // Calculate derived values from phys_par array
+    const absoluteMagnitude = getPhysParam('H');
+    const diameter = getPhysParam('diameter');
+    const albedo = getPhysParam('albedo');
+    const rotationPeriod = getPhysParam('rot_per');
+    const density = getPhysParam('density');
+
+    // Helper function to get orbital element value
+    const getOrbitalElement = (name: string): number | null => {
+      const element = orbit?.elements?.find(e => e.name === name);
+      return element?.value ? parseFloat(element.value) : null;
+    };
 
     // Orbital elements
-    const eccentricity = orbit?.elements.e ? parseFloat(orbit.elements.e) : null;
-    const semiMajorAxis = orbit?.elements.a ? parseFloat(orbit.elements.a) : null;
-    const inclination = orbit?.elements.i ? parseFloat(orbit.elements.i) : null;
-    const orbitalPeriod = orbit?.elements.per ? parseFloat(orbit.elements.per) : null;
+    const eccentricity = getOrbitalElement('e');
+    const semiMajorAxis = getOrbitalElement('a');
+    const inclination = getOrbitalElement('i');
+    const orbitalPeriod = getOrbitalElement('per');
+    const perihelionDistance = getOrbitalElement('q');
+    const longitudeAscendingNode = getOrbitalElement('om');
+    const argumentPerihelion = getOrbitalElement('w');
+    const meanAnomaly = getOrbitalElement('ma');
+
+    // Helper to get string value from phys_par array
+    const getPhysParamString = (name: string): string | null => {
+      const param = physPar?.find(p => p.name === name);
+      return param?.value || null;
+    };
 
     // Classify asteroid type
-    const spectralType = physPar?.spec_B || physPar?.spec_T || 'Unknown';
+    const spectralType = getPhysParamString('spec_B') || getPhysParamString('spec_T') || 'Unknown';
     const orbitClass = object.orbit_class?.name || 'Unknown';
+    const extent = getPhysParamString('extent');
 
     // Size category
     let sizeCategory = 'Unknown';
@@ -150,6 +176,27 @@ export async function GET(request: NextRequest) {
                        isNEO ? 'Near-Earth Object' :
                        'Non-hazardous';
 
+    // Parse alternative designations from fullname
+    // Example: "99942 Apophis (2004 MN4)" -> provisional: "2004 MN4"
+    const parseAlternativeDesignations = (fullname: string | undefined, designation: string) => {
+      if (!fullname) return { primary: designation, provisional: null, name: null };
+
+      // Extract provisional designation from parentheses
+      const provisionalMatch = fullname.match(/\(([^)]+)\)/);
+      const provisional = provisionalMatch ? provisionalMatch[1] : null;
+
+      // Extract name (if present)
+      const nameParts = fullname.split(' ');
+      let name = null;
+      if (nameParts.length > 1 && !nameParts[1].startsWith('(')) {
+        name = nameParts.slice(1).join(' ').replace(/\([^)]+\)/, '').trim();
+      }
+
+      return { primary: designation, provisional, name };
+    };
+
+    const alternativeDesignations = parseAlternativeDesignations(object.fullname, object.des);
+
     return NextResponse.json({
       success: true,
       dataSource: 'NASA JPL Small-Body Database',
@@ -158,6 +205,7 @@ export async function GET(request: NextRequest) {
         // Identification
         designation: object.des,
         fullName: object.fullname || object.des,
+        alternativeDesignations,
 
         // Classification
         orbitClass,
@@ -172,7 +220,7 @@ export async function GET(request: NextRequest) {
           absoluteMagnitude,
           diameter,
           diameterUnit: 'km',
-          extent: physPar?.extent || null,
+          extent,
           albedo,
           rotationPeriod,
           rotationUnit: 'hours',
@@ -186,15 +234,20 @@ export async function GET(request: NextRequest) {
           eccentricity,
           semiMajorAxis,
           semiMajorAxisUnit: 'AU',
-          perihelionDistance: orbit?.elements.q ? parseFloat(orbit.elements.q) : null,
+          perihelionDistance,
           inclination,
           inclinationUnit: 'degrees',
-          longitudeAscendingNode: orbit?.elements.om ? parseFloat(orbit.elements.om) : null,
-          argumentPerihelion: orbit?.elements.w ? parseFloat(orbit.elements.w) : null,
-          meanAnomaly: orbit?.elements.ma ? parseFloat(orbit.elements.ma) : null,
+          longitudeAscendingNode,
+          argumentPerihelion,
+          meanAnomaly,
           orbitalPeriod,
           orbitalPeriodUnit: 'days',
           epoch: orbit?.epoch || null,
+          firstObservation: orbit?.first_obs || null,
+          lastObservation: orbit?.last_obs || null,
+          dataArc: orbit?.data_arc || null,
+          orbitUncertainty: orbit?.condition_code || null,
+          moid: orbit?.moid ? parseFloat(orbit.moid) : null,
         },
 
         // Descriptions

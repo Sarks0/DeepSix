@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface ScoutObject {
   designation: string;
@@ -147,17 +148,21 @@ export function ScoutTracker() {
       {data.objects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {data.objects.map((obj, index) => (
-            <motion.div
+            <Link
               key={obj.designation}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`rounded-lg p-4 border transition-all ${
-                obj.hasImpactRisk
-                  ? 'bg-orange-900/20 border-orange-700/50 hover:border-orange-500'
-                  : 'bg-gray-800/50 border-gray-700/50 hover:border-cyan-500/50'
-              }`}
+              href={`/asteroids/${encodeURIComponent(obj.designation)}`}
+              className="block"
             >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`rounded-lg p-4 border transition-all cursor-pointer ${
+                  obj.hasImpactRisk
+                    ? 'bg-orange-900/20 border-orange-700/50 hover:border-orange-500'
+                    : 'bg-gray-800/50 border-gray-700/50 hover:border-cyan-500/50'
+                }`}
+              >
               {/* Header */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -230,6 +235,7 @@ export function ScoutTracker() {
                 )}
               </div>
             </motion.div>
+            </Link>
           ))}
         </div>
       ) : (
@@ -247,9 +253,13 @@ export function ScoutTracker() {
           computing possible future trajectories and assessing potential Earth impact risk.
           Scout tracked objects are often just hours or days old, with orbits still being refined.
         </p>
-        <p className="text-xs text-cyan-300/70">
+        <p className="text-xs text-cyan-300/70 mb-2">
           <strong>NEO Rating (1-10):</strong> Higher numbers indicate objects requiring closer monitoring.
           Most objects receive low ratings as additional observations refine their orbits and rule out Earth impacts.
+        </p>
+        <p className="text-xs text-yellow-300/70 bg-yellow-900/20 border border-yellow-800/30 rounded px-2 py-1 mt-2">
+          <strong>Note:</strong> Scout objects have temporary designations and may not yet be in NASA&apos;s permanent catalog.
+          Clicking on very recent discoveries may show &quot;not found&quot; until they receive enough observations to be cataloged.
         </p>
       </div>
     </div>
