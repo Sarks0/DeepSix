@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 interface ScoutObject {
   designation: string;
@@ -147,17 +148,21 @@ export function ScoutTracker() {
       {data.objects.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
           {data.objects.map((obj, index) => (
-            <motion.div
+            <Link
               key={obj.designation}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: index * 0.05 }}
-              className={`rounded-lg p-4 border transition-all ${
-                obj.hasImpactRisk
-                  ? 'bg-orange-900/20 border-orange-700/50 hover:border-orange-500'
-                  : 'bg-gray-800/50 border-gray-700/50 hover:border-cyan-500/50'
-              }`}
+              href={`/asteroids/${encodeURIComponent(obj.designation)}`}
+              className="block"
             >
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
+                className={`rounded-lg p-4 border transition-all cursor-pointer ${
+                  obj.hasImpactRisk
+                    ? 'bg-orange-900/20 border-orange-700/50 hover:border-orange-500'
+                    : 'bg-gray-800/50 border-gray-700/50 hover:border-cyan-500/50'
+                }`}
+              >
               {/* Header */}
               <div className="flex items-start justify-between mb-3">
                 <div className="flex-1">
@@ -230,6 +235,7 @@ export function ScoutTracker() {
                 )}
               </div>
             </motion.div>
+            </Link>
           ))}
         </div>
       ) : (
