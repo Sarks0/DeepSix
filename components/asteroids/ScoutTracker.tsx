@@ -253,9 +253,13 @@ export function ScoutTracker() {
           computing possible future trajectories and assessing potential Earth impact risk.
           Scout tracked objects are often just hours or days old, with orbits still being refined.
         </p>
-        <p className="text-xs text-cyan-300/70">
+        <p className="text-xs text-cyan-300/70 mb-2">
           <strong>NEO Rating (1-10):</strong> Higher numbers indicate objects requiring closer monitoring.
           Most objects receive low ratings as additional observations refine their orbits and rule out Earth impacts.
+        </p>
+        <p className="text-xs text-yellow-300/70 bg-yellow-900/20 border border-yellow-800/30 rounded px-2 py-1 mt-2">
+          <strong>Note:</strong> Scout objects have temporary designations and may not yet be in NASA&apos;s permanent catalog.
+          Clicking on very recent discoveries may show &quot;not found&quot; until they receive enough observations to be cataloged.
         </p>
       </div>
     </div>
