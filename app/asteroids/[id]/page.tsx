@@ -1398,7 +1398,7 @@ export default function AsteroidDetailPage() {
                             <div>
                               <p className="text-gray-400 text-sm">Delta-V Required</p>
                               <p className="text-orange-400 font-semibold">
-                                {missionData.mission.shortestDuration.trajectory.deltaV.toFixed(2)} km/s
+                                {missionData.mission.shortestDuration.deltaV.toFixed(2)} km/s
                               </p>
                             </div>
                           </div>
