@@ -58,8 +58,7 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // Date range: default to today +/- 25 years for comprehensive view
-    const today = new Date().toISOString().split('T')[0];
+    // Date range: comprehensive view from 2000 to 2050
     const dateMin = searchParams.get('date-min') || '2000-01-01';
     const dateMax = searchParams.get('date-max') || '2050-12-31';
     const distMax = searchParams.get('dist-max') || '0.2'; // 0.2 AU = ~30 million km

@@ -1170,7 +1170,7 @@ export default function AsteroidDetailPage() {
 
                 <div className="mb-4 p-4 bg-red-900/30 border border-red-800/50 rounded-lg">
                   <p className="text-red-200 text-sm font-semibold">
-                    ⚠️ This asteroid is being monitored by NASA's Sentry impact monitoring system.
+                    ⚠️ This asteroid is being monitored by NASA&apos;s Sentry impact monitoring system.
                   </p>
                 </div>
 

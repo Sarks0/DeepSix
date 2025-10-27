@@ -112,7 +112,6 @@ export async function GET(request: NextRequest) {
 
     // Object is in NHATS database - extract mission data
     const minDvDelta = parseFloat(nhatsData.min_dv?.dv || '0');
-    const minDurDelta = parseFloat(nhatsData.min_dur?.dv || '0');
 
     // Determine accessibility level based on delta-V
     let accessibilityLevel: string;
