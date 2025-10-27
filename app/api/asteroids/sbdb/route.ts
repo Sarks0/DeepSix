@@ -176,6 +176,27 @@ export async function GET(request: NextRequest) {
                        isNEO ? 'Near-Earth Object' :
                        'Non-hazardous';
 
+    // Parse alternative designations from fullname
+    // Example: "99942 Apophis (2004 MN4)" -> provisional: "2004 MN4"
+    const parseAlternativeDesignations = (fullname: string | undefined, designation: string) => {
+      if (!fullname) return { primary: designation, provisional: null, name: null };
+
+      // Extract provisional designation from parentheses
+      const provisionalMatch = fullname.match(/\(([^)]+)\)/);
+      const provisional = provisionalMatch ? provisionalMatch[1] : null;
+
+      // Extract name (if present)
+      const nameParts = fullname.split(' ');
+      let name = null;
+      if (nameParts.length > 1 && !nameParts[1].startsWith('(')) {
+        name = nameParts.slice(1).join(' ').replace(/\([^)]+\)/, '').trim();
+      }
+
+      return { primary: designation, provisional, name };
+    };
+
+    const alternativeDesignations = parseAlternativeDesignations(object.fullname, object.des);
+
     return NextResponse.json({
       success: true,
       dataSource: 'NASA JPL Small-Body Database',
@@ -184,6 +205,7 @@ export async function GET(request: NextRequest) {
         // Identification
         designation: object.des,
         fullName: object.fullname || object.des,
+        alternativeDesignations,
 
         // Classification
         orbitClass,
