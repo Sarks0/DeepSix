@@ -43,6 +43,11 @@ interface AsteroidData {
       orbitalPeriod: number | null;
       orbitalPeriodUnit: string;
       epoch: string | null;
+      firstObservation: string | null;
+      lastObservation: string | null;
+      dataArc: string | null;
+      orbitUncertainty: string | null;
+      moid: number | null;
     };
     descriptions: {
       orbitDescription: string;
@@ -398,6 +403,80 @@ export default function AsteroidDetailPage() {
             </div>
           </div>
         </motion.section>
+
+        {/* Discovery & Observation History */}
+        {(orbit.firstObservation || orbit.lastObservation || orbit.dataArc || typeof orbit.moid === 'number') && (
+          <motion.section
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.35 }}
+            className="mb-8"
+          >
+            <div className="bg-gray-900/50 backdrop-blur-sm rounded-lg border border-gray-800 p-6">
+              <h2 className="text-2xl font-bold text-white mb-4">Discovery & Observation History</h2>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                {orbit.firstObservation && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1">First Observed</p>
+                    <p className="text-xl font-bold text-cyan-400">{orbit.firstObservation}</p>
+                  </div>
+                )}
+
+                {orbit.lastObservation && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1">Last Observed</p>
+                    <p className="text-xl font-bold text-green-400">{orbit.lastObservation}</p>
+                  </div>
+                )}
+
+                {orbit.dataArc && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1">Observation Arc</p>
+                    <p className="text-2xl font-bold text-purple-400">{orbit.dataArc}</p>
+                    <p className="text-xs text-gray-500 mt-1">days of observations</p>
+                  </div>
+                )}
+
+                {typeof orbit.moid === 'number' && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1">MOID (Earth)</p>
+                    <p className="text-2xl font-bold text-orange-400">{orbit.moid.toFixed(4)} AU</p>
+                    <p className="text-xs text-gray-500 mt-1">Minimum orbit intersection distance</p>
+                  </div>
+                )}
+
+                {orbit.orbitUncertainty && (
+                  <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+                    <p className="text-gray-400 text-sm mb-1">Orbit Uncertainty</p>
+                    <p className="text-2xl font-bold text-white">{orbit.orbitUncertainty}</p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {orbit.orbitUncertainty === '0' ? 'Very well determined' :
+                       parseInt(orbit.orbitUncertainty) <= 3 ? 'Well determined' :
+                       parseInt(orbit.orbitUncertainty) <= 6 ? 'Moderately uncertain' :
+                       'Poorly determined'}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {(orbit.firstObservation && orbit.lastObservation && orbit.dataArc) && (
+                <div className="mt-4 p-4 bg-blue-900/20 border border-blue-800/50 rounded-lg">
+                  <p className="text-blue-200 text-sm">
+                    This asteroid has been observed for{' '}
+                    <span className="font-semibold">
+                      {Math.floor(parseInt(orbit.dataArc) / 365.25)} years
+                    </span>
+                    , providing a well-constrained orbit.
+                    {typeof orbit.moid === 'number' && orbit.moid < 0.05 && (
+                      <span className="text-orange-300"> The minimum orbit intersection distance (MOID) is less than 0.05 AU, making this a near-Earth object of interest.</span>
+                    )}
+                  </p>
+                </div>
+              )}
+            </div>
+          </motion.section>
+        )}
 
         {/* Radar Observations */}
         {radarData && radarData.totalObservations > 0 && (
