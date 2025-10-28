@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { CompactStat } from '@/components/ui/StatCard';
 import { HelpTooltip } from '@/components/ui/Tooltip';
+import { formatLocalDateTime, formatLocalDate } from '@/lib/utils/datetime';
 
 interface InterstellarObject {
   designation: string;
@@ -175,7 +176,7 @@ export function InterstellarObjectTracker({
           <div className="flex items-center gap-4">
             <span>{object.type}</span>
             <span>•</span>
-            <span>Discovered: {new Date(object.discoveryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+            <span>Discovered: {formatLocalDate(object.discoveryDate)}</span>
           </div>
           <div className="flex items-center gap-4">
             <span>Discovery Site: {object.discoveryLocation}</span>
@@ -203,12 +204,12 @@ export function InterstellarObjectTracker({
           </div>
           <div>
             <p className="text-gray-400 mb-1">Perihelion Date</p>
-            <p className="text-white font-semibold">{new Date(object.perihelionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+            <p className="text-white font-semibold">{formatLocalDate(object.perihelionDate)}</p>
           </div>
           <div>
             <p className="text-gray-400 mb-1">Closest Earth Approach</p>
             <p className="text-white font-semibold">
-              {new Date(object.closestEarthApproach).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {formatLocalDate(object.closestEarthApproach)}
               {' '}({object.closestEarthDistanceAU.toFixed(2)} AU)
             </p>
           </div>
@@ -363,7 +364,7 @@ export function InterstellarObjectTracker({
           <div className="bg-purple-900/30 rounded p-4">
             <p className="text-base text-purple-300 font-semibold mb-2">Brief Encounter</p>
             <p className="text-base text-purple-200/80">
-              Perihelion at {object.perihelionDistanceAU.toFixed(2)} AU on {new Date(object.perihelionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
+              Perihelion at {object.perihelionDistanceAU.toFixed(2)} AU on {formatLocalDate(object.perihelionDate)}.
               One-time observation opportunity.
             </p>
           </div>
@@ -378,9 +379,9 @@ export function InterstellarObjectTracker({
 
       {/* Data timestamp */}
       <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
-        <div>Ephemeris data last updated: {new Date(timestamp).toLocaleString()}</div>
+        <div>Ephemeris data last updated: {formatLocalDateTime(timestamp)}</div>
         <div className="text-gray-600">
-          Object characteristics last reviewed: {new Date(object.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+          Object characteristics last reviewed: {formatLocalDate(object.lastUpdated)}
         </div>
         <div className="text-gray-600">
           {object.status === 'active'
