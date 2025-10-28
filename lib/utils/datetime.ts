@@ -96,7 +96,9 @@ export function formatLocalDateTime(
 }
 
 /**
- * Format a date in user's local timezone
+ * Format a date in user's local timezone (long format)
+ * @param date - Date to format
+ * @returns Formatted date string (e.g., "January 15, 2023")
  */
 export function formatLocalDate(date: Date | string | number): string {
   const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
@@ -109,6 +111,28 @@ export function formatLocalDate(date: Date | string | number): string {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
+  });
+}
+
+/**
+ * Format a date in user's local timezone (numeric format)
+ * Respects user's locale for date ordering (MM/DD/YYYY for US, DD/MM/YYYY for Europe, etc.)
+ * @param date - Date to format
+ * @param shortYear - Use 2-digit year (e.g., "23" instead of "2023")
+ * @returns Formatted date string (e.g., "01/15/2023" or "15/01/2023" depending on locale)
+ */
+export function formatLocalDateNumeric(date: Date | string | number, shortYear = false): string {
+  const dateObj = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
+
+  if (isNaN(dateObj.getTime())) {
+    return 'Invalid Date';
+  }
+
+  // Use user's locale to respect their date ordering preference
+  return dateObj.toLocaleDateString(undefined, {
+    year: shortYear ? '2-digit' : 'numeric',
+    month: '2-digit',
+    day: '2-digit',
   });
 }
 
