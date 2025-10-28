@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import type { DSNStation } from '@/lib/api/dsn';
+import { formatTimeInTimezone, getTimezoneAbbreviation } from '@/lib/utils/datetime';
 
 interface StationListProps {
   stations: DSNStation[];
@@ -13,21 +14,24 @@ const STATION_INFO = {
     name: 'Goldstone',
     location: 'California, USA',
     flag: '🇺🇸',
-    timezone: 'PST/PDT',
+    timezone: 'America/Los_Angeles',
+    timezoneLabel: 'PT', // Pacific Time
     coordinates: '35.4°N, 116.9°W'
   },
   mdscc: {
     name: 'Madrid',
     location: 'Spain',
     flag: '🇪🇸',
-    timezone: 'CET/CEST',
+    timezone: 'Europe/Madrid',
+    timezoneLabel: 'CET', // Central European Time
     coordinates: '40.4°N, 4.2°W'
   },
   cdscc: {
     name: 'Canberra',
     location: 'Australia',
     flag: '🇦🇺',
-    timezone: 'AEST/AEDT',
+    timezone: 'Australia/Sydney',
+    timezoneLabel: 'AEST', // Australian Eastern Standard Time
     coordinates: '35.4°S, 149.0°E'
   }
 };
@@ -91,16 +95,11 @@ export function StationList({ stations }: StationListProps) {
                   </div>
                 </div>
                 <div className="text-right">
-                  <p className="text-sm text-gray-500">Local Time</p>
+                  <p className="text-sm text-gray-500">Station Local Time</p>
                   <p className="text-lg font-mono text-white">
-                    {new Date(station.timeUTC).toLocaleTimeString('en-US', {
-                      hour12: false,
-                      hour: '2-digit',
-                      minute: '2-digit',
-                      second: '2-digit'
-                    })}
+                    {formatTimeInTimezone(station.timeUTC, info.timezone)}
                   </p>
-                  <p className="text-xs text-gray-500">{info.timezone}</p>
+                  <p className="text-xs text-gray-500">{getTimezoneAbbreviation(info.timezone)}</p>
                 </div>
               </div>
               

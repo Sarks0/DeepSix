@@ -6,6 +6,7 @@ import { MissionDataFeed } from '@/components/mission-data/MissionDataFeed';
 import { MissionStatusIndicator } from '@/components/mission-data/MissionStatusIndicator';
 import { DiscoveryFeed } from '@/components/mission-data/DiscoveryFeed';
 import { LiveSpacecraftData } from '@/components/mission-data/LiveSpacecraftData';
+import { formatLocalDateNumeric } from '@/lib/utils/datetime';
 
 // Dynamic page for mission details
 
@@ -680,18 +681,18 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
           </div>
           <div className="bg-gray-900 rounded-lg p-3">
             <p className="text-sm text-gray-400">Launch Date</p>
-            <p className="font-semibold">{mission.launchDate}</p>
+            <p className="font-semibold">{formatLocalDateNumeric(mission.launchDate)}</p>
           </div>
           {mission.landingDate && (
             <div className="bg-gray-900 rounded-lg p-3">
               <p className="text-sm text-gray-400">Landing Date</p>
-              <p className="font-semibold">{mission.landingDate}</p>
+              <p className="font-semibold">{formatLocalDateNumeric(mission.landingDate)}</p>
             </div>
           )}
           {mission.endDate && (
             <div className="bg-gray-900 rounded-lg p-3">
               <p className="text-sm text-gray-400">End Date</p>
-              <p className="font-semibold">{mission.endDate}</p>
+              <p className="font-semibold">{formatLocalDateNumeric(mission.endDate)}</p>
             </div>
           )}
           <div className="bg-gray-900 rounded-lg p-3">
@@ -853,7 +854,7 @@ export default async function MissionDetailPage({ params }: { params: Promise<{ 
                 Last Recorded Weather Data
               </h2>
               <p className="text-sm text-gray-400 mb-4">
-                Sol {mission.lastData.sol} • {mission.lastData.date}
+                Sol {mission.lastData.sol} • {formatLocalDateNumeric(mission.lastData.date)}
               </p>
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">

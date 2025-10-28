@@ -6,6 +6,7 @@ import { dsnService, type DSNData } from '@/lib/api/dsn';
 import { SignalVisualizer } from '@/components/dsn/SignalVisualizer';
 import { MissionControlDashboard } from '@/components/dsn/MissionControlDashboard';
 import { StationList } from '@/components/dsn/StationList';
+import { formatLocalDateTime } from '@/lib/utils/datetime';
 
 export default function DeepSpaceNetworkPage() {
   const [dsnData, setDsnData] = useState<DSNData | null>(null);
@@ -106,7 +107,7 @@ export default function DeepSpaceNetworkPage() {
               Real-time communication status with spacecraft across the solar system
             </p>
             <p className="text-sm text-gray-500 mt-2">
-              Last updated: {lastUpdate.toLocaleTimeString()} • Updates every 10 seconds
+              Last updated: {formatLocalDateTime(lastUpdate, { showDate: false })} • Updates every 10 seconds
             </p>
           </div>
           
