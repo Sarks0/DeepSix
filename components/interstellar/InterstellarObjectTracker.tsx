@@ -347,29 +347,29 @@ export function InterstellarObjectTracker({
           {objectId === '3I' ? 's' : ''} ever detected passing through our Solar System.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-purple-900/30 rounded p-3">
-            <p className="text-sm text-purple-300 font-semibold mb-2">Hyperbolic Trajectory</p>
-            <p className="text-sm text-purple-200/80">
+          <div className="bg-purple-900/30 rounded p-4">
+            <p className="text-base text-purple-300 font-semibold mb-2">Hyperbolic Trajectory</p>
+            <p className="text-base text-purple-200/80">
               Eccentricity of {object.eccentricity.toFixed(2)} means it&apos;s traveling faster than escape velocity
               and will leave the Solar System forever.
             </p>
           </div>
-          <div className="bg-purple-900/30 rounded p-3">
-            <p className="text-sm text-purple-300 font-semibold mb-2">Interstellar Origin</p>
-            <p className="text-sm text-purple-200/80">
+          <div className="bg-purple-900/30 rounded p-4">
+            <p className="text-base text-purple-300 font-semibold mb-2">Interstellar Origin</p>
+            <p className="text-base text-purple-200/80">
               Came from another star system, providing a rare chance to study material from beyond our Solar System.
             </p>
           </div>
-          <div className="bg-purple-900/30 rounded p-3">
-            <p className="text-sm text-purple-300 font-semibold mb-2">Brief Encounter</p>
-            <p className="text-sm text-purple-200/80">
+          <div className="bg-purple-900/30 rounded p-4">
+            <p className="text-base text-purple-300 font-semibold mb-2">Brief Encounter</p>
+            <p className="text-base text-purple-200/80">
               Perihelion at {object.perihelionDistanceAU.toFixed(2)} AU on {new Date(object.perihelionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
               One-time observation opportunity.
             </p>
           </div>
-          <div className="bg-purple-900/30 rounded p-3">
-            <p className="text-sm text-purple-300 font-semibold mb-2">Scientific Value</p>
-            <p className="text-sm text-purple-200/80">
+          <div className="bg-purple-900/30 rounded p-4">
+            <p className="text-base text-purple-300 font-semibold mb-2">Scientific Value</p>
+            <p className="text-base text-purple-200/80">
               {object.characteristics}
             </p>
           </div>
