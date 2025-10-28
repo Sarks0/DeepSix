@@ -7,6 +7,9 @@ export const metadata: Metadata = {
   description: 'Real-time tracking of interstellar objects passing through our Solar System. Monitor 3I/ATLAS, 2I/Borisov, and 1I/\'Oumuamua with live data from NASA JPL Horizons.',
 };
 
+// Revalidate this page every 24 hours to get updated information
+export const revalidate = 86400; // 24 hours in seconds
+
 export default function InterstellarPage() {
   return (
     <main className="min-h-screen bg-gradient-to-b from-black via-purple-950/10 to-black px-4 md:px-6 lg:px-8 py-12">

@@ -8,6 +8,12 @@ const AU_TO_KM = 149597870.7;
 // Known interstellar objects with their Horizons-compatible designations
 // Note: Horizons API treats parentheses as special characters (subscripts)
 // Must use designation without parentheses for API calls
+//
+// TODO: Consider fetching updated characteristics daily from:
+// - NASA Science API: https://science.nasa.gov/solar-system/comets/3i-atlas/
+// - Minor Planet Center: https://minorplanetcenter.net/
+// - TheSkyLive: https://theskylive.com/c2025n1-info
+// For now, manually update these values as new observations are published
 const INTERSTELLAR_OBJECTS = {
   '3I': {
     designation: '3I/ATLAS',
@@ -23,6 +29,7 @@ const INTERSTELLAR_OBJECTS = {
     estimatedDiameterKm: '0.44 - 5.6',
     eccentricity: 6.0,
     characteristics: 'Very red color, similar to Trans-Neptunian Objects',
+    lastUpdated: '2025-10-28', // Manual update: Check NASA Science page for latest observations
   },
   '2I': {
     designation: '2I/Borisov',
@@ -38,6 +45,7 @@ const INTERSTELLAR_OBJECTS = {
     estimatedDiameterKm: '0.4 - 7',
     eccentricity: 3.36,
     characteristics: 'Similar composition to Solar System comets, active coma',
+    lastUpdated: '2020-01-15', // Historical - no longer updating
   },
   '1I': {
     designation: '1I/\'Oumuamua',
@@ -53,6 +61,7 @@ const INTERSTELLAR_OBJECTS = {
     estimatedDiameterKm: '0.1 - 0.4',
     eccentricity: 1.20,
     characteristics: 'Elongated cigar/pancake shape, non-gravitational acceleration',
+    lastUpdated: '2018-06-30', // Historical - no longer updating
   },
 };
 
@@ -228,6 +237,7 @@ export async function GET(request: NextRequest) {
         estimatedDiameterKm: objectInfo.estimatedDiameterKm,
         eccentricity: objectInfo.eccentricity,
         characteristics: objectInfo.characteristics,
+        lastUpdated: objectInfo.lastUpdated,
       },
       ephemeris: ephemeris || {},
       rawData: observerData.result, // Include for debugging

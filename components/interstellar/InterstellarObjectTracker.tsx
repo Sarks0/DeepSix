@@ -19,6 +19,7 @@ interface InterstellarObject {
   estimatedDiameterKm: string;
   eccentricity: number;
   characteristics: string;
+  lastUpdated: string;
 }
 
 interface Position {
@@ -81,7 +82,9 @@ export function InterstellarObjectTracker({
     async function fetchData() {
       try {
         setLoading(true);
-        const response = await fetch(`/api/interstellar/horizons?object=${objectId}`);
+        // Add cache-busting timestamp for daily updates
+        const cacheBuster = Math.floor(Date.now() / 86400000); // Changes once per day
+        const response = await fetch(`/api/interstellar/horizons?object=${objectId}&_t=${cacheBuster}`);
         const result = await response.json();
 
         if (!response.ok || !result.success) {
@@ -99,7 +102,7 @@ export function InterstellarObjectTracker({
     }
 
     fetchData();
-    // Refresh every hour
+    // Refresh every hour for position updates
     const interval = setInterval(fetchData, 3600000);
     return () => clearInterval(interval);
   }, [objectId]);
@@ -157,6 +160,12 @@ export function InterstellarObjectTracker({
             {object.interstellarOrigin && (
               <span className="px-3 py-1 rounded-full text-sm font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/50">
                 Interstellar Origin
+              </span>
+            )}
+            {isActive && (
+              <span className="px-3 py-1 rounded-full text-xs font-semibold bg-blue-500/20 text-blue-300 border border-blue-500/50 flex items-center gap-1">
+                <span className="w-1.5 h-1.5 bg-blue-400 rounded-full animate-pulse"></span>
+                Daily Updates
               </span>
             )}
           </div>
@@ -348,8 +357,16 @@ export function InterstellarObjectTracker({
       </div>
 
       {/* Data timestamp */}
-      <div className="mt-4 text-xs text-gray-500 text-center">
-        Last updated: {new Date(timestamp).toLocaleString()}
+      <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
+        <div>Ephemeris data last updated: {new Date(timestamp).toLocaleString()}</div>
+        <div className="text-gray-600">
+          Object characteristics last reviewed: {new Date(object.lastUpdated).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </div>
+        <div className="text-gray-600">
+          {object.status === 'active'
+            ? 'Position data updates hourly • Characteristics reviewed daily'
+            : 'Historical data - no longer updating'}
+        </div>
       </div>
 
       {/* Debug: Raw Data */}
