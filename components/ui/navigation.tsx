@@ -11,7 +11,6 @@ const navItems = [
   { label: 'Asteroids', href: '/asteroids' },
   { label: 'News', href: '/news' },
   { label: 'DSN', href: '/dsn' },
-  { label: 'Live Data', href: '/live' },
   { label: 'About', href: '/about' },
   { label: 'Privacy', href: '/privacy' },
 ];
