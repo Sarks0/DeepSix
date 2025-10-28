@@ -6,24 +6,26 @@ const HORIZONS_API_BASE = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const AU_TO_KM = 149597870.7;
 
 // Known interstellar objects with their Horizons-compatible designations
+// Note: Horizons API treats parentheses as special characters (subscripts)
+// Must use designation without parentheses for API calls
 const INTERSTELLAR_OBJECTS = {
   '3I': {
     designation: '3I/ATLAS',
-    horizonsCommand: 'C/2025 N1 (ATLAS)', // Exact format from Horizons web interface
+    horizonsCommand: 'C/2025 N1', // Without parentheses for API
     type: 'Interstellar Comet',
     discoveryDate: '2025-07',
     status: 'active', // Currently observable
   },
   '2I': {
     designation: '2I/Borisov',
-    horizonsCommand: 'C/2019 Q4 (Borisov)', // Standard Horizons format
+    horizonsCommand: 'C/2019 Q4', // Without parentheses for API
     type: 'Interstellar Comet',
     discoveryDate: '2019-08',
     status: 'historical', // Passed through, no longer observable
   },
   '1I': {
     designation: '1I/\'Oumuamua',
-    horizonsCommand: 'A/2017 U1', // Asteroid designation
+    horizonsCommand: 'A/2017 U1', // Asteroid designation (no parentheses)
     type: 'Interstellar Object',
     discoveryDate: '2017-10',
     status: 'historical',
