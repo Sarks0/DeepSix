@@ -44,7 +44,7 @@ export default function Home() {
       {/* Featured Mission Spotlight */}
       <FeaturedMission
         mission={{
-          id: 'voyager1',
+          id: 'voyager-1',
           name: 'Voyager 1',
           tagline: 'Humanity\'s Farthest Explorer',
           description: 'Launched in 1977, Voyager 1 is the most distant human-made object in space. It entered interstellar space in 2012 and continues to send back data about the boundary between our solar system and the rest of the galaxy.',
@@ -71,7 +71,7 @@ export default function Home() {
               helpText: 'Total time in space since launch',
             },
           ],
-          detailLink: '/missions/voyager1',
+          detailLink: '/missions/voyager-1',
         }}
       />
 

@@ -142,7 +142,7 @@ export function FeaturedMission({ mission }: FeaturedMissionProps) {
             </Link>
 
             <Link
-              href="#missions"
+              href="/missions"
               className="px-6 py-3 bg-gray-800/50 hover:bg-gray-800 text-gray-300 hover:text-white border border-gray-700 rounded-lg font-medium transition-all"
             >
               Explore All Missions
