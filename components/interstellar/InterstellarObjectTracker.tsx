@@ -321,7 +321,7 @@ export function InterstellarObjectTracker({
           <div className="bg-purple-900/30 rounded p-2">
             <p className="text-purple-300 font-semibold mb-1">Hyperbolic Trajectory</p>
             <p className="text-purple-200/70">
-              Eccentricity of {object.eccentricity.toFixed(2)} means it's traveling faster than escape velocity
+              Eccentricity of {object.eccentricity.toFixed(2)} means it&apos;s traveling faster than escape velocity
               and will leave the Solar System forever.
             </p>
           </div>
