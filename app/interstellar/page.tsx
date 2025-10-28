@@ -42,13 +42,13 @@ export default function InterstellarPage() {
 
         {/* Beginner Guide */}
         <div className="mb-12 p-6 bg-purple-900/10 border border-purple-800/30 rounded-lg">
-          <h3 className="text-lg font-bold text-purple-300 mb-3">What Are Interstellar Objects?</h3>
-          <p className="text-sm text-purple-200/80 mb-4">
+          <h3 className="text-xl font-bold text-purple-300 mb-3">What Are Interstellar Objects?</h3>
+          <p className="text-base text-purple-200/80 mb-4">
             Interstellar objects are celestial bodies that originated from beyond our Solar System.
             They travel through interstellar space and occasionally pass through our cosmic neighborhood on hyperbolic trajectories,
             meaning they will never return.
           </p>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-purple-200/80">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-base text-purple-200/80">
             <div>
               <p className="font-semibold mb-1 text-purple-400">Origin</p>
               <p>These objects come from other star systems, providing a unique opportunity to study material from beyond our Solar System.</p>
@@ -97,7 +97,7 @@ export default function InterstellarPage() {
                 </span>
               </div>
 
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 text-base">
                 <div>
                   <span className="text-gray-400">Type:</span>
                   <span className="text-white ml-2">Interstellar Comet</span>
@@ -116,7 +116,7 @@ export default function InterstellarPage() {
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-purple-900/20 border border-purple-800/30 rounded text-xs text-purple-200/80">
+              <div className="mt-4 p-3 bg-purple-900/20 border border-purple-800/30 rounded text-sm text-purple-200/80">
                 2I/Borisov was the first interstellar comet ever confirmed. Observations revealed it had a composition
                 similar to comets from our own Solar System, providing insights into planet formation in other star systems.
               </div>
@@ -134,7 +134,7 @@ export default function InterstellarPage() {
                 </span>
               </div>
 
-              <div className="space-y-3 text-sm">
+              <div className="space-y-3 text-base">
                 <div>
                   <span className="text-gray-400">Type:</span>
                   <span className="text-white ml-2">Interstellar Object</span>
@@ -153,7 +153,7 @@ export default function InterstellarPage() {
                 </div>
               </div>
 
-              <div className="mt-4 p-3 bg-red-900/20 border border-red-800/30 rounded text-xs text-red-200/80">
+              <div className="mt-4 p-3 bg-red-900/20 border border-red-800/30 rounded text-sm text-red-200/80">
                 &apos;Oumuamua (Hawaiian for &quot;scout&quot; or &quot;messenger&quot;) was the first interstellar object
                 ever detected. Its unusual elongated shape and unexplained acceleration sparked intense scientific debate
                 and captured global attention.
@@ -180,23 +180,23 @@ export default function InterstellarPage() {
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div className="bg-gray-800/50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">Hubble</div>
-                <div className="text-xs text-gray-400">Space Telescope</div>
+                <div className="text-sm text-gray-400">Space Telescope</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">JWST</div>
-                <div className="text-xs text-gray-400">James Webb</div>
+                <div className="text-sm text-gray-400">James Webb</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">Parker</div>
-                <div className="text-xs text-gray-400">Solar Probe</div>
+                <div className="text-sm text-gray-400">Solar Probe</div>
               </div>
               <div className="bg-gray-800/50 rounded-lg p-4 text-center">
                 <div className="text-2xl font-bold text-blue-400 mb-1">Mars</div>
-                <div className="text-xs text-gray-400">Rovers & Orbiters</div>
+                <div className="text-sm text-gray-400">Rovers & Orbiters</div>
               </div>
             </div>
 
-            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+            <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4 text-base">
               <div className="p-4 bg-blue-900/20 border border-blue-800/30 rounded-lg">
                 <h4 className="font-bold text-blue-300 mb-2">Space Telescopes</h4>
                 <p className="text-blue-200/80">
@@ -228,8 +228,8 @@ export default function InterstellarPage() {
                 className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50 hover:border-purple-500 transition-all group"
               >
                 <h3 className="text-xl font-bold text-cyan-400 mb-2 group-hover:text-cyan-300">Asteroid Tracking</h3>
-                <p className="text-sm text-gray-400 mb-3">Near-Earth asteroids and planetary defense monitoring</p>
-                <div className="text-xs text-gray-500">
+                <p className="text-base text-gray-400 mb-3">Near-Earth asteroids and planetary defense monitoring</p>
+                <div className="text-sm text-gray-500">
                   Monitor close approaches, impact risks, and mission-accessible targets
                 </div>
               </Link>
@@ -240,8 +240,8 @@ export default function InterstellarPage() {
                 className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50 hover:border-purple-500 transition-all group"
               >
                 <h3 className="text-xl font-bold text-purple-400 mb-2 group-hover:text-purple-300">Active Missions</h3>
-                <p className="text-sm text-gray-400 mb-3">NASA spacecraft exploring the Solar System</p>
-                <div className="text-xs text-gray-500">
+                <p className="text-base text-gray-400 mb-3">NASA spacecraft exploring the Solar System</p>
+                <div className="text-sm text-gray-500">
                   Track real-time positions of Voyager, New Horizons, and more
                 </div>
               </Link>
@@ -252,8 +252,8 @@ export default function InterstellarPage() {
                 className="bg-gray-800/50 rounded-lg p-6 border border-gray-700/50 hover:border-purple-500 transition-all group"
               >
                 <h3 className="text-xl font-bold text-blue-400 mb-2 group-hover:text-blue-300">Deep Space Network</h3>
-                <p className="text-sm text-gray-400 mb-3">Live communications with deep space missions</p>
-                <div className="text-xs text-gray-500">
+                <p className="text-base text-gray-400 mb-3">Live communications with deep space missions</p>
+                <div className="text-sm text-gray-500">
                   Monitor real-time antenna connections and data rates
                 </div>
               </Link>
@@ -266,9 +266,9 @@ export default function InterstellarPage() {
           <div className="bg-gradient-to-br from-purple-900/20 to-gray-900/50 backdrop-blur-sm rounded-lg border border-purple-800/30 p-8">
             <h2 className="text-2xl font-bold text-white mb-4">Why Interstellar Objects Matter</h2>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-sm">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 text-base">
               <div>
-                <h3 className="font-bold text-purple-300 mb-2">Scientific Significance</h3>
+                <h3 className="text-lg font-bold text-purple-300 mb-3">Scientific Significance</h3>
                 <ul className="space-y-2 text-gray-300">
                   <li className="flex items-start">
                     <span className="text-purple-400 mr-2">•</span>
@@ -290,7 +290,7 @@ export default function InterstellarPage() {
               </div>
 
               <div>
-                <h3 className="font-bold text-purple-300 mb-2">Observation Challenges</h3>
+                <h3 className="text-lg font-bold text-purple-300 mb-3">Observation Challenges</h3>
                 <ul className="space-y-2 text-gray-300">
                   <li className="flex items-start">
                     <span className="text-purple-400 mr-2">•</span>
@@ -312,7 +312,7 @@ export default function InterstellarPage() {
               </div>
             </div>
 
-            <div className="mt-6 p-4 bg-purple-900/20 border border-purple-800/30 rounded-lg text-sm text-purple-200/80">
+            <div className="mt-6 p-4 bg-purple-900/20 border border-purple-800/30 rounded-lg text-base text-purple-200/80">
               <p className="font-bold mb-2">Future Detection</p>
               <p>
                 As telescope technology improves, astronomers expect to detect more interstellar visitors.
