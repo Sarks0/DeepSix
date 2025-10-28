@@ -9,6 +9,7 @@ const navItems = [
   { label: 'Dashboard', href: '/' },
   { label: 'Missions', href: '/missions' },
   { label: 'Asteroids', href: '/asteroids' },
+  { label: 'Interstellar', href: '/interstellar' },
   { label: 'News', href: '/news' },
   { label: 'DSN', href: '/dsn' },
   { label: 'About', href: '/about' },
