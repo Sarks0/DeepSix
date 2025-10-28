@@ -270,32 +270,52 @@ export function InterstellarObjectTracker({
       {/* Orbital Characteristics */}
       <div className="mb-6">
         <h3 className="text-xl font-bold text-white mb-4">Orbital Characteristics</h3>
-        <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
-          <div className="space-y-2">
-            <CompactStat
-              label="Eccentricity"
-              value={object.eccentricity.toFixed(2)}
-              helpText="e > 1.0 indicates hyperbolic (interstellar) trajectory"
-            />
-            {object.eccentricity > 1 && (
-              <div className="text-sm text-yellow-300 bg-yellow-900/20 border border-yellow-800/30 rounded px-3 py-2">
-                Hyperbolic orbit - this object will leave the Solar System forever
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Eccentricity Card */}
+          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-gray-400">Eccentricity</p>
+                <HelpTooltip content="e > 1.0 indicates hyperbolic (interstellar) trajectory" />
               </div>
-            )}
-            <CompactStat
-              label="Perihelion Distance"
-              value={`${object.perihelionDistanceAU.toFixed(2)} AU`}
-              helpText="Closest distance to the Sun"
-            />
-            {ephemeris?.orbital?.inclinationDeg > 0 && (
-              <CompactStat
-                label="Inclination"
-                value={`${ephemeris.orbital.inclinationDeg.toFixed(1)}°`}
-                helpText="Tilt of orbit relative to ecliptic plane"
-              />
-            )}
+            </div>
+            <p className="text-3xl font-bold text-yellow-400">{object.eccentricity.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">Hyperbolic</p>
           </div>
+
+          {/* Perihelion Distance Card */}
+          <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+            <div className="flex items-center justify-between mb-1">
+              <div className="flex items-center gap-1.5">
+                <p className="text-xs text-gray-400">Perihelion Distance</p>
+                <HelpTooltip content="Closest distance to the Sun" />
+              </div>
+            </div>
+            <p className="text-3xl font-bold text-cyan-400">{object.perihelionDistanceAU.toFixed(2)}</p>
+            <p className="text-xs text-gray-500 mt-1">AU</p>
+          </div>
+
+          {/* Inclination Card (if available) */}
+          {ephemeris?.orbital?.inclinationDeg > 0 && (
+            <div className="bg-gray-800/50 rounded-lg p-4 border border-gray-700/50">
+              <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs text-gray-400">Inclination</p>
+                  <HelpTooltip content="Tilt of orbit relative to ecliptic plane" />
+                </div>
+              </div>
+              <p className="text-3xl font-bold text-purple-400">{ephemeris.orbital.inclinationDeg.toFixed(1)}°</p>
+              <p className="text-xs text-gray-500 mt-1">Degrees</p>
+            </div>
+          )}
         </div>
+
+        {/* Hyperbolic orbit notice */}
+        {object.eccentricity > 1 && (
+          <div className="mt-4 text-sm text-yellow-300 bg-yellow-900/20 border border-yellow-800/30 rounded px-3 py-2">
+            Hyperbolic orbit - this object will leave the Solar System forever
+          </div>
+        )}
       </div>
 
       {/* Visual Observation Data */}
