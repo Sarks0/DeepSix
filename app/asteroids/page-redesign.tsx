@@ -79,7 +79,7 @@ export default function AsteroidsPage() {
             helpText="NASA tracks near-Earth objects to identify any that could pose a threat to our planet"
             badge="2 systems"
             badgeColor="red"
-            defaultExpanded={true}
+            defaultExpanded={false}
             storageKey="asteroids-planetary-defense-expanded"
           >
             <div className="space-y-8">
@@ -106,7 +106,7 @@ export default function AsteroidsPage() {
             helpText="These tools help scientists and engineers plan missions to visit asteroids"
             badge="2 tools"
             badgeColor="cyan"
-            defaultExpanded={true}
+            defaultExpanded={false}
             storageKey="asteroids-mission-planning-expanded"
           >
             <div className="space-y-8">
