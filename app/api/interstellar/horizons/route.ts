@@ -121,7 +121,7 @@ export async function GET(request: NextRequest) {
       START_TIME: startTime || now.toISOString().split('T')[0],
       STOP_TIME: stopTime || tomorrow.toISOString().split('T')[0],
       STEP_SIZE: stepSize,
-      QUANTITIES: '1,9,20,23,24,29', // RA/DEC, distance, magnitude, etc.
+      QUANTITIES: '1,9,20', // RA/DEC, magnitude, range & range-rate
       SKIP_DAYLT: 'NO',
     });
 
@@ -232,6 +232,7 @@ function parseOrbitalElements(resultText: string) {
     const eoeIndex = resultText.indexOf('$$EOE');
 
     if (soeIndex === -1 || eoeIndex === -1) {
+      console.log('No SOE/EOE markers in ELEMENTS result');
       return null;
     }
 
@@ -239,23 +240,65 @@ function parseOrbitalElements(resultText: string) {
     const lines = ephemerisBlock.split('\n').filter(line => line.trim());
 
     if (lines.length === 0) {
+      console.log('No data lines in ELEMENTS result');
       return null;
     }
 
     // Parse first data line (most recent elements)
     const dataLine = lines[0].trim();
+    console.log('Parsing ELEMENTS line:', dataLine);
 
-    // Horizons ELEMENTS format (common columns):
-    // Date, EC (eccentricity), QR (perihelion), IN (inclination), etc.
-    // The exact format depends on the output, but typically space or comma separated
-    const parts = dataLine.split(/\s+/);
+    // Horizons ELEMENTS format typically has comma-separated values
+    // Standard format: JDTDB, Calendar Date, EC, QR, IN, OM, W, Tp, N, MA, TA, A, AD, PR
+    const parts = dataLine.includes(',') ? dataLine.split(',').map(p => p.trim()) : dataLine.split(/\s+/);
 
-    // Try to extract orbital elements (positions may vary)
-    // This is a best-effort parse - actual positions depend on Horizons output
+    // Extract orbital elements (try multiple column positions)
+    let eccentricity = 0;
+    let perihelionDistanceAU = 0;
+    let inclinationDeg = 0;
+    let distanceFromSunAU = 0;
+
+    // Look for eccentricity (typically 3rd column, value > 1 for hyperbolic)
+    for (let i = 2; i < Math.min(parts.length, 8); i++) {
+      const val = parseFloat(parts[i]);
+      if (!isNaN(val) && val > 0.5 && val < 50) {
+        eccentricity = val;
+        break;
+      }
+    }
+
+    // Look for perihelion distance (QR, typically after EC)
+    for (let i = 3; i < Math.min(parts.length, 9); i++) {
+      const val = parseFloat(parts[i]);
+      if (!isNaN(val) && val > 0 && val < 10) {
+        perihelionDistanceAU = val;
+        break;
+      }
+    }
+
+    // Look for inclination (IN, typically after QR, value 0-180 degrees)
+    for (let i = 4; i < Math.min(parts.length, 10); i++) {
+      const val = parseFloat(parts[i]);
+      if (!isNaN(val) && val >= 0 && val <= 180) {
+        inclinationDeg = val;
+        break;
+      }
+    }
+
+    // Try to find current distance from Sun (R, typically later in line)
+    for (let i = 10; i < Math.min(parts.length, 15); i++) {
+      const val = parseFloat(parts[i]);
+      if (!isNaN(val) && val > 0 && val < 100) {
+        distanceFromSunAU = val;
+        break;
+      }
+    }
+
     return {
-      eccentricity: parseFloat(parts[2]) || 0,
-      perihelionDistanceAU: parseFloat(parts[3]) || 0,
-      inclinationDeg: parseFloat(parts[4]) || 0,
+      eccentricity,
+      perihelionDistanceAU,
+      inclinationDeg,
+      distanceFromSunAU,
     };
   } catch (error) {
     console.error('Error parsing orbital elements:', error);
@@ -269,7 +312,7 @@ function parseOrbitalElements(resultText: string) {
  */
 function parseHorizonsResult(
   resultText: string,
-  orbitalElements: { eccentricity: number; perihelionDistanceAU: number; inclinationDeg: number } | null
+  orbitalElements: { eccentricity: number; perihelionDistanceAU: number; inclinationDeg: number; distanceFromSunAU: number } | null
 ): Partial<InterstellarPosition> | null {
   try {
     // Horizons returns data in a specific text format
@@ -290,14 +333,18 @@ function parseHorizonsResult(
 
     // Parse first data line (most recent position)
     const dataLine = lines[0].trim();
+    console.log('Parsing OBSERVER line:', dataLine);
 
-    // Horizons OBSERVER format with QUANTITIES 1,9,20,23,24,29:
-    // Typically includes: Date, RA, DEC, magnitude, range, range-rate, etc.
+    // Horizons OBSERVER format with QUANTITIES 1,9,20:
+    // 1 = Astrometric RA & DEC
+    // 9 = Visual magnitude & surface brightness
+    // 20 = Range (distance) & range-rate
     // Format is space-separated with some columns having multiple values
 
     // Extract timestamp from the beginning of the line
     const dateMatch = dataLine.match(/^\d{4}-\w{3}-\d{2}\s+\d{2}:\d{2}/);
     const timestamp = dateMatch ? new Date(dateMatch[0]).toISOString() : new Date().toISOString();
+    console.log('Extracted timestamp:', timestamp);
 
     // Use regex to extract specific data patterns
     // RA format: HH MM SS.SS or degrees
@@ -308,21 +355,22 @@ function parseHorizonsResult(
     // Extract magnitude (usually after RA/DEC)
     const magMatch = dataLine.match(/\s+(\d{1,2}\.\d+)\s+/);
 
-    // Extract distances (AU) - look for decimal numbers that could be distances
-    const numbersMatch = dataLine.match(/(\d+\.\d+)/g);
-    const numbers = numbersMatch ? numbersMatch.map(n => parseFloat(n)) : [];
+    // Extract distance from Earth (range) - QUANTITY 20
+    // Look for range value (typically in AU, appears after RA/DEC)
+    const rangeMatch = dataLine.match(/\s+(\d+\.\d+)\s+/g);
+    const rangeValues = rangeMatch ? rangeMatch.map(m => parseFloat(m.trim())) : [];
 
-    // Heuristic: distances are typically larger values (> 0.1 AU)
-    const distances = numbers.filter(n => n > 0.1 && n < 100);
+    // Filter for realistic Earth distance values (0.5 to 50 AU for interstellar objects)
+    const earthDistance = rangeValues.find(v => v > 0.5 && v < 50) || 0;
 
     return {
       timestamp,
       position: {
         ra: raMatch ? raMatch[1].replace(/\s+/g, ' ') : 'N/A',
         dec: decMatch ? decMatch[1].replace(/\s+/g, ' ') : 'N/A',
-        distanceFromSunAU: distances[0] || 0,
-        distanceFromEarthAU: distances[1] || distances[0] || 0,
-        distanceFromEarthKm: (distances[1] || distances[0] || 0) * AU_TO_KM,
+        distanceFromSunAU: orbitalElements?.distanceFromSunAU || earthDistance,
+        distanceFromEarthAU: earthDistance,
+        distanceFromEarthKm: earthDistance * AU_TO_KM,
       },
       velocity: {
         totalKmS: 0, // Would need VECTORS ephemeris type for accurate velocity
