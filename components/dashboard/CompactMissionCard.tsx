@@ -4,7 +4,6 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import { ChevronDownIcon, ChevronUpIcon, ArrowTopRightOnSquareIcon } from '@heroicons/react/24/outline';
-import { HelpTooltip } from '@/components/ui/Tooltip';
 import { CompactStat } from '@/components/ui/StatCard';
 
 interface MissionData {
