@@ -44,34 +44,34 @@ export default function Home() {
       {/* Featured Mission Spotlight */}
       <FeaturedMission
         mission={{
-          id: 'voyager-1',
-          name: 'Voyager 1',
-          tagline: 'Humanity\'s Farthest Explorer',
-          description: 'Launched in 1977, Voyager 1 is the most distant human-made object in space. It entered interstellar space in 2012 and continues to send back data about the boundary between our solar system and the rest of the galaxy.',
+          id: 'perseverance',
+          name: 'Perseverance',
+          tagline: 'Searching for Ancient Life on Mars',
+          description: 'NASA\'s Perseverance rover is exploring Jezero Crater, an ancient lake bed on Mars. It\'s searching for signs of ancient microbial life, collecting rock samples for future return to Earth, and testing new technologies including the Ingenuity helicopter - the first aircraft to fly on another planet.',
           status: 'Active',
           distance: {
-            value: 165,
+            value: 2.3,
             unit: 'AU',
             label: 'Distance from Earth',
           },
           speed: {
-            value: 17.0,
-            unit: 'km/s',
+            value: 0.12,
+            unit: 'km/h',
           },
-          whyFeatured: 'Voyager 1 is exploring territory no spacecraft has ever reached before. At 165 AU from Earth, it takes over 22 hours for signals to reach us, yet it still transmits data about the mysterious region between stars.',
+          whyFeatured: 'Perseverance is actively searching for evidence that Mars once hosted life. It\'s collecting samples that will be returned to Earth in the 2030s, potentially answering one of humanity\'s biggest questions: Are we alone in the universe?',
           quickFacts: [
             {
-              label: 'Launched',
-              value: 'Sep 5, 1977',
-              helpText: 'Launch date from Cape Canaveral',
+              label: 'Landed',
+              value: 'Feb 18, 2021',
+              helpText: 'Touchdown in Jezero Crater, Mars',
             },
             {
-              label: 'Mission Time',
-              value: '47+ years',
-              helpText: 'Total time in space since launch',
+              label: 'Mars Sol',
+              value: '1,300+ days',
+              helpText: 'Martian days since landing (1 sol ≈ 24.6 hours)',
             },
           ],
-          detailLink: '/missions/voyager-1',
+          detailLink: '/missions/perseverance',
         }}
       />
 
