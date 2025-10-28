@@ -113,6 +113,7 @@ export async function GET(request: NextRequest) {
     const tomorrow = new Date(now.getTime() + 86400000);
 
     // Query 1: OBSERVER ephemeris for position and visual data
+    // Use minimal parameters - QUANTITIES may not be supported for some objects
     const observerParams = new URLSearchParams({
       format: 'json',
       COMMAND: command,
@@ -121,8 +122,7 @@ export async function GET(request: NextRequest) {
       START_TIME: startTime || now.toISOString().split('T')[0],
       STOP_TIME: stopTime || tomorrow.toISOString().split('T')[0],
       STEP_SIZE: stepSize,
-      QUANTITIES: '1,9,20', // RA/DEC, magnitude, range & range-rate
-      SKIP_DAYLT: 'NO',
+      MAKE_EPHEM: 'YES',
     });
 
     // Query 2: ELEMENTS for orbital parameters
@@ -335,39 +335,63 @@ function parseHorizonsResult(
     const dataLine = lines[0].trim();
     console.log('Parsing OBSERVER line:', dataLine);
 
-    // Horizons OBSERVER format with QUANTITIES 1,9,20:
-    // 1 = Astrometric RA & DEC
-    // 9 = Visual magnitude & surface brightness
-    // 20 = Range (distance) & range-rate
-    // Format is space-separated with some columns having multiple values
+    // Horizons default OBSERVER format typically includes:
+    // Date, R.A._(ICRF), DEC_(ICRF), APmag, S-brt, delta, deldot, ...
+    // Format can vary, so we'll parse flexibly
 
     // Extract timestamp from the beginning of the line
     const dateMatch = dataLine.match(/^\d{4}-\w{3}-\d{2}\s+\d{2}:\d{2}/);
     const timestamp = dateMatch ? new Date(dateMatch[0]).toISOString() : new Date().toISOString();
     console.log('Extracted timestamp:', timestamp);
 
-    // Use regex to extract specific data patterns
-    // RA format: HH MM SS.SS or degrees
-    const raMatch = dataLine.match(/(\d{1,3}\s+\d{2}\s+\d{2}\.\d+|\d{1,3}\.\d+)/);
-    // DEC format: +/-DD MM SS.S or degrees
-    const decMatch = dataLine.match(/([+-]\d{1,2}\s+\d{2}\s+\d{2}\.\d+|[+-]\d{1,2}\.\d+)/);
+    // Split by multiple spaces to get columns (Horizons uses column alignment)
+    const parts = dataLine.split(/\s{2,}/).filter(p => p.trim());
+    console.log('Split into parts:', parts.length, 'columns');
 
-    // Extract magnitude (usually after RA/DEC)
-    const magMatch = dataLine.match(/\s+(\d{1,2}\.\d+)\s+/);
+    // Try to extract RA and DEC from the data
+    // RA format: HH MM SS.SS or decimal degrees
+    // DEC format: +/-DD MM SS.S or decimal degrees
+    let ra = 'N/A';
+    let dec = 'N/A';
+    let magnitude = 99;
+    let earthDistance = 0;
 
-    // Extract distance from Earth (range) - QUANTITY 20
-    // Look for range value (typically in AU, appears after RA/DEC)
-    const rangeMatch = dataLine.match(/\s+(\d+\.\d+)\s+/g);
-    const rangeValues = rangeMatch ? rangeMatch.map(m => parseFloat(m.trim())) : [];
+    // Look through parts for RA/DEC patterns
+    for (let i = 0; i < parts.length; i++) {
+      const part = parts[i].trim();
 
-    // Filter for realistic Earth distance values (0.5 to 50 AU for interstellar objects)
-    const earthDistance = rangeValues.find(v => v > 0.5 && v < 50) || 0;
+      // RA pattern: HH MM SS.SS or similar
+      if (/^\d{1,3}\s+\d{2}\s+\d{2}\.\d+$/.test(part) && ra === 'N/A') {
+        ra = part;
+        console.log('Found RA:', ra);
+      }
+
+      // DEC pattern: +/-DD MM SS.S or similar
+      if (/^[+-]\d{1,2}\s+\d{2}\s+\d{2}\.\d+$/.test(part) && dec === 'N/A') {
+        dec = part;
+        console.log('Found DEC:', dec);
+      }
+
+      // Magnitude (typically 1-2 digits with decimal, value 0-30)
+      const magValue = parseFloat(part);
+      if (!isNaN(magValue) && magValue >= 0 && magValue <= 30 && magnitude === 99) {
+        magnitude = magValue;
+        console.log('Found magnitude:', magnitude);
+      }
+
+      // Distance (typically larger decimal, > 0.1 AU)
+      const distValue = parseFloat(part);
+      if (!isNaN(distValue) && distValue > 0.5 && distValue < 50 && earthDistance === 0) {
+        earthDistance = distValue;
+        console.log('Found Earth distance:', earthDistance);
+      }
+    }
 
     return {
       timestamp,
       position: {
-        ra: raMatch ? raMatch[1].replace(/\s+/g, ' ') : 'N/A',
-        dec: decMatch ? decMatch[1].replace(/\s+/g, ' ') : 'N/A',
+        ra: ra,
+        dec: dec,
         distanceFromSunAU: orbitalElements?.distanceFromSunAU || earthDistance,
         distanceFromEarthAU: earthDistance,
         distanceFromEarthKm: earthDistance * AU_TO_KM,
@@ -382,7 +406,7 @@ function parseHorizonsResult(
         inclinationDeg: orbitalElements?.inclinationDeg || 0,
       },
       visual: {
-        magnitude: magMatch ? parseFloat(magMatch[1]) : 99,
+        magnitude: magnitude,
         phaseAngleDeg: 0,
         illuminationPercent: 0,
       },
