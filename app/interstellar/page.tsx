@@ -159,14 +159,9 @@ export default function InterstellarPage() {
           </div>
 
           <div className="mt-6 text-center">
-            <button
-              className="text-purple-400 hover:text-purple-300 text-sm font-medium transition-colors"
-              onClick={() => {
-                // Future: Show detailed comparison or timeline
-              }}
-            >
-              Compare All Interstellar Visitors →
-            </button>
+            <div className="text-purple-400 text-sm font-medium">
+              Compare All Interstellar Visitors (Coming Soon)
+            </div>
           </div>
         </section>
 

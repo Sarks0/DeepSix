@@ -1,7 +1,6 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
 import { CompactStat } from '@/components/ui/StatCard';
 import { HelpTooltip } from '@/components/ui/Tooltip';
 
