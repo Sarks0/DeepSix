@@ -92,12 +92,11 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Build COMMAND using DES= format
-    // Format: DES=designation; (semicolon is required)
-    // Example: DES=C/2025 N1;
-    // URLSearchParams will handle the encoding automatically
-    let designation = objectInfo?.altName || objectParam;
-    const command = `DES=${designation};`;
+    // Build COMMAND - use simple interstellar designation
+    // For interstellar objects, Horizons accepts simple designations:
+    // "3I" for 3I/ATLAS, "2I" for 2I/Borisov, "1I" for 1I/'Oumuamua
+    // The DES= format doesn't work for these objects
+    const command = objectParam; // Just use "3I", "2I", or "1I"
 
     if (!objectInfo) {
       return NextResponse.json(
