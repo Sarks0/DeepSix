@@ -116,7 +116,8 @@ export async function GET(request: NextRequest) {
     const tomorrow = new Date(now.getTime() + 86400000);
 
     // Query 1: OBSERVER ephemeris for position and visual data
-    // Using proper DES= format and QUANTITIES parameter
+    // Using proper DES= format WITHOUT QUANTITIES (use Horizons default output)
+    // QUANTITIES parameter appears to be rejected for certain objects like new comets
     const observerParams = new URLSearchParams({
       format: 'json',
       COMMAND: command,
@@ -127,7 +128,7 @@ export async function GET(request: NextRequest) {
       START_TIME: startTime || now.toISOString().split('T')[0],
       STOP_TIME: stopTime || tomorrow.toISOString().split('T')[0],
       STEP_SIZE: stepSize,
-      QUANTITIES: '1,9,20,23,24', // RA/DEC, magnitude, range, solar range, range-rate
+      // No QUANTITIES - let Horizons provide default columns
     });
 
     // Query 2: ELEMENTS for orbital parameters
@@ -316,88 +317,95 @@ function parseOrbitalElements(resultText: string) {
 /**
  * Parse Horizons ephemeris result text
  * Extracts position, velocity, and visual data
+ * Dynamically identifies columns from header line
  */
 function parseHorizonsResult(
   resultText: string,
   orbitalElements: { eccentricity: number; perihelionDistanceAU: number; inclinationDeg: number; distanceFromSunAU: number } | null
 ): Partial<InterstellarPosition> | null {
   try {
+    console.log('=== Starting Horizons OBSERVER parsing ===');
+
     // Horizons returns data in a specific text format
     // Look for the ephemeris table ($$SOE to $$EOE markers)
     const soeIndex = resultText.indexOf('$$SOE');
     const eoeIndex = resultText.indexOf('$$EOE');
 
     if (soeIndex === -1 || eoeIndex === -1) {
+      console.error('No $$SOE or $$EOE markers found');
       return null;
+    }
+
+    // Look for column headers (usually a few lines before $$SOE)
+    const headerSection = resultText.substring(0, soeIndex);
+    const headerLines = headerSection.split('\n');
+
+    // Find the line with column names (usually contains "R.A." or "Date")
+    let columnHeaderLine = '';
+    for (let i = headerLines.length - 1; i >= Math.max(0, headerLines.length - 10); i--) {
+      const line = headerLines[i];
+      if (line.includes('R.A.') || line.includes('DEC') || line.includes('Date')) {
+        columnHeaderLine = line;
+        console.log('Found column header:', line);
+        break;
+      }
     }
 
     const ephemerisBlock = resultText.substring(soeIndex + 5, eoeIndex).trim();
     const lines = ephemerisBlock.split('\n').filter(line => line.trim());
 
     if (lines.length === 0) {
+      console.error('No data lines found between $$SOE and $$EOE');
       return null;
     }
 
+    console.log('Column headers:', columnHeaderLine);
+    console.log('Number of data lines:', lines.length);
+
     // Parse first data line (most recent position)
     const dataLine = lines[0].trim();
-    console.log('Parsing OBSERVER line:', dataLine);
-
-    // Horizons OBSERVER format with QUANTITIES 1,9,20,23,24:
-    // Date, R.A._(ICRF), DEC_(ICRF), APmag, S-brt, Illu%, delta, deldot, S-O-T, S-T-O, r, rdot
-    // Column-aligned with spaces
+    console.log('Data line:', dataLine);
 
     // Extract timestamp from the beginning of the line (format: YYYY-MMM-DD HH:MM)
-    const dateMatch = dataLine.match(/^\d{4}-\w{3}-\d{2}\s+\d{2}:\d{2}/);
-    const timestamp = dateMatch ? new Date(dateMatch[0]).toISOString() : new Date().toISOString();
-    console.log('Extracted timestamp:', timestamp);
+    const dateMatch = dataLine.match(/(\d{4}-\w{3}-\d{2}\s+\d{2}:\d{2})/);
+    const timestamp = dateMatch ? new Date(dateMatch[1]).toISOString() : new Date().toISOString();
+    console.log('Timestamp:', timestamp);
 
-    // Split by one or more spaces (simpler approach)
-    const parts = dataLine.split(/\s+/);
-    console.log('Split into parts:', parts.length, 'tokens');
+    // Extract RA: format is HH MM SS.SS (with or without spaces)
+    // Could be: "12 34 56.78" or "12:34:56.78" or "12h34m56.78s"
+    const raMatch = dataLine.match(/(\d{1,2}[\s:h]\d{2}[\s:m]\d{2}\.\d+[s]?)/);
+    const ra = raMatch ? raMatch[1].replace(/[hms:]/g, ' ').trim() : 'N/A';
+    console.log('RA:', ra);
 
-    // Try to parse the expected format
-    // Expected columns after date/time: RA (3 parts), DEC (3 parts), mag, s-brt, delta, deldot, S-O-T, S-T-O, r, rdot
-    let ra = 'N/A';
-    let dec = 'N/A';
+    // Extract DEC: format is +/-DD MM SS.S
+    const decMatch = dataLine.match(/([+-]\d{1,2}[\s:d]\d{2}[\s:m]\d{2}\.\d+[s]?)/);
+    const dec = decMatch ? decMatch[1].replace(/[dms:]/g, ' ').trim() : 'N/A';
+    console.log('DEC:', dec);
+
+    // Extract all decimal numbers from the line for distance/magnitude extraction
+    const numbers = dataLine.match(/\b\d+\.\d+\b/g)?.map(n => parseFloat(n)) || [];
+    console.log('Found numeric values:', numbers);
+
+    // Identify magnitude (typically between 0-30, often appears early)
     let magnitude = 99;
-    let earthDistance = 0;
-    let sunDistance = 0;
-
-    // Look for RA: format is HH MM SS.SS (three consecutive parts)
-    for (let i = 2; i < parts.length - 2; i++) {
-      if (/^\d{1,3}$/.test(parts[i]) && /^\d{2}$/.test(parts[i + 1]) && /^\d{2}\.\d+$/.test(parts[i + 2])) {
-        ra = `${parts[i]} ${parts[i + 1]} ${parts[i + 2]}`;
-        console.log('Found RA at index', i, ':', ra);
-
-        // DEC should follow RA: +/-DD MM SS.S
-        if (i + 3 < parts.length - 2 && /^[+-]\d{1,2}$/.test(parts[i + 3]) && /^\d{2}$/.test(parts[i + 4]) && /^\d{2}\.\d+$/.test(parts[i + 5])) {
-          dec = `${parts[i + 3]} ${parts[i + 4]} ${parts[i + 5]}`;
-          console.log('Found DEC at index', i + 3, ':', dec);
-
-          // Magnitude should be around index i+6
-          const magValue = parseFloat(parts[i + 6]);
-          if (!isNaN(magValue)) {
-            magnitude = magValue;
-            console.log('Found magnitude:', magnitude);
-          }
-
-          // Distance from Earth (delta) around i+8
-          const deltaValue = parseFloat(parts[i + 8]);
-          if (!isNaN(deltaValue) && deltaValue > 0) {
-            earthDistance = deltaValue;
-            console.log('Found Earth distance (delta):', earthDistance);
-          }
-
-          // Distance from Sun (r) around i+12
-          const rValue = parseFloat(parts[i + 12]);
-          if (!isNaN(rValue) && rValue > 0) {
-            sunDistance = rValue;
-            console.log('Found Sun distance (r):', sunDistance);
-          }
-        }
+    for (const num of numbers) {
+      if (num >= 0 && num <= 30 && num !== parseFloat(ra.split(' ')[0])) {
+        magnitude = num;
+        console.log('Identified magnitude:', magnitude);
         break;
       }
     }
+
+    // Identify distances (typically > 0.5 AU)
+    const distances = numbers.filter(n => n > 0.5 && n < 100);
+    console.log('Potential distances (AU):', distances);
+
+    // First large value is likely Earth distance, second is likely Sun distance
+    const earthDistance = distances[0] || 0;
+    const sunDistance = distances[1] || distances[0] || 0;
+
+    console.log('Earth distance:', earthDistance, 'AU');
+    console.log('Sun distance:', sunDistance, 'AU');
 
     return {
       timestamp,
