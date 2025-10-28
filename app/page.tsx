@@ -89,21 +89,18 @@ export default function Home() {
               {
                 id: 'deep-space',
                 label: 'Deep Space',
-                icon: '🌌',
                 count: missionCounts['deep-space'],
                 helpText: 'Missions exploring beyond Mars orbit',
               },
               {
                 id: 'mars-system',
                 label: 'Mars System',
-                icon: '🔴',
                 count: missionCounts['mars-system'],
                 helpText: 'Rovers and orbiters at Mars',
               },
               {
                 id: 'en-route',
                 label: 'En Route',
-                icon: '🚀',
                 count: missionCounts['en-route'],
                 helpText: 'Missions traveling to their destinations',
               },
@@ -148,7 +145,6 @@ export default function Home() {
               <CollapsibleSection
                 title="Mars Rovers"
                 description="Surface exploration missions currently active on Mars"
-                icon="🤖"
                 badge={2}
                 badgeColor="red"
                 defaultExpanded={true}
@@ -170,7 +166,6 @@ export default function Home() {
               <CollapsibleSection
                 title="Mars Orbiters"
                 description="Spacecraft orbiting Mars for communications and observation"
-                icon="🛰️"
                 badge={3}
                 badgeColor="red"
                 defaultExpanded={false}
@@ -221,15 +216,15 @@ export default function Home() {
         <h3 className="text-lg font-bold text-cyan-300 mb-3">New to Space Missions?</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm text-cyan-200/80">
           <div>
-            <p className="font-semibold mb-1">🌌 Deep Space</p>
+            <p className="font-semibold mb-1 text-cyan-400">Deep Space</p>
             <p>Missions exploring beyond Mars, including the outer planets and interstellar space.</p>
           </div>
           <div>
-            <p className="font-semibold mb-1">🔴 Mars System</p>
+            <p className="font-semibold mb-1 text-cyan-400">Mars System</p>
             <p>Rovers driving on Mars surface and orbiters studying the planet from above.</p>
           </div>
           <div>
-            <p className="font-semibold mb-1">🚀 En Route</p>
+            <p className="font-semibold mb-1 text-cyan-400">En Route</p>
             <p>Spacecraft currently traveling to asteroids, moons, and other destinations.</p>
           </div>
         </div>
