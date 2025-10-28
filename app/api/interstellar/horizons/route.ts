@@ -76,26 +76,29 @@ export async function GET(request: NextRequest) {
     const stepSize = searchParams.get('stepSize') || '1d';
 
     // Determine object designation
-    let command = objectParam;
     let objectInfo = INTERSTELLAR_OBJECTS[objectParam as keyof typeof INTERSTELLAR_OBJECTS];
 
     // If not found in known objects, try using it as a direct designation
     if (!objectInfo && objectParam.includes('/')) {
-      command = `'${objectParam}'`;
       // Infer object type from designation pattern
       if (objectParam.startsWith('C/2025')) {
         objectInfo = {
           designation: objectParam,
-          altName: '3I/ATLAS',
+          altName: 'C/2025 N1',
           type: 'Interstellar Comet',
           discoveryDate: '2025-07',
           status: 'active',
         };
       }
-    } else if (objectInfo) {
-      // Use alternate name for query (more reliable)
-      command = `'${objectInfo.altName}'`;
     }
+
+    // Build COMMAND using DES= format with proper encoding
+    // Format: DES=designation; (semicolon is required)
+    // Example: DES=C/2025 N1;
+    let designation = objectInfo?.altName || objectParam;
+    // URL encode: space=%20, semicolon=%3B
+    const encodedDesignation = designation.replace(/\s/g, '%20');
+    const command = `DES=${encodedDesignation}%3B`;
 
     if (!objectInfo) {
       return NextResponse.json(
@@ -113,24 +116,28 @@ export async function GET(request: NextRequest) {
     const tomorrow = new Date(now.getTime() + 86400000);
 
     // Query 1: OBSERVER ephemeris for position and visual data
-    // Use minimal parameters - QUANTITIES may not be supported for some objects
+    // Using proper DES= format and QUANTITIES parameter
     const observerParams = new URLSearchParams({
       format: 'json',
       COMMAND: command,
+      OBJ_DATA: 'YES',
+      MAKE_EPHEM: 'YES',
       EPHEM_TYPE: 'OBSERVER',
-      CENTER: '500@399', // Geocentric
+      CENTER: '500@399', // Geocentric (Earth)
       START_TIME: startTime || now.toISOString().split('T')[0],
       STOP_TIME: stopTime || tomorrow.toISOString().split('T')[0],
       STEP_SIZE: stepSize,
-      MAKE_EPHEM: 'YES',
+      QUANTITIES: '1,9,20,23,24', // RA/DEC, magnitude, range, solar range, range-rate
     });
 
     // Query 2: ELEMENTS for orbital parameters
     const elementsParams = new URLSearchParams({
       format: 'json',
       COMMAND: command,
+      OBJ_DATA: 'YES',
+      MAKE_EPHEM: 'YES',
       EPHEM_TYPE: 'ELEMENTS',
-      CENTER: '500@10', // Sun center
+      CENTER: '500@10', // Heliocentric (Sun center)
       START_TIME: startTime || now.toISOString().split('T')[0],
       STOP_TIME: stopTime || tomorrow.toISOString().split('T')[0],
       STEP_SIZE: stepSize,
@@ -335,55 +342,60 @@ function parseHorizonsResult(
     const dataLine = lines[0].trim();
     console.log('Parsing OBSERVER line:', dataLine);
 
-    // Horizons default OBSERVER format typically includes:
-    // Date, R.A._(ICRF), DEC_(ICRF), APmag, S-brt, delta, deldot, ...
-    // Format can vary, so we'll parse flexibly
+    // Horizons OBSERVER format with QUANTITIES 1,9,20,23,24:
+    // Date, R.A._(ICRF), DEC_(ICRF), APmag, S-brt, Illu%, delta, deldot, S-O-T, S-T-O, r, rdot
+    // Column-aligned with spaces
 
-    // Extract timestamp from the beginning of the line
+    // Extract timestamp from the beginning of the line (format: YYYY-MMM-DD HH:MM)
     const dateMatch = dataLine.match(/^\d{4}-\w{3}-\d{2}\s+\d{2}:\d{2}/);
     const timestamp = dateMatch ? new Date(dateMatch[0]).toISOString() : new Date().toISOString();
     console.log('Extracted timestamp:', timestamp);
 
-    // Split by multiple spaces to get columns (Horizons uses column alignment)
-    const parts = dataLine.split(/\s{2,}/).filter(p => p.trim());
-    console.log('Split into parts:', parts.length, 'columns');
+    // Split by one or more spaces (simpler approach)
+    const parts = dataLine.split(/\s+/);
+    console.log('Split into parts:', parts.length, 'tokens');
 
-    // Try to extract RA and DEC from the data
-    // RA format: HH MM SS.SS or decimal degrees
-    // DEC format: +/-DD MM SS.S or decimal degrees
+    // Try to parse the expected format
+    // Expected columns after date/time: RA (3 parts), DEC (3 parts), mag, s-brt, delta, deldot, S-O-T, S-T-O, r, rdot
     let ra = 'N/A';
     let dec = 'N/A';
     let magnitude = 99;
     let earthDistance = 0;
+    let sunDistance = 0;
 
-    // Look through parts for RA/DEC patterns
-    for (let i = 0; i < parts.length; i++) {
-      const part = parts[i].trim();
+    // Look for RA: format is HH MM SS.SS (three consecutive parts)
+    for (let i = 2; i < parts.length - 2; i++) {
+      if (/^\d{1,3}$/.test(parts[i]) && /^\d{2}$/.test(parts[i + 1]) && /^\d{2}\.\d+$/.test(parts[i + 2])) {
+        ra = `${parts[i]} ${parts[i + 1]} ${parts[i + 2]}`;
+        console.log('Found RA at index', i, ':', ra);
 
-      // RA pattern: HH MM SS.SS or similar
-      if (/^\d{1,3}\s+\d{2}\s+\d{2}\.\d+$/.test(part) && ra === 'N/A') {
-        ra = part;
-        console.log('Found RA:', ra);
-      }
+        // DEC should follow RA: +/-DD MM SS.S
+        if (i + 3 < parts.length - 2 && /^[+-]\d{1,2}$/.test(parts[i + 3]) && /^\d{2}$/.test(parts[i + 4]) && /^\d{2}\.\d+$/.test(parts[i + 5])) {
+          dec = `${parts[i + 3]} ${parts[i + 4]} ${parts[i + 5]}`;
+          console.log('Found DEC at index', i + 3, ':', dec);
 
-      // DEC pattern: +/-DD MM SS.S or similar
-      if (/^[+-]\d{1,2}\s+\d{2}\s+\d{2}\.\d+$/.test(part) && dec === 'N/A') {
-        dec = part;
-        console.log('Found DEC:', dec);
-      }
+          // Magnitude should be around index i+6
+          const magValue = parseFloat(parts[i + 6]);
+          if (!isNaN(magValue)) {
+            magnitude = magValue;
+            console.log('Found magnitude:', magnitude);
+          }
 
-      // Magnitude (typically 1-2 digits with decimal, value 0-30)
-      const magValue = parseFloat(part);
-      if (!isNaN(magValue) && magValue >= 0 && magValue <= 30 && magnitude === 99) {
-        magnitude = magValue;
-        console.log('Found magnitude:', magnitude);
-      }
+          // Distance from Earth (delta) around i+8
+          const deltaValue = parseFloat(parts[i + 8]);
+          if (!isNaN(deltaValue) && deltaValue > 0) {
+            earthDistance = deltaValue;
+            console.log('Found Earth distance (delta):', earthDistance);
+          }
 
-      // Distance (typically larger decimal, > 0.1 AU)
-      const distValue = parseFloat(part);
-      if (!isNaN(distValue) && distValue > 0.5 && distValue < 50 && earthDistance === 0) {
-        earthDistance = distValue;
-        console.log('Found Earth distance:', earthDistance);
+          // Distance from Sun (r) around i+12
+          const rValue = parseFloat(parts[i + 12]);
+          if (!isNaN(rValue) && rValue > 0) {
+            sunDistance = rValue;
+            console.log('Found Sun distance (r):', sunDistance);
+          }
+        }
+        break;
       }
     }
 
@@ -392,7 +404,7 @@ function parseHorizonsResult(
       position: {
         ra: ra,
         dec: dec,
-        distanceFromSunAU: orbitalElements?.distanceFromSunAU || earthDistance,
+        distanceFromSunAU: sunDistance || orbitalElements?.distanceFromSunAU || 0,
         distanceFromEarthAU: earthDistance,
         distanceFromEarthKm: earthDistance * AU_TO_KM,
       },
