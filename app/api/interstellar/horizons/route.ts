@@ -5,25 +5,25 @@ export const runtime = 'edge';
 const HORIZONS_API_BASE = 'https://ssd.jpl.nasa.gov/api/horizons.api';
 const AU_TO_KM = 149597870.7;
 
-// Known interstellar objects with their designations
+// Known interstellar objects with their Horizons-compatible designations
 const INTERSTELLAR_OBJECTS = {
   '3I': {
     designation: '3I/ATLAS',
-    altName: 'C/2025 N1',
+    horizonsCommand: 'C/2025 N1 (ATLAS)', // Exact format from Horizons web interface
     type: 'Interstellar Comet',
     discoveryDate: '2025-07',
     status: 'active', // Currently observable
   },
   '2I': {
     designation: '2I/Borisov',
-    altName: 'C/2019 Q4',
+    horizonsCommand: 'C/2019 Q4 (Borisov)', // Standard Horizons format
     type: 'Interstellar Comet',
     discoveryDate: '2019-08',
     status: 'historical', // Passed through, no longer observable
   },
   '1I': {
     designation: '1I/\'Oumuamua',
-    altName: 'A/2017 U1',
+    horizonsCommand: 'A/2017 U1', // Asteroid designation
     type: 'Interstellar Object',
     discoveryDate: '2017-10',
     status: 'historical',
@@ -76,27 +76,7 @@ export async function GET(request: NextRequest) {
     const stepSize = searchParams.get('stepSize') || '1d';
 
     // Determine object designation
-    let objectInfo = INTERSTELLAR_OBJECTS[objectParam as keyof typeof INTERSTELLAR_OBJECTS];
-
-    // If not found in known objects, try using it as a direct designation
-    if (!objectInfo && objectParam.includes('/')) {
-      // Infer object type from designation pattern
-      if (objectParam.startsWith('C/2025')) {
-        objectInfo = {
-          designation: objectParam,
-          altName: 'C/2025 N1',
-          type: 'Interstellar Comet',
-          discoveryDate: '2025-07',
-          status: 'active',
-        };
-      }
-    }
-
-    // Build COMMAND - use simple interstellar designation
-    // For interstellar objects, Horizons accepts simple designations:
-    // "3I" for 3I/ATLAS, "2I" for 2I/Borisov, "1I" for 1I/'Oumuamua
-    // The DES= format doesn't work for these objects
-    const command = objectParam; // Just use "3I", "2I", or "1I"
+    const objectInfo = INTERSTELLAR_OBJECTS[objectParam as keyof typeof INTERSTELLAR_OBJECTS];
 
     if (!objectInfo) {
       return NextResponse.json(
@@ -108,6 +88,11 @@ export async function GET(request: NextRequest) {
         { status: 404 }
       );
     }
+
+    // Build COMMAND using exact Horizons format
+    // Format verified from JPL Horizons web interface
+    // Example: "C/2025 N1 (ATLAS)" for 3I/ATLAS
+    const command = objectInfo.horizonsCommand;
 
     // Build Horizons API queries
     const now = new Date();
@@ -204,7 +189,7 @@ export async function GET(request: NextRequest) {
       success: true,
       object: {
         designation: objectInfo.designation,
-        alternateName: objectInfo.altName,
+        alternateName: objectInfo.horizonsCommand,
         type: objectInfo.type,
         discoveryDate: objectInfo.discoveryDate,
         status: objectInfo.status,
