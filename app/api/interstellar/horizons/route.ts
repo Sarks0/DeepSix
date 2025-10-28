@@ -92,13 +92,12 @@ export async function GET(request: NextRequest) {
       }
     }
 
-    // Build COMMAND using DES= format with proper encoding
+    // Build COMMAND using DES= format
     // Format: DES=designation; (semicolon is required)
     // Example: DES=C/2025 N1;
+    // URLSearchParams will handle the encoding automatically
     let designation = objectInfo?.altName || objectParam;
-    // URL encode: space=%20, semicolon=%3B
-    const encodedDesignation = designation.replace(/\s/g, '%20');
-    const command = `DES=${encodedDesignation}%3B`;
+    const command = `DES=${designation};`;
 
     if (!objectInfo) {
       return NextResponse.json(
