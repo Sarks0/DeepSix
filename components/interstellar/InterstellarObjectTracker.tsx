@@ -9,8 +9,16 @@ interface InterstellarObject {
   alternateName: string;
   type: string;
   discoveryDate: string;
+  discoveryLocation: string;
   status: 'active' | 'historical';
   interstellarOrigin: boolean;
+  perihelionDate: string;
+  perihelionDistanceAU: number;
+  closestEarthApproach: string;
+  closestEarthDistanceAU: number;
+  estimatedDiameterKm: string;
+  eccentricity: number;
+  characteristics: string;
 }
 
 interface Position {
@@ -154,15 +162,51 @@ export function InterstellarObjectTracker({
           </div>
         </div>
 
-        <div className="flex items-center gap-4 text-sm text-gray-400">
-          <span>{object.type}</span>
-          <span>•</span>
-          <span>Discovered: {object.discoveryDate}</span>
-          <span>•</span>
-          <span className="flex items-center gap-1">
-            {dataSource}
-            <HelpTooltip content="Real-time data from NASA's Jet Propulsion Laboratory" />
-          </span>
+        <div className="flex flex-col gap-2 text-sm text-gray-400">
+          <div className="flex items-center gap-4">
+            <span>{object.type}</span>
+            <span>•</span>
+            <span>Discovered: {new Date(object.discoveryDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span>Discovery Site: {object.discoveryLocation}</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span className="flex items-center gap-1">
+              Data: {dataSource}
+              <HelpTooltip content="Real-time data from NASA's Jet Propulsion Laboratory" />
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Discovery & Physical Characteristics */}
+      <div className="mb-6 p-4 bg-gray-800/30 rounded-lg border border-gray-700/50">
+        <h3 className="text-lg font-bold text-white mb-3">Object Characteristics</h3>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-400 mb-1">Estimated Diameter</p>
+            <p className="text-white font-semibold">{object.estimatedDiameterKm} km</p>
+          </div>
+          <div>
+            <p className="text-gray-400 mb-1">Orbital Eccentricity</p>
+            <p className="text-white font-semibold">{object.eccentricity.toFixed(2)} (hyperbolic)</p>
+          </div>
+          <div>
+            <p className="text-gray-400 mb-1">Perihelion Date</p>
+            <p className="text-white font-semibold">{new Date(object.perihelionDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          </div>
+          <div>
+            <p className="text-gray-400 mb-1">Closest Earth Approach</p>
+            <p className="text-white font-semibold">
+              {new Date(object.closestEarthApproach).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {' '}({object.closestEarthDistanceAU.toFixed(2)} AU)
+            </p>
+          </div>
+        </div>
+        <div className="mt-3 pt-3 border-t border-gray-700/50">
+          <p className="text-gray-400 text-xs mb-1">Notable Characteristics</p>
+          <p className="text-purple-200 text-sm">{object.characteristics}</p>
         </div>
       </div>
 
@@ -215,35 +259,35 @@ export function InterstellarObjectTracker({
       )}
 
       {/* Orbital Characteristics */}
-      {ephemeris && ephemeris.orbital && (
-        <div className="mb-6">
-          <h3 className="text-xl font-bold text-white mb-4">Orbital Characteristics</h3>
-          <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
-            <div className="space-y-2">
-              <CompactStat
-                label="Eccentricity"
-                value={ephemeris.orbital.eccentricity.toFixed(2) || 'Calculating...'}
-                helpText="e > 1.0 indicates hyperbolic (interstellar) trajectory"
-              />
-              {ephemeris.orbital.eccentricity > 1 && (
-                <div className="text-sm text-yellow-300 bg-yellow-900/20 border border-yellow-800/30 rounded px-3 py-2">
-                  Hyperbolic orbit - this object will leave the Solar System
-                </div>
-              )}
-              <CompactStat
-                label="Perihelion Distance"
-                value={`${ephemeris.orbital.perihelionDistanceAU.toFixed(2)} AU` || 'Calculating...'}
-                helpText="Closest distance to the Sun"
-              />
+      <div className="mb-6">
+        <h3 className="text-xl font-bold text-white mb-4">Orbital Characteristics</h3>
+        <div className="bg-gray-800/30 rounded-lg p-4 border border-gray-700/50">
+          <div className="space-y-2">
+            <CompactStat
+              label="Eccentricity"
+              value={object.eccentricity.toFixed(2)}
+              helpText="e > 1.0 indicates hyperbolic (interstellar) trajectory"
+            />
+            {object.eccentricity > 1 && (
+              <div className="text-sm text-yellow-300 bg-yellow-900/20 border border-yellow-800/30 rounded px-3 py-2">
+                Hyperbolic orbit - this object will leave the Solar System forever
+              </div>
+            )}
+            <CompactStat
+              label="Perihelion Distance"
+              value={`${object.perihelionDistanceAU.toFixed(2)} AU`}
+              helpText="Closest distance to the Sun"
+            />
+            {ephemeris?.orbital?.inclinationDeg > 0 && (
               <CompactStat
                 label="Inclination"
-                value={`${ephemeris.orbital.inclinationDeg.toFixed(1)}°` || 'Calculating...'}
+                value={`${ephemeris.orbital.inclinationDeg.toFixed(1)}°`}
                 helpText="Tilt of orbit relative to ecliptic plane"
               />
-            </div>
+            )}
           </div>
         </div>
-      )}
+      </div>
 
       {/* Visual Observation Data */}
       {ephemeris && ephemeris.visual && ephemeris.visual.magnitude < 50 && (
@@ -266,15 +310,41 @@ export function InterstellarObjectTracker({
 
       {/* Interstellar Context */}
       <div className="mt-6 p-4 bg-purple-900/20 border border-purple-800/30 rounded-lg">
-        <h4 className="text-sm font-bold text-purple-300 mb-2">What Makes This Special?</h4>
-        <p className="text-sm text-purple-200/80">
+        <h4 className="text-sm font-bold text-purple-300 mb-2">Why This Is Extraordinary</h4>
+        <p className="text-sm text-purple-200/80 mb-3">
           {object.designation} is one of only{' '}
           {objectId === '3I' ? 'three' : objectId === '2I' ? 'two' : 'one'} confirmed interstellar
           {object.type.includes('Comet') ? ' comet' : ' object'}
-          {objectId === '3I' ? 's' : ''} ever detected. It originated from beyond our Solar System
-          and is passing through on a hyperbolic trajectory, meaning it will never return. This is a
-          once-in-a-lifetime opportunity to study material from another star system.
+          {objectId === '3I' ? 's' : ''} ever detected passing through our Solar System.
         </p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+          <div className="bg-purple-900/30 rounded p-2">
+            <p className="text-purple-300 font-semibold mb-1">Hyperbolic Trajectory</p>
+            <p className="text-purple-200/70">
+              Eccentricity of {object.eccentricity.toFixed(2)} means it's traveling faster than escape velocity
+              and will leave the Solar System forever.
+            </p>
+          </div>
+          <div className="bg-purple-900/30 rounded p-2">
+            <p className="text-purple-300 font-semibold mb-1">Interstellar Origin</p>
+            <p className="text-purple-200/70">
+              Came from another star system, providing a rare chance to study material from beyond our Solar System.
+            </p>
+          </div>
+          <div className="bg-purple-900/30 rounded p-2">
+            <p className="text-purple-300 font-semibold mb-1">Brief Encounter</p>
+            <p className="text-purple-200/70">
+              Perihelion at {object.perihelionDistanceAU.toFixed(2)} AU on {new Date(object.perihelionDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}.
+              One-time observation opportunity.
+            </p>
+          </div>
+          <div className="bg-purple-900/30 rounded p-2">
+            <p className="text-purple-300 font-semibold mb-1">Scientific Value</p>
+            <p className="text-purple-200/70">
+              {object.characteristics}
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Data timestamp */}

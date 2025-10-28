@@ -11,24 +11,48 @@ const AU_TO_KM = 149597870.7;
 const INTERSTELLAR_OBJECTS = {
   '3I': {
     designation: '3I/ATLAS',
-    horizonsCommand: 'C/2025 N1', // Without parentheses for API
+    horizonsCommand: 'C/2025 N1',
     type: 'Interstellar Comet',
-    discoveryDate: '2025-07',
-    status: 'active', // Currently observable
+    discoveryDate: '2025-07-01',
+    discoveryLocation: 'ATLAS-HKO (Río Hurtado, Chile)',
+    status: 'active',
+    perihelionDate: '2025-10-29',
+    perihelionDistanceAU: 1.36,
+    closestEarthApproach: '2025-12-19',
+    closestEarthDistanceAU: 1.80,
+    estimatedDiameterKm: '0.44 - 5.6',
+    eccentricity: 6.0,
+    characteristics: 'Very red color, similar to Trans-Neptunian Objects',
   },
   '2I': {
     designation: '2I/Borisov',
-    horizonsCommand: 'C/2019 Q4', // Without parentheses for API
+    horizonsCommand: 'C/2019 Q4',
     type: 'Interstellar Comet',
-    discoveryDate: '2019-08',
-    status: 'historical', // Passed through, no longer observable
+    discoveryDate: '2019-08-30',
+    discoveryLocation: 'MARGO Observatory, Crimea',
+    status: 'historical',
+    perihelionDate: '2019-12-08',
+    perihelionDistanceAU: 2.0,
+    closestEarthApproach: '2019-12-28',
+    closestEarthDistanceAU: 1.9,
+    estimatedDiameterKm: '0.4 - 7',
+    eccentricity: 3.36,
+    characteristics: 'Similar composition to Solar System comets, active coma',
   },
   '1I': {
     designation: '1I/\'Oumuamua',
-    horizonsCommand: 'A/2017 U1', // Asteroid designation (no parentheses)
+    horizonsCommand: 'A/2017 U1',
     type: 'Interstellar Object',
-    discoveryDate: '2017-10',
+    discoveryDate: '2017-10-19',
+    discoveryLocation: 'Pan-STARRS telescope, Hawaii',
     status: 'historical',
+    perihelionDate: '2017-09-09',
+    perihelionDistanceAU: 0.25,
+    closestEarthApproach: '2017-10-14',
+    closestEarthDistanceAU: 0.16,
+    estimatedDiameterKm: '0.1 - 0.4',
+    eccentricity: 1.20,
+    characteristics: 'Elongated cigar/pancake shape, non-gravitational acceleration',
   },
 };
 
@@ -194,8 +218,16 @@ export async function GET(request: NextRequest) {
         alternateName: objectInfo.horizonsCommand,
         type: objectInfo.type,
         discoveryDate: objectInfo.discoveryDate,
+        discoveryLocation: objectInfo.discoveryLocation,
         status: objectInfo.status,
         interstellarOrigin: true,
+        perihelionDate: objectInfo.perihelionDate,
+        perihelionDistanceAU: objectInfo.perihelionDistanceAU,
+        closestEarthApproach: objectInfo.closestEarthApproach,
+        closestEarthDistanceAU: objectInfo.closestEarthDistanceAU,
+        estimatedDiameterKm: objectInfo.estimatedDiameterKm,
+        eccentricity: objectInfo.eccentricity,
+        characteristics: objectInfo.characteristics,
       },
       ephemeris: ephemeris || {},
       rawData: observerData.result, // Include for debugging
