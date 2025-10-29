@@ -21,6 +21,68 @@ interface InterstellarObject {
   eccentricity: number;
   characteristics: string;
   lastUpdated: string;
+  narrative?: {
+    overview: string;
+    journey: {
+      origin: string;
+      discovery: string;
+      perihelion: string;
+      currentStatus?: string;
+      earthApproach: string;
+      future?: string;
+      departure?: string;
+      legacy?: string;
+      currentLocation?: string;
+    };
+    observability?: {
+      currentConstellation: string;
+      visibility: string;
+      apparentMagnitude: number;
+      magnitudeNote: string;
+      bestViewing: {
+        period: string;
+        reason: string;
+      };
+      equipment: {
+        minimum: string;
+        recommended: string;
+        photography: string;
+      };
+      appearance: string;
+      challengeLevel: string;
+      viewingTips: string;
+    };
+    significance: {
+      rarity: string;
+      scientificValue: string;
+      composition?: string;
+      comparison: string;
+      uniqueTrajectory?: string;
+      uniqueShape?: string;
+      mysteriousAcceleration?: string;
+      noComaDetected?: string;
+      scientificDebate?: string;
+      cometActivity?: string;
+    };
+    research: {
+      activeObservations?: string;
+      observations?: string;
+      spectroscopy?: string;
+      dynamics?: string;
+      spaceWeathering?: string;
+      futureStudies?: string;
+      composition?: string;
+      nucleus?: string;
+      dust?: string;
+      scientificImpact?: string;
+      colorAndReflectivity?: string;
+      rotationAndTumbling?: string;
+      controversialTheories?: string;
+      lessonsLearned?: string;
+    };
+    oneTimeOpportunity?: string;
+    historicalSignificance?: string;
+  };
 }
 
 interface Position {
@@ -338,44 +400,374 @@ export function InterstellarObjectTracker({
         </div>
       )}
 
-      {/* Interstellar Context */}
-      <div className="mt-6 p-6 bg-purple-900/20 border border-purple-800/30 rounded-lg">
-        <h4 className="text-xl font-bold text-purple-300 mb-3">Why This Is Extraordinary</h4>
-        <p className="text-base text-purple-200/90 mb-4">
-          {object.designation} is one of only{' '}
-          {objectId === '3I' ? 'three' : objectId === '2I' ? 'two' : 'one'} confirmed interstellar
-          {object.type.includes('Comet') ? ' comet' : ' object'}
-          {objectId === '3I' ? 's' : ''} ever detected passing through our Solar System.
-        </p>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-purple-900/30 rounded p-4">
-            <p className="text-base text-purple-300 font-semibold mb-2">Hyperbolic Trajectory</p>
-            <p className="text-base text-purple-200/80">
-              Eccentricity of {object.eccentricity.toFixed(2)} means it&apos;s traveling faster than escape velocity
-              and will leave the Solar System forever.
-            </p>
-          </div>
-          <div className="bg-purple-900/30 rounded p-4">
-            <p className="text-base text-purple-300 font-semibold mb-2">Interstellar Origin</p>
-            <p className="text-base text-purple-200/80">
-              Came from another star system, providing a rare chance to study material from beyond our Solar System.
-            </p>
-          </div>
-          <div className="bg-purple-900/30 rounded p-4">
-            <p className="text-base text-purple-300 font-semibold mb-2">Brief Encounter</p>
-            <p className="text-base text-purple-200/80">
-              Perihelion at {object.perihelionDistanceAU.toFixed(2)} AU on {formatLocalDate(object.perihelionDate)}.
-              One-time observation opportunity.
-            </p>
-          </div>
-          <div className="bg-purple-900/30 rounded p-4">
-            <p className="text-base text-purple-300 font-semibold mb-2">Scientific Value</p>
-            <p className="text-base text-purple-200/80">
-              {object.characteristics}
-            </p>
+      {/* Overview Section */}
+      {object.narrative?.overview && (
+        <div className="mb-6 p-6 bg-blue-900/10 border border-blue-800/30 rounded-lg">
+          <h3 className="text-xl font-bold text-blue-300 mb-3">Overview</h3>
+          <p className="text-base text-gray-200 leading-relaxed">{object.narrative.overview}</p>
+        </div>
+      )}
+
+      {/* Journey Timeline */}
+      {object.narrative?.journey && (
+        <div className="mb-6 p-6 bg-gray-800/30 border border-gray-700/50 rounded-lg">
+          <h3 className="text-xl font-bold text-white mb-4">Journey Through the Solar System</h3>
+
+          <div className="space-y-4">
+            <div className="border-l-4 border-purple-500 pl-4 py-2">
+              <h4 className="text-base font-semibold text-purple-300 mb-1">Origin</h4>
+              <p className="text-base text-gray-300">{object.narrative.journey.origin}</p>
+            </div>
+
+            <div className="border-l-4 border-cyan-500 pl-4 py-2">
+              <h4 className="text-base font-semibold text-cyan-300 mb-1">Discovery</h4>
+              <p className="text-base text-gray-300">{object.narrative.journey.discovery}</p>
+            </div>
+
+            <div className="border-l-4 border-yellow-500 pl-4 py-2">
+              <h4 className="text-base font-semibold text-yellow-300 mb-1">Perihelion</h4>
+              <p className="text-base text-gray-300">{object.narrative.journey.perihelion}</p>
+            </div>
+
+            {object.narrative.journey.currentStatus && (
+              <div className="border-l-4 border-green-500 pl-4 py-2">
+                <h4 className="text-base font-semibold text-green-300 mb-1">Current Status</h4>
+                <p className="text-base text-gray-300">{object.narrative.journey.currentStatus}</p>
+              </div>
+            )}
+
+            <div className="border-l-4 border-blue-500 pl-4 py-2">
+              <h4 className="text-base font-semibold text-blue-300 mb-1">Earth Approach</h4>
+              <p className="text-base text-gray-300">{object.narrative.journey.earthApproach}</p>
+            </div>
+
+            {object.narrative.journey.future && (
+              <div className="border-l-4 border-red-500 pl-4 py-2">
+                <h4 className="text-base font-semibold text-red-300 mb-1">Future</h4>
+                <p className="text-base text-gray-300">{object.narrative.journey.future}</p>
+              </div>
+            )}
+
+            {object.narrative.journey.departure && (
+              <div className="border-l-4 border-gray-500 pl-4 py-2">
+                <h4 className="text-base font-semibold text-gray-300 mb-1">Departure</h4>
+                <p className="text-base text-gray-300">{object.narrative.journey.departure}</p>
+              </div>
+            )}
+
+            {object.narrative.journey.legacy && (
+              <div className="border-l-4 border-purple-500 pl-4 py-2">
+                <h4 className="text-base font-semibold text-purple-300 mb-1">Legacy</h4>
+                <p className="text-base text-gray-300">{object.narrative.journey.legacy}</p>
+              </div>
+            )}
+
+            {object.narrative.journey.currentLocation && (
+              <div className="border-l-4 border-indigo-500 pl-4 py-2">
+                <h4 className="text-base font-semibold text-indigo-300 mb-1">Current Location</h4>
+                <p className="text-base text-gray-300">{object.narrative.journey.currentLocation}</p>
+              </div>
+            )}
           </div>
         </div>
-      </div>
+      )}
+
+      {/* Observability & Viewing Guide (only for active objects) */}
+      {object.status === 'active' && object.narrative?.observability && (
+        <div className="mb-6 p-6 bg-gradient-to-br from-green-900/20 to-blue-900/20 border border-green-800/30 rounded-lg">
+          <h3 className="text-xl font-bold text-green-300 mb-4">🔭 Observability & Viewing Guide</h3>
+
+          <div className="space-y-4">
+            {/* Current Status */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h4 className="text-base font-semibold text-green-400 mb-2">Current Visibility</h4>
+              <p className="text-base text-gray-200 mb-2">{object.narrative.observability.visibility}</p>
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-400">Constellation:</span>
+                  <span className="text-white ml-2 font-semibold">{object.narrative.observability.currentConstellation}</span>
+                </div>
+                <div>
+                  <span className="text-gray-400">Apparent Magnitude:</span>
+                  <span className="text-white ml-2 font-semibold">{object.narrative.observability.apparentMagnitude}</span>
+                </div>
+              </div>
+              <p className="text-xs text-gray-400 mt-2 italic">{object.narrative.observability.magnitudeNote}</p>
+            </div>
+
+            {/* Best Viewing Period */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h4 className="text-base font-semibold text-blue-400 mb-2">Best Viewing Period</h4>
+              <p className="text-lg font-bold text-blue-300 mb-1">{object.narrative.observability.bestViewing.period}</p>
+              <p className="text-base text-gray-300">{object.narrative.observability.bestViewing.reason}</p>
+            </div>
+
+            {/* Equipment Requirements */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h4 className="text-base font-semibold text-cyan-400 mb-3">Equipment Required</h4>
+              <div className="space-y-2 text-base">
+                <div>
+                  <span className="text-gray-400">Minimum:</span>
+                  <p className="text-gray-200 ml-4">{object.narrative.observability.equipment.minimum}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Recommended:</span>
+                  <p className="text-gray-200 ml-4">{object.narrative.observability.equipment.recommended}</p>
+                </div>
+                <div>
+                  <span className="text-gray-400">Photography:</span>
+                  <p className="text-gray-200 ml-4">{object.narrative.observability.equipment.photography}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* What You'll See */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h4 className="text-base font-semibold text-purple-400 mb-2">What You'll See</h4>
+              <p className="text-base text-gray-200 mb-3">{object.narrative.observability.appearance}</p>
+              <div className="flex items-start gap-2 p-3 bg-yellow-900/20 border border-yellow-800/30 rounded">
+                <span className="text-yellow-400 text-lg">⚠️</span>
+                <div>
+                  <p className="text-sm font-semibold text-yellow-300">Challenge Level</p>
+                  <p className="text-sm text-yellow-200">{object.narrative.observability.challengeLevel}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Viewing Tips */}
+            <div className="bg-gray-800/50 rounded-lg p-4">
+              <h4 className="text-base font-semibold text-indigo-400 mb-2">💡 Viewing Tips</h4>
+              <p className="text-base text-gray-200">{object.narrative.observability.viewingTips}</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* One-Time Opportunity Banner (for active objects) */}
+      {object.status === 'active' && object.narrative?.oneTimeOpportunity && (
+        <div className="mb-6 p-6 bg-gradient-to-r from-red-900/30 via-orange-900/30 to-yellow-900/30 border-2 border-orange-500/50 rounded-lg">
+          <h3 className="text-xl font-bold text-orange-300 mb-3 flex items-center gap-2">
+            <span className="text-2xl">⚡</span>
+            Once-in-a-Lifetime Opportunity
+          </h3>
+          <p className="text-base text-gray-200 leading-relaxed">{object.narrative.oneTimeOpportunity}</p>
+        </div>
+      )}
+
+      {/* Scientific Significance */}
+      {object.narrative?.significance && (
+        <div className="mt-6 p-6 bg-purple-900/20 border border-purple-800/30 rounded-lg">
+          <h4 className="text-xl font-bold text-purple-300 mb-4">🌟 Why This Is Extraordinary</h4>
+
+          <div className="space-y-4">
+            {/* Rarity */}
+            <div className="bg-purple-900/30 rounded-lg p-4">
+              <h5 className="text-base font-semibold text-purple-300 mb-2">Unprecedented Rarity</h5>
+              <p className="text-base text-purple-200/90">{object.narrative.significance.rarity}</p>
+            </div>
+
+            {/* Scientific Value */}
+            <div className="bg-purple-900/30 rounded-lg p-4">
+              <h5 className="text-base font-semibold text-purple-300 mb-2">Scientific Value</h5>
+              <p className="text-base text-purple-200/90">{object.narrative.significance.scientificValue}</p>
+            </div>
+
+            {/* Composition */}
+            {object.narrative.significance.composition && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Composition</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.composition}</p>
+              </div>
+            )}
+
+            {/* Comparison */}
+            <div className="bg-purple-900/30 rounded-lg p-4">
+              <h5 className="text-base font-semibold text-purple-300 mb-2">Comparison with Other Objects</h5>
+              <p className="text-base text-purple-200/90">{object.narrative.significance.comparison}</p>
+            </div>
+
+            {/* Unique Shape (for Oumuamua) */}
+            {object.narrative.significance.uniqueShape && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Unusual Shape</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.uniqueShape}</p>
+              </div>
+            )}
+
+            {/* Mysterious Acceleration (for Oumuamua) */}
+            {object.narrative.significance.mysteriousAcceleration && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Mysterious Acceleration</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.mysteriousAcceleration}</p>
+              </div>
+            )}
+
+            {/* No Coma Detected (for Oumuamua) */}
+            {object.narrative.significance.noComaDetected && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">No Cometary Activity</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.noComaDetected}</p>
+              </div>
+            )}
+
+            {/* Scientific Debate (for Oumuamua) */}
+            {object.narrative.significance.scientificDebate && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Ongoing Scientific Debate</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.scientificDebate}</p>
+              </div>
+            )}
+
+            {/* Comet Activity (for Borisov) */}
+            {object.narrative.significance.cometActivity && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Cometary Activity</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.cometActivity}</p>
+              </div>
+            )}
+
+            {/* Unique Trajectory */}
+            {object.narrative.significance.uniqueTrajectory && (
+              <div className="bg-purple-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-purple-300 mb-2">Hyperbolic Trajectory</h5>
+                <p className="text-base text-purple-200/90">{object.narrative.significance.uniqueTrajectory}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Scientific Research */}
+      {object.narrative?.research && (
+        <div className="mt-6 p-6 bg-blue-900/20 border border-blue-800/30 rounded-lg">
+          <h4 className="text-xl font-bold text-blue-300 mb-4">🔬 Scientific Research</h4>
+
+          <div className="space-y-4">
+            {/* Active Observations (for current objects) */}
+            {object.narrative.research.activeObservations && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Active Observations</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.activeObservations}</p>
+              </div>
+            )}
+
+            {/* Historical Observations (for past objects) */}
+            {object.narrative.research.observations && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Observational Campaign</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.observations}</p>
+              </div>
+            )}
+
+            {/* Spectroscopy */}
+            {object.narrative.research.spectroscopy && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Spectroscopic Analysis</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.spectroscopy}</p>
+              </div>
+            )}
+
+            {/* Composition */}
+            {object.narrative.research.composition && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Compositional Analysis</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.composition}</p>
+              </div>
+            )}
+
+            {/* Dynamics */}
+            {object.narrative.research.dynamics && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Orbital Dynamics</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.dynamics}</p>
+              </div>
+            )}
+
+            {/* Space Weathering */}
+            {object.narrative.research.spaceWeathering && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Space Weathering</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.spaceWeathering}</p>
+              </div>
+            )}
+
+            {/* Nucleus */}
+            {object.narrative.research.nucleus && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Nucleus Properties</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.nucleus}</p>
+              </div>
+            )}
+
+            {/* Dust */}
+            {object.narrative.research.dust && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Dust Analysis</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.dust}</p>
+              </div>
+            )}
+
+            {/* Color and Reflectivity */}
+            {object.narrative.research.colorAndReflectivity && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Color & Reflectivity</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.colorAndReflectivity}</p>
+              </div>
+            )}
+
+            {/* Rotation and Tumbling */}
+            {object.narrative.research.rotationAndTumbling && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Rotation & Tumbling</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.rotationAndTumbling}</p>
+              </div>
+            )}
+
+            {/* Controversial Theories */}
+            {object.narrative.research.controversialTheories && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Controversial Theories</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.controversialTheories}</p>
+              </div>
+            )}
+
+            {/* Lessons Learned */}
+            {object.narrative.research.lessonsLearned && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Lessons Learned</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.lessonsLearned}</p>
+              </div>
+            )}
+
+            {/* Scientific Impact */}
+            {object.narrative.research.scientificImpact && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Scientific Impact</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.scientificImpact}</p>
+              </div>
+            )}
+
+            {/* Future Studies */}
+            {object.narrative.research.futureStudies && (
+              <div className="bg-blue-900/30 rounded-lg p-4">
+                <h5 className="text-base font-semibold text-blue-300 mb-2">Future Studies</h5>
+                <p className="text-base text-blue-200/90">{object.narrative.research.futureStudies}</p>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Historical Significance (for past objects) */}
+      {object.status === 'historical' && object.narrative?.historicalSignificance && (
+        <div className="mt-6 p-6 bg-gradient-to-br from-amber-900/20 to-orange-900/20 border border-amber-800/30 rounded-lg">
+          <h4 className="text-xl font-bold text-amber-300 mb-3 flex items-center gap-2">
+            <span className="text-2xl">📜</span>
+            Historical Significance
+          </h4>
+          <p className="text-base text-gray-200 leading-relaxed">{object.narrative.historicalSignificance}</p>
+        </div>
+      )}
 
       {/* Data timestamp */}
       <div className="mt-4 text-xs text-gray-500 text-center space-y-1">
