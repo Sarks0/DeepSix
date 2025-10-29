@@ -523,7 +523,7 @@ export function InterstellarObjectTracker({
 
             {/* What You'll See */}
             <div className="bg-gray-800/50 rounded-lg p-4">
-              <h4 className="text-base font-semibold text-purple-400 mb-2">What You'll See</h4>
+              <h4 className="text-base font-semibold text-purple-400 mb-2">What You&apos;ll See</h4>
               <p className="text-base text-gray-200 mb-3">{object.narrative.observability.appearance}</p>
               <div className="flex items-start gap-2 p-3 bg-yellow-900/20 border border-yellow-800/30 rounded">
                 <span className="text-yellow-400 text-lg">⚠️</span>
